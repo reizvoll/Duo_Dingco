@@ -1,0 +1,31 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 전역 CSS 변수 설정 */
+:root {
+  --foreground-rgb: 255, 255, 255; /* 기본 텍스트 색상 - 흰색 (#fff) */
+  --background-rgb: 19, 19, 45;    /* 배경 색상 - 어두운 남색 (#13132D) */
+  --font-family: 'Pretendard Variable', sans-serif; /* 폰트 설정 */
+}
+
+/* 다크 모드에 상관없이 동일한 색상 사용 */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --foreground-rgb: 255, 255, 255; /* 다크 모드에서도 텍스트는 흰색 */
+    --background-rgb: 19, 19, 45;    /* 다크 모드 배경도 동일하게 설정 */
+  }
+}
+
+/* 전체 body 스타일 */
+body {
+  color: rgb(var(--foreground-rgb));              /* 텍스트 색상 적용 */
+  background-color: rgb(var(--background-rgb));   /* 배경색 적용 */
+  font-family: var(--font-family);                /* 폰트 적용 */
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
