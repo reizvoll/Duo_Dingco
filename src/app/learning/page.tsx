@@ -90,7 +90,7 @@ export default function LearnListPage() {
     )
   }
 
-  const handleGoToDetails = (id: number) => {
+  const handleGoToDetails = (id: string) => {
     router.push(`/learning/${id}`)
   }
 
