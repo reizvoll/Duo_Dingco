@@ -128,7 +128,7 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
 
   // justify-content: center;
   return (
-    <div className="min-h-screen bg-[#0A092D] text-white p-6 flex flex-col items-center justify-center">
+    <div className="min-h-screen bg-[#0A092D] text-white p-6 flex flex-col justify-center items-center">
       <div className="w-full max-w-3xl">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-bold">{posts.title}</h1>
@@ -160,7 +160,7 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
         <p className="text-gray-400">
           {posts.description || '설명이 들어갈 곳입니다.'}
         </p>
-        <div className="flex flex-row justify-between items-center">
+        <div className="flex items-center justify-between mt-4">
           <p className="flex items-center p-3">
             <Image
               src={user.img_url || '/default-profile.png'}
@@ -220,7 +220,7 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
         </div>
       </div>
 
-      <div className="w-full max-w-3xl mt-6 flex items-center justify-between">
+      <div className="w-full max-w-3xl mt-6 flex items-center justify-center">
         <button
           className={`p-2 transform transition duration-300 ${
             currentIndex === 0
@@ -231,7 +231,7 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
         >
           <Image src="/left.png" alt="Previous" width={25} height={25} />
         </button>
-        <p>
+        <p className="p-10">
           {currentIndex + 1}/{totalCards}
         </p>
         <button

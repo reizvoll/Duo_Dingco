@@ -110,65 +110,80 @@ export default function LearnListPage() {
 
   return (
     <div className="min-h-screen bg-[#0A092D] text-white p-6">
-      <h1 className="text-2xl font-bold mb-4">퀴즈 목록</h1>
-      <div className="grid grid-cols-4 gap-4">
-        {posts.map((post) => {
-          const userInfo = getUserInfo(post.user_id)
+      {/* 학습 페이지 문구 */}
+      <div className="absolute top-6 left-6">
+        <h1 className="text-2xl font-bold">학습 페이지</h1>
+      </div>
 
-          return (
-            <div
-              key={post.id}
-              className="w-60 h-50 bg-[#2E3856] text-white rounded-lg"
-            >
-              <div className="w-full flex flex-col p-3">
-                <h2 className="text-base font-semibold truncate">
-                  {post.title}
-                </h2>
-                <div className="text-sm text-gray-300 flex items-center justify-between m-4">
-                  <div className="flex items-center space-x-2">
-                    <Image
-                      src={userInfo.img_url || '/default-profile.png'}
-                      alt="Profile"
-                      width={25}
-                      height={25}
-                      className="rounded-full"
-                    />
-                    <p>{userInfo.nickname || 'Unknown User'}</p>
+      {/* 카드 그리드 */}
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          {posts.map((post) => {
+            const userInfo = getUserInfo(post.user_id)
+
+            return (
+              <div
+                key={post.id}
+                className="w-60 h-60 bg-[#2E3856] text-white rounded-lg shadow-lg"
+              >
+                {/* 카드 내부 여백 */}
+                <div className="w-full h-full flex flex-col p-3">
+                  {/* 카드 제목 */}
+                  <h2 className="text-2xl font-semibold truncate mb-2">
+                    {post.title}
+                  </h2>
+
+                  {/* 유저 정보 및 북마크 버튼 */}
+                  <div className="text-sm text-gray-300 flex items-center justify-between mb-4">
+                    <div className="flex items-center space-x-2">
+                      <Image
+                        src={userInfo.img_url || '/default-profile.png'}
+                        alt="Profile"
+                        width={30}
+                        height={30}
+                        className="rounded-full"
+                      />
+                      <p>{userInfo.nickname || 'Unknown User'}</p>
+                    </div>
+                    <button
+                      className="ml-4"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        toggleBookmark(post.id)
+                      }}
+                    >
+                      {post.isBookmarked ? (
+                        <Image
+                          src="/bookmarkon.png"
+                          alt="Bookmarked"
+                          width={25}
+                          height={25}
+                        />
+                      ) : (
+                        <Image
+                          src="/bookmarkoff.png"
+                          alt="Not Bookmarked"
+                          width={25}
+                          height={25}
+                        />
+                      )}
+                    </button>
                   </div>
-                  <button
-                    className="ml-4"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      toggleBookmark(post.id)
-                    }}
-                  >
-                    {post.isBookmarked ? (
-                      <Image
-                        src="/bookmarkon.png"
-                        alt="Bookmarked"
-                        width={25}
-                        height={25}
-                      />
-                    ) : (
-                      <Image
-                        src="/bookmarkoff.png"
-                        alt="Not Bookmarked"
-                        width={25}
-                        height={25}
-                      />
-                    )}
-                  </button>
-                </div>
-                <div
-                  className="flex items-center justify-center rounded-lg h-16 w-28 bg-[#282E3E] text-lg cursor-pointer hover:bg-[#3f475e] transition duration-300"
-                  onClick={() => handleGoToDetails(post.id)}
-                >
-                  {post.words.length} 단어
+
+                  {/* 단어 개수 */}
+                  <div className="flex items-center justify-center mt-6">
+                    <div
+                      className="text-2xl rounded-lg h-20 w-32 bg-[#282E3E] text-center text-white cursor-pointer hover:bg-[#3f475e] transition duration-300 flex items-center justify-center"
+                      onClick={() => handleGoToDetails(post.id)}
+                    >
+                      {post.words.length} 단어
+                    </div>
+                  </div>
                 </div>
               </div>
-            </div>
-          )
-        })}
+            )
+          })}
+        </div>
       </div>
     </div>
   )
