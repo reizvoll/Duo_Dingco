@@ -3,6 +3,7 @@
 import { PostCard } from '../../types/PostCard'
 import { useState } from 'react'
 import { RiDeleteBin6Line } from 'react-icons/ri'
+import { supabase } from '../api/supabase'
 
 export default function Post() {
   const [cards, setCards] = useState<PostCard[]>([
@@ -24,8 +25,53 @@ export default function Post() {
     setCards(cards.filter((card) => card.id !== id))
   }
 
+  const handleInputChange = (
+    id: number,
+    field: 'word' | 'meaning',
+    value: string,
+  ) => {
+    setCards(
+      cards.map((card) =>
+        card.id === id ? { ...card, [field]: value } : card,
+      ),
+    )
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    const words = cards.map((card) => ({
+      word: card.word,
+      meaning: card.meaning,
+    }))
+
+    try {
+      const { data, error } = await supabase.from('posts').insert([
+        {
+          title,
+          description,
+          words,
+        },
+      ])
+
+      if (error) {
+        console.error('Error inserting data:', error)
+      } else {
+        console.log('Data inserted successfully:', data)
+        setTitle('')
+        setDescription('')
+        setCards([{ id: 1, word: '', meaning: '' }])
+      }
+    } catch (err) {
+      console.error('Unexpected error:', err)
+    }
+  }
+
   return (
-    <form className="max-width-[1200px] min-h-screen flex items-center justify-center">
+    <form
+      onSubmit={handleSubmit}
+      className="max-width-[1200px] min-h-screen flex items-center justify-center"
+    >
       <div className="w-full max-w-3xl p-8 rounded-lg text-white ">
         <h1 className="text-2xl font-bold mb-8 text-start">카드 생성하기</h1>
 
@@ -75,10 +121,10 @@ export default function Post() {
               <div className="flex items-end min-h-full justify-between gap-4">
                 <div className="flex-[0.40] border-b border-white mr-4">
                   <textarea
-                    // value={card.word}
-                    // onChange={(e) =>
-                    //   handleInputChange(card.id, 'word', e.target.value)
-                    // }
+                    value={card.word}
+                    onChange={(e) =>
+                      handleInputChange(card.id, 'word', e.target.value)
+                    }
                     className="w-full bg-transparent text-white focus:outline-none resize-none overflow-hidden"
                     rows={1}
                     onInput={(e) => {
@@ -91,10 +137,10 @@ export default function Post() {
 
                 <div className="flex-[0.60] border-b border-white ml-4">
                   <textarea
-                    // value={card.meaning}
-                    // onChange={(e) =>
-                    //   handleInputChange(card.id, 'meaning', e.target.value)
-                    // }
+                    value={card.meaning}
+                    onChange={(e) =>
+                      handleInputChange(card.id, 'meaning', e.target.value)
+                    }
                     className="w-full bg-transparent text-white focus:outline-none resize-none overflow-hidden"
                     rows={1}
                     onInput={(e) => {
