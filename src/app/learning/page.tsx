@@ -144,14 +144,14 @@ export default function LearnListPage() {
                   >
                     {post.isBookmarked ? (
                       <Image
-                        src="/star2.png"
+                        src="/bookmarkon.png"
                         alt="Bookmarked"
                         width={25}
                         height={25}
                       />
                     ) : (
                       <Image
-                        src="/star1.png"
+                        src="/bookmarkoff.png"
                         alt="Not Bookmarked"
                         width={25}
                         height={25}
