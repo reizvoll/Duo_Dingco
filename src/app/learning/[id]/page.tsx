@@ -30,7 +30,7 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
   const { id } = params
   const router = useRouter()
 
-  const [post, setPost] = useState<Post | null>(null)
+  const [posts, setPosts] = useState<Post | null>(null)
   const [user, setUser] = useState<User | null>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isFlipped, setIsFlipped] = useState(false)
@@ -71,7 +71,7 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
           return
         }
 
-        setPost({ ...postData, words: parsedWords })
+        setPosts({ ...postData, words: parsedWords })
         setUser(userData)
       } catch (err) {
         setError('데이터를 가져오는 중 문제가 발생했습니다.')
@@ -90,7 +90,7 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
     )
   }
 
-  if (!post || !user) {
+  if (!posts || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#0A092D] text-white">
         <p>로딩 중...</p>
@@ -98,7 +98,7 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
     )
   }
 
-  const totalCards = post.words.length
+  const totalCards = posts.words.length
 
   const goToNextCard = () => {
     if (currentIndex < totalCards - 1) {
@@ -118,30 +118,68 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
     setIsFlipped(!isFlipped)
   }
 
+  const toggleBookmark = (id: string) => {
+    setPosts((prev) =>
+      prev.map((post) =>
+        post.id === id ? { ...post, isBookmarked: !post.isBookmarked } : post,
+      ),
+    )
+  }
+
+  // justify-content: center;
   return (
-    <div className="min-h-screen bg-[#0A092D] text-white p-6 flex flex-col items-center">
+    <div className="min-h-screen bg-[#0A092D] text-white p-6 flex flex-col items-center justify-center">
       <div className="w-full max-w-3xl">
         <div className="flex justify-between items-center mb-4">
-          <h1 className="text-2xl font-bold">{post.title}</h1>
-          <Image
-            src={user.img_url || '/default-profile.png'}
-            alt="Profile"
-            width={40}
-            height={40}
-            className="rounded-full"
-          />
+          <h1 className="text-2xl font-bold">{posts.title}</h1>
+        </div>
+        <div className="flex flex-row-reverse">
+          <button
+            onClick={(e) => {
+              e.stopPropagation()
+              toggleBookmark(posts.id)
+            }}
+          >
+            {posts.isBookmarked ? (
+              <Image
+                src="/bookmarkon.png"
+                alt="Bookmarked"
+                width={25}
+                height={25}
+              />
+            ) : (
+              <Image
+                src="/bookmarkoff.png"
+                alt="Not Bookmarked"
+                width={25}
+                height={25}
+              />
+            )}
+          </button>
         </div>
         <p className="text-gray-400">
-          {post.description || '설명이 들어갈 곳입니다.'}
+          {posts.description || '설명이 들어갈 곳입니다.'}
         </p>
-        <div className="flex items-center justify-between mt-4">
-          <p className="text-sm">{user.nickname}</p>
-          <p className="text-sm text-gray-500">등록일: {user.created_at}</p>
+        <div className="flex flex-row justify-between items-center">
+          <p className="flex items-center p-3">
+            <Image
+              src={user.img_url || '/default-profile.png'}
+              alt="Profile"
+              width={40}
+              height={40}
+              className="rounded-full"
+            />
+            <p className="p-2">{user.nickname}</p>
+          </p>
+          등록일-{user.created_at}
         </div>
       </div>
-
+      {/* display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center; */}
       <div
-        className="relative w-full max-w-3xl mt-10 h-[300px] rounded-lg shadow-lg cursor-pointer"
+        className="relative w-full max-w-3xl mt-2 h-[300px] rounded-lg shadow-lg cursor-pointer "
         onClick={flipCard}
         style={{
           perspective: '1000px', // 원근 효과
@@ -149,7 +187,7 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
       >
         {/* 카드 전체 컨테이너 */}
         <div
-          className={`w-full h-full rounded-lg bg-white transform transition-transform duration-700`}
+          className={`w-90 h-80 rounded-lg bg-white transform transition-transform duration-700 mt-0 `}
           style={{
             transformStyle: 'preserve-3d', // 3D 효과를 유지
             transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)', // 회전 상태
@@ -162,21 +200,21 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
               backfaceVisibility: 'hidden', // 뒷면 숨기기
             }}
           >
-            <p className="text-xl font-bold">
-              {post.words[currentIndex]?.word || '단어 없음'}
+            <p className="text-4xl font-bold">
+              {posts.words[currentIndex]?.word || '단어 없음'}
             </p>
           </div>
 
           {/* 카드 뒷면 */}
           <div
-            className="absolute w-full h-full flex items-center justify-center text-black bg-gray-100 rounded-lg"
+            className="absolute w-full h-full text-2xl flex items-center justify-center text-black bg-gray-100 rounded-lg"
             style={{
               transform: 'rotateY(180deg)', // 기본 180도 회전
               backfaceVisibility: 'hidden', // 앞면 숨기기
             }}
           >
             <p className="text-lg">
-              {post.words[currentIndex]?.meaning || '정의 없음'}
+              {posts.words[currentIndex]?.meaning || '정의 없음'}
             </p>
           </div>
         </div>
