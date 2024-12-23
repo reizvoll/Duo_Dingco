@@ -15,7 +15,7 @@ const HeadNav = () => {
   const handleLoginRedirect = () => {
     Swal.fire({
       title: `로그인이 필요합니다`,
-      text: `로그인 하러 가시겠습니까?`,
+      text: `로그인 하시겠습니까?`,
       icon: "question",
       showCancelButton: true,
       confirmButtonText: "예",
@@ -27,37 +27,41 @@ const HeadNav = () => {
     });
   };
 
-  const handleProfileClick = () => {
+  const handleAuthAction = (callback: () => void) => (e?: React.MouseEvent) => {
     if (user?.id) {
-      openModal();
+      callback();
     } else {
+      e?.preventDefault();
       handleLoginRedirect();
     }
   };
 
+  const handleProfileClick = handleAuthAction(openModal);
+  const handleBookmarkClick = handleAuthAction(() => {});
+
   return (
-    <div className="absolute top-5 right-5 w-[282px] h-[62px] bg-[rgba(137,137,137,0.4)] backdrop-blur-[2px] rounded-[30px] flex items-center justify-around px-5 z-30">
+    <div className="absolute top-5 right-5 w-[242px] h-[50px] bg-[rgba(137,137,137,0.4)] backdrop-blur-[2px] rounded-[30px] flex items-center justify-around px-5 z-30">
       {/* 홈 아이콘 */}
       <Link href="/" passHref>
-        <GoHome className="text-white w-[40px] h-[40px] cursor-pointer" />
+        <GoHome className="text-white w-[30px] h-[30px] cursor-pointer" />
       </Link>
 
       {/* 북마크 아이콘 */}
-      <Link href="/mypage" passHref>
-        <MdOutlineBookmarks className="text-white w-[35px] h-[35px] cursor-pointer" />
+      <Link href="/mypage" passHref onClick={handleBookmarkClick}>
+        <MdOutlineBookmarks className="text-white w-[25px] h-[25px] cursor-pointer" />
       </Link>
 
       {user?.id ? (
         <>
           {/* 로그아웃 아이콘 */}
           <FiLogOut 
-            className="text-white w-[35px] h-[35px] cursor-pointer" 
+            className="text-white w-[25px] h-[25px] cursor-pointer" 
             onClick={logout} 
           />
           
           {/* 프로필 이미지 */}
           <div 
-            className="w-[48px] h-[48px] rounded-full bg-gray-400 cursor-pointer flex items-center justify-center"
+            className="w-[38px] h-[38px] rounded-full bg-gray-400 cursor-pointer flex items-center justify-center"
             onClick={handleProfileClick}
           >
             <Image
@@ -73,11 +77,11 @@ const HeadNav = () => {
       ) : (
         <>
           {/* 로그인 아이콘 */}
-          <FiLogIn className="text-white w-[35px] h-[35px]" onClick={handleLoginRedirect} />
+          <FiLogIn className="text-white w-[25px] h-[25px]" onClick={handleLoginRedirect} />
           
           {/* 기본 회색 프로필 이미지 */}
           <div 
-            className="w-[48px] h-[48px] rounded-full bg-gray-500 flex items-center justify-center cursor-pointer"
+            className="w-[38px] h-[38px] rounded-full bg-gray-500 flex items-center justify-center cursor-pointer"
             onClick={handleProfileClick}
           >
           </div>
