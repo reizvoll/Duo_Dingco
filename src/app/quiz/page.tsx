@@ -1,18 +1,18 @@
-'use client';
+'use client'
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react'
 
 type Word = {
-  id: string;
-  words: string;
-  meaning: string;
+  id: string
+  words: string
+  meaning: string
 }
 
 type Post = {
-  id: string;
-  title: string;
-  words: Word[];
-  description: string;
+  id: string
+  title: string
+  words: Word[]
+  description: string
 }
 
 const mockPosts: Post[] = [
@@ -25,51 +25,52 @@ const mockPosts: Post[] = [
       { id: '2', words: 'Var', meaning: '변수 저장 2' },
     ],
   },
-  {
-    id: '2',
-    title: '타입 스크립트 단어 모음',
-    description: '타입 스크립트의 기본 타입 선언 방법입니다.',
-    words: [
-      { id: '3', words: 'Interface', meaning: '타입 선언' },
-      { id: '4', words: 'Type', meaning: '타입 선언 2' },
-    ],
-  },
-];
+]
 
 const QuizPage = () => {
-  const [posts, setPosts] = useState<Post[]>([]);
+  const [posts, setPosts] = useState<Post[]>([])
+  const [currentWordIndex, setCurrentWordIndex] = useState(0) // 현재 단어 인덱스
 
   useEffect(() => {
-    setPosts(mockPosts);
-  }, []);
+    setPosts(mockPosts)
+  }, [])
+
+  const handleNext = () => {
+    setCurrentWordIndex((prevIndex) => {
+      const totalWords = posts[0]?.words.length || 0
+      return (prevIndex + 1) % totalWords // 순환되도록 설정
+    })
+  }
+
+  const currentWord = posts[0]?.words[currentWordIndex] // 현재 표시할 단어
 
   return (
     <div className="quiz-page">
-      <div className="mx-auto mt-[200px] w-[900px] h-[550px] bg-[#2E3856] text-white p-6 rounded-lg shadow-lg">
-        <div className="posts-list space-y-6">
-          {posts.map((post) => (
-            <div key={post.id} className="post space-y-4">
-              <h2 className="text-2xl font-semibold">{post.title}</h2>
-              <p className="text-lg">{post.description}</p>
-              <ul className="space-y-2">
-                {post.words.map((word) => (
-                  <li
-                    key={word.id}
-                    className="flex justify-between bg-gray-800 p-2 rounded-lg"
-                  >
-                    <span className="font-medium">{word.words}</span>
-                    <span className="text-sm text-gray-300">
-                      {word.meaning}
-                    </span>
-                  </li>
-                ))}
-              </ul>
+      <div className="flex justify-center items-center h-[175px]">
+        {posts.map((post) => (
+          <h1 key={post.id} className="text-4xl font-semibold">
+            {post.title}
+          </h1>
+        ))}
+      </div>
+      <div className="mx-auto mt-10 w-[900px] h-[550px] bg-[#2E3856] text-white p-6 rounded-lg shadow-lg">
+        <div className="posts-list space-y-6 text-center">
+          {currentWord && (
+            <div className="word space-y-4">
+              <p className="text-2xl font-bold">{currentWord.words}</p>
+              <p className="text-lg">{currentWord.meaning}</p>
             </div>
-          ))}
+          )}
+          <button
+            onClick={handleNext}
+            className="mt-6 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
+          >
+            다음
+          </button>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default QuizPage;
+export default QuizPage
