@@ -26,7 +26,10 @@ const MENU_ITEMS = [
   },
 ]
 
-export default function InsideSideNav({ menuIsOpen, toggleMenu }: SidebarProps) {
+export default function InsideSideNav({
+  menuIsOpen,
+  toggleMenu,
+}: SidebarProps) {
   const pathname = usePathname()
   const [selectedMenu, setSelectedMenu] = useState<string>(pathname)
   const sidebarRef = useRef<HTMLDivElement | null>(null)
@@ -63,10 +66,7 @@ export default function InsideSideNav({ menuIsOpen, toggleMenu }: SidebarProps) 
     >
       {/* 상단 아이콘과 로고 */}
       <div className="flex items-center pt-6 pl-6">
-        <button
-          className="text-4xl text-gray-50"
-          onClick={toggleMenu}
-        >
+        <button className="text-4xl text-gray-50" onClick={toggleMenu}>
           <PiListBold />
         </button>
         {menuIsOpen && (
