@@ -250,7 +250,7 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
             }}
           >
             <p className="text-lg">
-              {posts.words[currentIndex]?.definition || '정의 없음'}
+              {posts.words[currentIndex]?.meaning || '정의 없음'}
             </p>
           </div>
         </div>
