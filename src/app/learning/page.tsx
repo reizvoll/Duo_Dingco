@@ -46,7 +46,6 @@ export default function LearnListPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      // posts 데이터 가져오기
       const { data: postData, error: postError } = await supabase.from('posts')
         .select(`
           id,
@@ -58,11 +57,10 @@ export default function LearnListPage() {
 
       if (postError) {
         setError('posts 데이터를 가져오는 중 오류가 발생했습니다.')
-        console.error('Supabase posts fetch error:', postError.message)
+        console.error('Supabase posts fetch error:', postError)
         return
       }
 
-      // users 데이터 가져오기
       const { data: userData, error: userError } = await supabase.from('users')
         .select(`
           id,
@@ -73,17 +71,16 @@ export default function LearnListPage() {
 
       if (userError) {
         setError('users 데이터를 가져오는 중 오류가 발생했습니다.')
-        console.error('Supabase users fetch error:', userError.message)
+        console.error('Supabase users fetch error:', userError)
         return
       }
 
-      // 🔥 추가: bookmarks 데이터 가져오기
       const { data: bookmarkData, error: bookmarkError } = await supabase
         .from('bookmarks')
         .select('post_id')
 
       if (bookmarkError) {
-        console.error('Supabase bookmarks fetch error:', bookmarkError.message)
+        console.error('Supabase bookmarks fetch error:', bookmarkError)
         return
       }
 
