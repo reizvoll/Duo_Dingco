@@ -82,7 +82,7 @@ export default function SignUpForm() {
       Swal.fire({
         icon: 'error',
         title: '오류',
-        text: '알 수 없는 오류가 발생했습니다. 다시 시도해주세요.',
+        text: '오류가 발생했습니다.',
       })
     }
   }
@@ -131,7 +131,7 @@ export default function SignUpForm() {
       <div className="space-y-4">
         <input
           type="email"
-          placeholder="이메일 입력창"
+          placeholder="이메일 입력"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           className="w-full p-3 border-none rounded-lg bg-[#1E1E30] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -139,7 +139,7 @@ export default function SignUpForm() {
         <div className="relative">
           <input
             type={isPasswordVisible ? 'text' : 'password'}
-            placeholder="비밀번호 입력창"
+            placeholder="비밀번호 입력"
             value={password}
             onChange={(e) => handlePasswordChange(e.target.value)}
             className={`w-full p-3 border-none rounded-lg bg-[#1E1E30] text-white placeholder-gray-400 focus:outline-none ${
@@ -165,7 +165,7 @@ export default function SignUpForm() {
         <div className="relative">
           <input
             type={isConfirmPasswordVisible ? 'text' : 'password'}
-            placeholder="비밀번호 확인 입력창"
+            placeholder="비밀번호 확인 입력"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             className="w-full p-3 border-none rounded-lg bg-[#1E1E30] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -181,7 +181,7 @@ export default function SignUpForm() {
 
         <input
           type="text"
-          placeholder="닉네임 입력창"
+          placeholder="닉네임 입력"
           value={nickname}
           onChange={(e) => setNickname(e.target.value)}
           className="w-full p-3 border-none rounded-lg bg-[#1E1E30] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
