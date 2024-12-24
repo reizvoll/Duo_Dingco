@@ -1,7 +1,7 @@
 'use client'
 
 import { RiDeleteBin6Line } from 'react-icons/ri'
-import { usePost } from '../hooks/usePost'
+import { usePost } from '../../hooks/usePost'
 
 export default function PostForm() {
   const {
