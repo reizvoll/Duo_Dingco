@@ -3,8 +3,11 @@
 import { useState } from 'react'
 import Swal from 'sweetalert2'
 import Image from 'next/image'
+import { useRouter } from 'next/navigation'
+import { IoIosArrowDropleft } from 'react-icons/io'
 import { createClient } from '@supabase/supabase-js'
 
+// Supabase 클라이언트 생성
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
@@ -21,12 +24,13 @@ export default function SignUp() {
     useState(false)
   const [passwordError, setPasswordError] = useState(false)
 
+  const router = useRouter() // Next.js 라우터 사용을 위한 초기화
+
   const handlePasswordChange = (value: string) => {
     setPassword(value)
     const isValid =
       value.length >= 6 && /[a-z]/.test(value) && /[0-9]/.test(value)
-
-    setPasswordError(!isValid) //비밀번호 실시간 유효성 검사
+    setPasswordError(!isValid) // 비밀번호 실시간 유효성 검사
   }
 
   const handleSignUp = async () => {
@@ -59,7 +63,20 @@ export default function SignUp() {
         title: '회원가입 실패',
         text: error.message,
       })
-    } else {
+      return
+    }
+
+    if (data.user) {
+      const userInsertError = await addUserToPublicTable(data.user.id)
+      if (userInsertError) {
+        Swal.fire({
+          icon: 'error',
+          title: '프로필 추가 실패',
+          text: userInsertError.message,
+        })
+        return
+      }
+
       Swal.fire({
         icon: 'success',
         title: '회원가입 완료',
@@ -68,10 +85,36 @@ export default function SignUp() {
     }
   }
 
+  const addUserToPublicTable = async (userId: string) => {
+    const imgUrl = profileImage
+      ? URL.createObjectURL(profileImage)
+      : '/dingco.png'
+
+    const { error } = await supabase.from('users').insert([
+      {
+        id: userId,
+        created_at: new Date().toISOString(),
+        nickname: nickname || '',
+        img_url: imgUrl,
+        Exp: 0,
+        Lv: 1,
+      },
+    ])
+
+    return error
+  }
+
   return (
     <div className="min-h-screen bg-[#13132D] flex items-center justify-center">
-      <div className="border border-white rounded-lg p-8 bg-[#13132D] max-w-md w-full">
-        <h2 className="text-2xl font-bold text-center text-white mb-2">
+      <div className="relative w-full max-w-md bg-[#13132D] border border-white rounded-lg p-8">
+        <button
+          onClick={() => router.push('/')}
+          className="absolute top-4 left-4 text-white text-xl"
+        >
+          <IoIosArrowDropleft size={30} />
+        </button>
+
+        <h2 className="text-2xl font-bold text-center mt-7 text-white mb-2">
           가입하기
         </h2>
         <p className="text-center text-gray-400 mb-10">정보를 입력해주세요.</p>
