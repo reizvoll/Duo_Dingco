@@ -1,5 +1,8 @@
-import type { Metadata } from 'next'
-import '@/styles/globals.css'
+import type { Metadata } from 'next';
+import { headers } from 'next/headers'; // headers 사용
+import HeadNav from '@/components/layout/HeadNav';
+import SideNav from '@/components/layout/SideNav';
+import '@/styles/globals.css';
 
 export const metadata: Metadata = {
   title: 'Duo-Dingco',
@@ -7,16 +10,26 @@ export const metadata: Metadata = {
   icons: {
     icon: '/dingco.png',
   },
-}
+};
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
+  const pathname = headers().get('x-pathname') || '/'; // 현재 경로 가져오기
+  const isAuthPage = pathname.startsWith('/auth'); // 인증 페이지 확인
+
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <div className="flex h-screen relative overflow-hidden">
+          {/* auth 페이지가 아닐 경우에만 SideNav, HeadNav 렌더링 */}
+          {!isAuthPage && <SideNav />}
+          {!isAuthPage && <HeadNav />}
+          <main className="flex-1">{children}</main>
+        </div>
+      </body>
     </html>
-  )
+  );
 }
