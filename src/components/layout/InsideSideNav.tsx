@@ -17,21 +17,8 @@ interface SidebarProps {
 
 const MENU_ITEMS = [
   { path: '/', label: '홈', icon: <GoHome className="text-4xl" /> },
-<<<<<<< HEAD
-  {
-    path: '/learning',
-    label: '학습하기',
-    icon: <LuBookA className="text-4xl" />,
-  },
-  {
-    path: '/quiz',
-    label: 'Quiz',
-    icon: <MdOutlineQuiz className="text-4xl" />,
-  },
-=======
   { path: '/learning', label: '학습하기', icon: <LuBookA className="text-4xl" /> },
   { path: '/quiz', label: 'Quiz', icon: <MdOutlineQuiz className="text-4xl" /> },
->>>>>>> 36e71a793d3e87362f9281017c3aae000e1ef075
   {
     path: '/create',
     label: '문제 생성하기',
