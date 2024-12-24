@@ -132,8 +132,6 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
       <div className="w-full max-w-3xl">
         <div className="flex justify-between items-center mb-4">
           <h1 className="text-2xl font-bold">{posts.title}</h1>
-        </div>
-        <div className="flex flex-row-reverse">
           <button
             onClick={(e) => {
               e.stopPropagation()
@@ -171,7 +169,10 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
             />
             <p className="p-2">{user.nickname}</p>
           </p>
-          등록일-{user.created_at}
+          등록일 -{' '}
+          {new Date('2024-12-23T11:06:29.607')
+            .toLocaleDateString('ko-KR')
+            .replace(/\.$/, '')}
         </div>
       </div>
       {/* display: flex;
@@ -229,9 +230,9 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
           }`}
           onClick={goToPrevCard}
         >
-          <Image src="/left.png" alt="Previous" width={25} height={25} />
+          <Image src="/left.png" alt="Previous" width={30} height={30} />
         </button>
-        <p className="p-10">
+        <p className="p-10 text-2xl">
           {currentIndex + 1}/{totalCards}
         </p>
         <button
@@ -242,18 +243,16 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
           }`}
           onClick={goToNextCard}
         >
-          <Image src="/right.png" alt="Next" width={25} height={25} />
+          <Image src="/right.png" alt="Next" width={30} height={30} />
         </button>
       </div>
 
-      <div className="mt-10">
-        <button
-          className="px-4 py-2 bg-[#282E3E] text-white rounded hover:bg-[#3f475e] transition duration-300"
-          onClick={() => router.push('/learning')}
-        >
-          뒤로가기
-        </button>
-      </div>
+      <button
+        className="px-4 py-2 bg-[#282E3E] text-white rounded hover:bg-[#3f475e] transition duration-300"
+        onClick={() => router.push('/learning')}
+      >
+        뒤로가기
+      </button>
     </div>
   )
 }
