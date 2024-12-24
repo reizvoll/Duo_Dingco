@@ -1,30 +1,55 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { supabase } from '@/app/api/supabase' 
+import { supabase } from '@/app/api/supabase'
+import { useRouter } from 'next/navigation'
 import { Tables } from '../../../database.types'
 
-type Post = Tables<'posts'>
+// 타입 정의
+type Word = {
+  id: string
+  word: string
+  meaning: string
+}
 
-const QuizPage = () => {
+type Post = Tables<'posts'> & {
+  words: Word[] // JSON 배열로 가정
+  users: {
+    nickname: string
+  }
+}
+
+const QuizListPage = () => {
   const [posts, setPosts] = useState<Post[]>([])
-  const [currentWordIndex, setCurrentWordIndex] = useState(0)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const router = useRouter()
 
   useEffect(() => {
     const fetchPosts = async () => {
       setLoading(true)
       setError(null)
-
       try {
         const { data, error } = await supabase
           .from('posts')
-          .select('id, title, words, description')
+          .select(`
+            id,
+            title,
+            words,
+            user_id,
+            created_at,
+            description,
+            users!inner(nickname)
+          `)
 
         if (error) throw error
         if (data) {
-          setPosts(data as Post[])
+          // users가 배열로 반환되면 첫 번째 항목만 사용
+          const formattedData = data.map((post: any) => ({
+            ...post,
+            users: post.users[0], // 첫 번째 사용자를 가져옴
+          }))
+          setPosts(formattedData as Post[])
         }
       } catch (err: any) {
         setError('데이터를 가져오는 중 오류가 발생했습니다.')
@@ -36,48 +61,40 @@ const QuizPage = () => {
     fetchPosts()
   }, [])
 
-  const handleNext = () => {
-    setCurrentWordIndex((prevIndex) => {
-      const totalWords = posts[0]?.words.length || 0
-      return (prevIndex + 1) % totalWords
-    })
+  const handleNavigateToQuiz = (postId: string) => {
+    router.push(`/quiz/${postId}`)
   }
 
-  const currentWord = posts[0]?.words[currentWordIndex]
-
   return (
-    <div className="quiz-page">
-      {loading && <p className="text-center text-lg">로딩 중...</p>}
+    <div className="quiz-list-page p-6">
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold text-left text-white">퀴즈 풀기</h1>
+      </div>
+
+      {loading && <p className="text-center text-white">로딩 중...</p>}
       {error && <p className="text-center text-red-500">{error}</p>}
+
       {!loading && !error && (
-        <>
-          <div className="flex justify-center items-center h-[175px]">
-            {posts.map((post) => (
-              <h1 key={post.id} className="text-4xl font-semibold">
-                {post.title}
-              </h1>
-            ))}
-          </div>
-          <div className="mx-auto mt-10 w-[900px] h-[550px] bg-[#2E3856] text-white p-6 rounded-lg shadow-lg">
-            <div className="posts-list space-y-6 text-center">
-              {currentWord && (
-                <div className="word space-y-4">
-                  <p className="text-2xl font-bold">{currentWord.words}</p>
-                  <p className="text-lg">{currentWord.meaning}</p>
-                </div>
-              )}
-              <button
-                onClick={handleNext}
-                className="mt-6 px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600"
-              >
-                다음
-              </button>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+          {posts.map((post) => (
+            <div
+              key={post.id}
+              className="p-4 bg-[#2E3856] rounded-lg shadow cursor-pointer"
+              onClick={() => handleNavigateToQuiz(post.id)}
+            >
+              <h2 className="text-xl font-semibold text-white">{post.title}</h2>
+              <p className="text-white">
+                닉네임: {post.users?.nickname || '알 수 없음'}
+              </p>
+              <p className="text-white">
+                단어 개수: {Array.isArray(post.words) ? post.words.length : '알 수 없음'}
+              </p>
             </div>
-          </div>
-        </>
+          ))}
+        </div>
       )}
     </div>
   )
 }
 
-export default QuizPage
+export default QuizListPage
