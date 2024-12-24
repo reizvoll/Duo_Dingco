@@ -1,7 +1,7 @@
 'use client'
 
+import { usePost } from '@/hooks/usePost'
 import { RiDeleteBin6Line } from 'react-icons/ri'
-import { usePost } from '../../hooks/usePost'
 
 export default function PostForm() {
   const {
@@ -14,6 +14,7 @@ export default function PostForm() {
     handleRemoveCard,
     handleInputChange,
     handleSubmit,
+    isFormCheck,
   } = usePost()
 
   return (
@@ -123,7 +124,10 @@ export default function PostForm() {
         <div className="flex justify-end">
           <button
             type="submit"
-            className={`w-[100px] p-2 font-bold rounded-xl border-2 `}
+            disabled={!isFormCheck}
+            className={`w-[100px] p-2 font-bold rounded-xl border-2 ${
+              !isFormCheck ? 'text-gray-500' : ''
+            } `}
           >
             만들기
           </button>
