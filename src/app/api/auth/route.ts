@@ -30,8 +30,8 @@ export async function POST(request: Request) {
           created_at: new Date().toISOString(),
           nickname: nickname || '',
           img_url: profileImage,
-          exp: 0,
-          lv: 1,
+          Exp: 0,
+          Lv: 1,
         },
       ])
 
