@@ -4,8 +4,11 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/app/api/supabase'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-
-type Word = {
+import { FaCircleArrowRight } from 'react-icons/fa6'
+import { FaCircleArrowLeft } from 'react-icons/fa6'
+import { FaStar } from 'react-icons/fa'
+import { FaRegStar } from 'react-icons/fa'
+type PostCard = {
   id: string // 단어 ID
   word: string // 단어
   meaning: string // 단어의 뜻
@@ -15,7 +18,7 @@ type Post = {
   id: string // 학습 리스트 ID
   title: string // 학습 리스트 제목
   description: string // 학습 리스트 설명
-  words: Word[] // 단어 목록
+  words: PostCard[] // 단어 목록
   user_id: string // 작성자 ID
   isBookmarked?: boolean // 북마크 상태
 }
@@ -180,19 +183,9 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
             }}
           >
             {posts.isBookmarked ? (
-              <Image
-                src="/bookmarkon.png"
-                alt="Bookmarked"
-                width={25}
-                height={25}
-              />
+              <FaStar className="w-[30px] h-[30px]" />
             ) : (
-              <Image
-                src="/bookmarkoff.png"
-                alt="Not Bookmarked"
-                width={25}
-                height={25}
-              />
+              <FaRegStar className="w-[30px] h-[30px]" />
             )}
           </button>
         </div>
@@ -265,7 +258,7 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
           }`}
           onClick={goToPrevCard}
         >
-          <Image src="/left.png" alt="Previous" width={30} height={30} />
+          <FaCircleArrowLeft className="w-[30px] h-[30px]" />
         </button>
         <p className="p-10 text-2xl">
           {currentIndex + 1}/{totalCards}
@@ -278,7 +271,8 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
           }`}
           onClick={goToNextCard}
         >
-          <Image src="/right.png" alt="Next" width={30} height={30} />
+          {/* 리랙트아이콘 */}
+          <FaCircleArrowRight className="w-[30px] h-[30px]" />
         </button>
       </div>
 
