@@ -152,7 +152,7 @@ export default function LearnListPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0A092D] text-white">
+      <div className="min-h-screen flex items-center justify-center bg-[#0A092D] text-white overflow-y-auto">
         <p>{error}</p>
       </div>
     )
@@ -160,12 +160,17 @@ export default function LearnListPage() {
 
   return (
     <div className="min-h-screen bg-[#0A092D] text-white flex">
-      <div className="flex-1 ml-20 p-8">
+      {/* 메인 콘텐츠 */}
+      <div className="flex-1 ml-20 p-8 overflow-y-auto h-screen">
+        {' '}
+        {/* h-screen과 overflow-y-auto 추가 */}
         <div className="relative flex flex-col items-center justify-center">
+          {/* 학습 페이지 제목 */}
           <div className="absolute top-14 left-40">
             <h1 className="text-3xl font-bold">학습하기</h1>
           </div>
 
+          {/* 카드 묶음 */}
           <div className="flex items-center justify-center w-full mt-24">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {posts.map((post) => {
@@ -180,6 +185,7 @@ export default function LearnListPage() {
                       <h2 className="text-lg font-semibold truncate mb-4">
                         {post.title}
                       </h2>
+
                       <div className="text-sm text-gray-300 flex items-center justify-between mb-6">
                         <div className="flex items-center space-x-2">
                           <Image
@@ -215,11 +221,12 @@ export default function LearnListPage() {
                           )}
                         </button>
                       </div>
+
                       <div className="flex items-center justify-center mt-6">
                         <div
                           className="text-lg rounded-lg bg-[#282E3E] text-center text-white flex items-center justify-center
-      cursor-pointer hover:bg-[#3f475e] transition duration-300 
-      h-14 w-28 sm:h-16 sm:w-32 md:h-18 md:w-36 lg:h-18 lg:w-36"
+                            cursor-pointer hover:bg-[#3f475e] transition duration-300 
+                            h-14 w-28 sm:h-16 sm:w-32 md:h-18 md:w-36 lg:h-18 lg:w-36"
                           onClick={() => handleGoToDetails(post.id)}
                         >
                           {post.words.length} 단어
