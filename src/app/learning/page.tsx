@@ -33,7 +33,6 @@ export default function LearnListPage() {
   const [error, setError] = useState<string | null>(null) // 에러 상태
   const router = useRouter()
 
-  // 🔥 추가: 로그인된 사용자 세션 확인
   useEffect(() => {
     const checkSession = async () => {
       const { data, error } = await supabase.auth.getSession()
@@ -44,8 +43,7 @@ export default function LearnListPage() {
     }
     checkSession()
   }, [router])
-  // 🔥 추가 끝
-  // Supabase에서 데이터 가져오기
+
   useEffect(() => {
     const fetchData = async () => {
       // posts 데이터 가져오기
@@ -79,12 +77,26 @@ export default function LearnListPage() {
         return
       }
 
-      // posts의 words 컬럼 파싱 및 데이터 설정
+      // 🔥 추가: bookmarks 데이터 가져오기
+      const { data: bookmarkData, error: bookmarkError } = await supabase
+        .from('bookmarks')
+        .select('post_id')
+
+      if (bookmarkError) {
+        console.error('Supabase bookmarks fetch error:', bookmarkError.message)
+        return
+      }
+
+      const bookmarkedPostIds = bookmarkData?.map(
+        (bookmark) => bookmark.post_id,
+      )
+
+      // posts 데이터에 isBookmarked 값 업데이트
       const parsedPosts = (postData as Post[]).map((post) => ({
         ...post,
         words:
           typeof post.words === 'string' ? JSON.parse(post.words) : post.words,
-        isBookmarked: false,
+        isBookmarked: bookmarkedPostIds?.includes(post.id) || false,
       }))
 
       setPosts(parsedPosts)
@@ -94,7 +106,34 @@ export default function LearnListPage() {
     fetchData()
   }, [])
 
-  const toggleBookmark = (id: string) => {
+  const toggleBookmark = async (id: string) => {
+    const user = await supabase.auth.getUser()
+    if (!user.data.user) {
+      router.push('/auth/signin') // 유저가 없으면 로그인 페이지로 이동
+      return
+    }
+
+    const post = posts.find((p) => p.id === id)
+    if (!post) return
+
+    const isBookmarked = post.isBookmarked
+
+    if (isBookmarked) {
+      // 북마크 해제
+      await supabase
+        .from('bookmarks')
+        .delete()
+        .eq('user_id', user.data.user.id)
+        .eq('post_id', id)
+    } else {
+      // 북마크 추가
+      await supabase.from('bookmarks').insert({
+        user_id: user.data.user.id,
+        post_id: id,
+      })
+    }
+
+    // 로컬 상태 업데이트
     setPosts((prev) =>
       prev.map((post) =>
         post.id === id ? { ...post, isBookmarked: !post.isBookmarked } : post,
@@ -106,7 +145,6 @@ export default function LearnListPage() {
     router.push(`/learning/${id}`)
   }
 
-  // 유저 ID로 닉네임과 프로필 이미지 가져오기
   const getUserInfo = (userId: string) => {
     const user = users.find((user) => user.id === userId)
     return user ? { nickname: user.nickname, img_url: user.img_url } : {}
@@ -122,12 +160,10 @@ export default function LearnListPage() {
 
   return (
     <div className="min-h-screen bg-[#0A092D] text-white p-6">
-      {/* 학습 페이지 문구 */}
       <div className="absolute top-6 left-6">
         <h1 className="text-2xl font-bold">학습 페이지</h1>
       </div>
 
-      {/* 카드 그리드 */}
       <div className="flex flex-col items-center justify-center min-h-screen">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {posts.map((post) => {
@@ -138,18 +174,15 @@ export default function LearnListPage() {
                 key={post.id}
                 className="w-60 h-60 bg-[#2E3856] text-white rounded-lg shadow-lg"
               >
-                {/* 카드 내부 여백 */}
                 <div className="w-full h-full flex flex-col p-3">
-                  {/* 카드 제목 */}
                   <h2 className="text-2xl font-semibold truncate mb-2">
                     {post.title}
                   </h2>
 
-                  {/* 유저 정보 및 북마크 버튼 */}
                   <div className="text-sm text-gray-300 flex items-center justify-between mb-4">
                     <div className="flex items-center space-x-2">
                       <Image
-                        src={userInfo.img_url || '/default-profile.png'}
+                        src={userInfo.img_url || '/dingco.png'}
                         alt="Profile"
                         width={30}
                         height={30}
@@ -182,7 +215,6 @@ export default function LearnListPage() {
                     </button>
                   </div>
 
-                  {/* 단어 개수 */}
                   <div className="flex items-center justify-center mt-6">
                     <div
                       className="text-2xl rounded-lg h-20 w-32 bg-[#282E3E] text-center text-white cursor-pointer hover:bg-[#3f475e] transition duration-300 flex items-center justify-center"
