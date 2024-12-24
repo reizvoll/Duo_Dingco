@@ -22,7 +22,7 @@ const HeadNav = () => {
       cancelButtonText: '아니오',
     }).then((result) => {
       if (result.isConfirmed) {
-        window.location.href = '/auth/signin'
+        window.location.href = '/auth/login'
       }
     })
   }
