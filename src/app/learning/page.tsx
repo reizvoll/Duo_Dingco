@@ -33,6 +33,18 @@ export default function LearnListPage() {
   const [error, setError] = useState<string | null>(null) // 에러 상태
   const router = useRouter()
 
+  // 🔥 추가: 로그인된 사용자 세션 확인
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data, error } = await supabase.auth.getSession()
+      if (error || !data.session) {
+        router.push('/auth/sigin') // 세션이 없으면 로그인 페이지로 이동
+      }
+      console.log('data', data)
+    }
+    checkSession()
+  }, [router])
+  // 🔥 추가 끝
   // Supabase에서 데이터 가져오기
   useEffect(() => {
     const fetchData = async () => {
