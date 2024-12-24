@@ -8,7 +8,7 @@ import Image from 'next/image'
 type Word = {
   id: string // 단어 ID
   word: string // 단어
-  definition: string // 단어의 뜻
+  meaning: string // 단어의 뜻
 }
 
 type Post = {
