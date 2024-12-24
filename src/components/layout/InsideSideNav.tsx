@@ -17,7 +17,7 @@ interface SidebarProps {
 
 const MENU_ITEMS = [
   { path: '/', label: '홈', icon: <GoHome className="text-4xl" /> },
-  { path: '/study', label: '학습하기', icon: <LuBookA className="text-4xl" /> },
+  { path: '/learning', label: '학습하기', icon: <LuBookA className="text-4xl" /> },
   { path: '/quiz', label: 'Quiz', icon: <MdOutlineQuiz className="text-4xl" /> },
   {
     path: '/create',
@@ -26,7 +26,10 @@ const MENU_ITEMS = [
   },
 ]
 
-export default function InsideSideNav({ menuIsOpen, toggleMenu }: SidebarProps) {
+export default function InsideSideNav({
+  menuIsOpen,
+  toggleMenu,
+}: SidebarProps) {
   const pathname = usePathname()
   const [selectedMenu, setSelectedMenu] = useState<string>(pathname)
   const sidebarRef = useRef<HTMLDivElement | null>(null)
@@ -63,10 +66,7 @@ export default function InsideSideNav({ menuIsOpen, toggleMenu }: SidebarProps) 
     >
       {/* 상단 아이콘과 로고 */}
       <div className="flex items-center pt-6 pl-6">
-        <button
-          className="text-4xl text-gray-50"
-          onClick={toggleMenu}
-        >
+        <button className="text-4xl text-gray-50" onClick={toggleMenu}>
           <PiListBold />
         </button>
         {menuIsOpen && (
