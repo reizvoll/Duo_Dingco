@@ -18,7 +18,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   const pathname = headers().get('x-pathname') || '/' // 현재 경로 가져오기
-  const isAuthPage = pathname.startsWith('/api/auth') // 인증 페이지 확인
+  const isAuthPage = pathname.startsWith('/auth') // 인증 페이지 확인
 
   return (
     <html lang="en">
