@@ -17,6 +17,7 @@ type Post = {
   description: string // 학습 리스트 설명
   words: Word[] // 단어 목록
   user_id: string // 작성자 ID
+  isBookmarked?: boolean // 북마크 상태
 }
 
 type User = {
@@ -71,7 +72,23 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
           return
         }
 
-        setPosts({ ...postData, words: parsedWords })
+        // 🔥 추가: 북마크 상태 가져오기
+        const { data: bookmarkData, error: bookmarkError } = await supabase
+          .from('bookmarks')
+          .select('post_id')
+          .eq('post_id', id)
+
+        if (bookmarkError) {
+          console.error(
+            'Supabase bookmarks fetch error:',
+            bookmarkError.message,
+          )
+        }
+
+        // `isBookmarked` 상태 설정
+        const isBookmarked = !!bookmarkData?.length
+
+        setPosts({ ...postData, words: parsedWords, isBookmarked })
         setUser(userData)
       } catch (err) {
         setError('데이터를 가져오는 중 문제가 발생했습니다.')
@@ -118,15 +135,39 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
     setIsFlipped(!isFlipped)
   }
 
-  const toggleBookmark = (id: string) => {
-    setPosts((prev) =>
-      prev.map((post) =>
-        post.id === id ? { ...post, isBookmarked: !post.isBookmarked } : post,
-      ),
-    )
+  const toggleBookmark = async (id: string) => {
+    if (!posts) return // posts가 null인 경우 바로 종료
+
+    const user = await supabase.auth.getUser()
+    if (!user.data.user) {
+      router.push('/auth/signin') // 유저가 없으면 로그인 페이지로 이동
+      return
+    }
+
+    const isBookmarked = posts.isBookmarked || false
+
+    if (isBookmarked) {
+      // 북마크 해제
+      await supabase
+        .from('bookmarks')
+        .delete()
+        .eq('user_id', user.data.user.id)
+        .eq('post_id', id)
+    } else {
+      // 북마크 추가
+      await supabase.from('bookmarks').insert({
+        user_id: user.data.user.id,
+        post_id: id,
+      })
+    }
+
+    // 로컬 상태 업데이트
+    setPosts({
+      ...posts,
+      isBookmarked: !isBookmarked, // 북마크 상태 토글
+    })
   }
 
-  // justify-content: center;
   return (
     <div className="min-h-screen bg-[#0A092D] text-white p-6 flex flex-col justify-center items-center">
       <div className="w-full max-w-3xl">
@@ -161,7 +202,7 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
         <div className="flex items-center justify-between mt-4">
           <p className="flex items-center p-3">
             <Image
-              src={user.img_url || '/default-profile.png'}
+              src={user.img_url || '/dingco.png'}
               alt="Profile"
               width={40}
               height={40}
@@ -175,30 +216,25 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
             .replace(/\.$/, '')}
         </div>
       </div>
-      {/* display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: center; */}
+
       <div
-        className="relative w-full max-w-3xl mt-2 h-[300px] rounded-lg shadow-lg cursor-pointer "
+        className="relative w-full max-w-3xl mt-2 h-[300px] rounded-lg shadow-lg cursor-pointer"
         onClick={flipCard}
         style={{
-          perspective: '1000px', // 원근 효과
+          perspective: '1000px',
         }}
       >
-        {/* 카드 전체 컨테이너 */}
         <div
-          className={`w-90 h-80 rounded-lg bg-white transform transition-transform duration-700 mt-0 `}
+          className={`w-90 h-80 rounded-lg bg-white transform transition-transform duration-700 mt-0`}
           style={{
-            transformStyle: 'preserve-3d', // 3D 효과를 유지
-            transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)', // 회전 상태
+            transformStyle: 'preserve-3d',
+            transform: isFlipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
           }}
         >
-          {/* 카드 앞면 */}
           <div
             className="absolute w-full h-full flex items-center justify-center text-black bg-white rounded-lg"
             style={{
-              backfaceVisibility: 'hidden', // 뒷면 숨기기
+              backfaceVisibility: 'hidden',
             }}
           >
             <p className="text-4xl font-bold">
@@ -206,16 +242,15 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
             </p>
           </div>
 
-          {/* 카드 뒷면 */}
           <div
             className="absolute w-full h-full text-2xl flex items-center justify-center text-black bg-gray-100 rounded-lg"
             style={{
-              transform: 'rotateY(180deg)', // 기본 180도 회전
-              backfaceVisibility: 'hidden', // 앞면 숨기기
+              transform: 'rotateY(180deg)',
+              backfaceVisibility: 'hidden',
             }}
           >
             <p className="text-lg">
-              {posts.words[currentIndex]?.meaning || '정의 없음'}
+              {posts.words[currentIndex]?.definition || '정의 없음'}
             </p>
           </div>
         </div>
