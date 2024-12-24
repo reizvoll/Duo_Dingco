@@ -22,6 +22,7 @@ const QuizPage = () => {
   const [allWords, setAllWords] = useState<Word[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [selectedAnswer, setSelectedAnswer] = useState<Word | null>(null)
 
   useEffect(() => {
     const fetchData = async () => {
@@ -52,8 +53,6 @@ const QuizPage = () => {
         if (mergedWords && post.words.length > 0) {
           setRandomOptions(post.words, post.words[0], mergedWords)
         }
-      } catch (err: any) {
-        setError('데이터를 가져오는 중 오류가 발생했습니다.')
       } finally {
         setLoading(false)
       }
@@ -81,6 +80,7 @@ const QuizPage = () => {
   }
 
   const handleNext = () => {
+    setSelectedAnswer(null)
     setCurrentWordIndex((prevIndex) => {
       const totalWords = post?.words.length || 0
       const nextIndex = (prevIndex + 1) % totalWords
@@ -90,34 +90,51 @@ const QuizPage = () => {
     })
   }
 
+  const handleSelectAnswer = (option: Word) => {
+    setSelectedAnswer(option)
+  }
+
   const currentWord = post?.words?.[currentWordIndex] || null
 
   return (
     <div className="quiz-page relative flex flex-col items-center min-h-screen">
       {!loading && !error && post && (
-        <h1 className="absolute top-8 text-5xl font-bold text-center text-white">
-          {post.title}
-        </h1>
+        <>
+          <h1 className="absolute top-8 text-5xl font-bold text-center text-white">
+            {post.title}
+          </h1>
+
+          <div className="absolute top-28 w-[46%] bg-gray-400 rounded-full">
+            <div
+              className="bg-green-500 h-4 rounded-full"
+              style={{
+                width: `${((currentWordIndex + 1) / post.words.length) * 100}%`,
+              }}
+            ></div>
+          </div>
+        </>
       )}
 
       <div className="flex flex-grow items-center justify-center w-full p-6">
         {!loading && !error && post && (
           <div className="relative w-[900px] h-[650px] bg-[#2E3856] p-8 rounded-lg shadow-lg text-white flex flex-col justify-between">
             <div className="quiz-description mb-6 text-center">
-              <p className="text-2xl">{post.description}</p>
-            </div>
-            <div className="quiz-container flex-grow flex items-center justify-center p-8 rounded-lg">
-              {currentWord && (
-                <div className="word-content text-center">
-                  <p className="text-4xl mt-4">{currentWord.meaning}</p>
-                </div>
-              )}
+              <p className="text-5xl mt-2">{currentWord?.meaning}</p>
             </div>
             <div className="options-container grid grid-cols-2 gap-10 mt-4 mb-20">
               {currentOptions.map((option, index) => (
                 <div
                   key={index}
-                  className="option text-white border border-white p-4 rounded-lg shadow text-center font-bold"
+                  onClick={() => handleSelectAnswer(option)}
+                  className={`option text-white border p-4 rounded-lg shadow text-center font-bold cursor-pointer ${
+                    selectedAnswer
+                      ? option.word === currentWord?.word
+                        ? 'border-green-500'
+                        : selectedAnswer.word === option.word
+                          ? 'border-red-500'
+                          : 'border-white'
+                      : 'border-white'
+                  }`}
                 >
                   {option.word}
                 </div>
@@ -125,7 +142,10 @@ const QuizPage = () => {
             </div>
             <button
               onClick={handleNext}
-              className="absolute bottom-4 right-4 px-6 py-3 text-white border border-white rounded-lg hover:text-gray-200"
+              disabled={!selectedAnswer}
+              className={`absolute bottom-4 right-4 px-6 py-3 text-white border border-white rounded-lg hover:text-gray-200 ${
+                !selectedAnswer ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
             >
               다음
             </button>
