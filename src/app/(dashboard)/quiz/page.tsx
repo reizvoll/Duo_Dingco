@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { supabase } from '@/app/api/supabase'
 import { useRouter } from 'next/navigation'
-import { Tables } from '../../../database.types'
+import { Tables } from '../../../../database.types'
 
 // 타입 정의
 type Word = {

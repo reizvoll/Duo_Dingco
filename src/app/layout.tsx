@@ -1,6 +1,4 @@
 import type { Metadata } from 'next'
-import HeadNav from '@/components/layout/HeadNav'
-import SideNav from '@/components/layout/SideNav'
 import '@/styles/globals.css'
 
 export const metadata: Metadata = {
@@ -19,8 +17,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <HeadNav />
-        <SideNav />
         <main className="flex-1">{children}</main>
       </body>
     </html>
