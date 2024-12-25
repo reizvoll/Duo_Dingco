@@ -9,13 +9,13 @@ export default function UpdateForm({ post }: { post: any }) {
     title,
     description,
     cards,
+    isFormCheck,
     setTitle,
     setDescription,
     handleAddCard,
     handleRemoveCard,
     handleInputChange,
     handleUpdateSubmit,
-    isFormCheck,
     initializeFields,
   } = useUpdate()
 
@@ -27,7 +27,10 @@ export default function UpdateForm({ post }: { post: any }) {
 
   return (
     <form
-      onSubmit={handleUpdateSubmit}
+      onSubmit={(e) => {
+        e.preventDefault()
+        handleUpdateSubmit(post.id)
+      }}
       className="max-width-[1200px] min-h-screen flex items-center justify-center"
     >
       <div className="w-full max-w-3xl p-8 rounded-lg text-white ">
@@ -60,9 +63,9 @@ export default function UpdateForm({ post }: { post: any }) {
         {/* 카드 내용 div */}
         <div>
           <label className="block text-lg font-bold mb-2">카드 내용</label>
-          {cards.map((card) => (
+          {cards.map((card, index) => (
             <div
-              key={card.id}
+              key={`card-${index}`}
               className="bg-gray-700 p-4 rounded-lg mb-4 relative"
             >
               <div className="flex items-center justify-between mb-2">
@@ -121,6 +124,7 @@ export default function UpdateForm({ post }: { post: any }) {
         {/* 카드 추가하기 버튼 */}
         <div className="flex items-center justify-center">
           <button
+            type="button"
             onClick={handleAddCard}
             className="w-[400px] bg-[#2E3856] hover:bg-blue-800 text-white font-bold p-3 rounded-full mt-4 mb-6"
           >

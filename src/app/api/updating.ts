@@ -1,5 +1,19 @@
 import { supabase } from './supabase'
 
+export async function fetchPostId(id: string) {
+  const { data, error } = await supabase
+    .from('posts')
+    .select('*')
+    .eq('id', id)
+    .single()
+
+  if (error) {
+    console.error('Error Fetching post:', error)
+    return null
+  }
+  return data
+}
+
 export async function updatePost({
   id,
   title,

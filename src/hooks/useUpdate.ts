@@ -42,9 +42,7 @@ export function useUpdate() {
     )
   }
 
-  const handleUpdateSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-
+  const handleUpdateSubmit = async (id: string) => {
     const words = cards.map((card) => ({
       word: card.word,
       meaning: card.meaning,
@@ -72,13 +70,13 @@ export function useUpdate() {
     cards,
     title,
     description,
+    isFormCheck,
     setTitle,
     setDescription,
     handleAddCard,
     handleRemoveCard,
     handleInputChange,
     handleUpdateSubmit,
-    isFormCheck,
     initializeFields,
   }
 }
