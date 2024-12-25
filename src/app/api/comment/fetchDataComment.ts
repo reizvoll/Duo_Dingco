@@ -1,9 +1,10 @@
 import { supabase } from '@/supabase/supabase'
+import { User } from '@/types/user'
 
 export const fetchProfile = async (userId: string) => {
   const { data, error } = await supabase
     .from('users')
-    .select('name, img_url')
+    .select('id, nickname, img_url')
     .eq('id', userId)
     .single()
 
@@ -12,7 +13,7 @@ export const fetchProfile = async (userId: string) => {
     return null
   }
 
-  return data
+  return data as User
 }
 
 export async function fetchBookmarkStatus(postId: string, userId: string) {
