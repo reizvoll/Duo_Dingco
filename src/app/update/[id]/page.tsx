@@ -1,5 +1,4 @@
-import { supabase } from '@/app/api/supabase'
-import { fetchPostId } from '@/app/api/updating'
+import { fetchPostId } from '@/app/api/post/updating'
 import UpdateForm from '@/components/posting/PostUpdateForm'
 
 export default async function UpdatePage({

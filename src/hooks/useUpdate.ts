@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 
-import { updatePost } from '@/app/api/updating'
+import { updatePost } from '@/app/api/post/updating'
 import { PostCard } from '@/types/PostCard'
 
 export function useUpdate() {

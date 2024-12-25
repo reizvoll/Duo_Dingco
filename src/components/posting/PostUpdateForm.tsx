@@ -21,7 +21,12 @@ export default function UpdateForm({ post }: { post: any }) {
 
   useEffect(() => {
     if (post) {
-      initializeFields(post)
+      const cardsWithIds = post.words.map((word: any, index: number) => ({
+        id: index + 1,
+        word: word.word,
+        meaning: word.meaning,
+      }))
+      initializeFields({ ...post, words: cardsWithIds })
     }
   }, [post])
 
@@ -63,9 +68,9 @@ export default function UpdateForm({ post }: { post: any }) {
         {/* 카드 내용 div */}
         <div>
           <label className="block text-lg font-bold mb-2">카드 내용</label>
-          {cards.map((card, index) => (
+          {cards.map((card) => (
             <div
-              key={`card-${index}`}
+              key={card.id}
               className="bg-gray-700 p-4 rounded-lg mb-4 relative"
             >
               <div className="flex items-center justify-between mb-2">
