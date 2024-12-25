@@ -1,9 +1,10 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { supabase } from '@/app/api/supabase'
+import { supabase } from '@/supabase/supabase'
 import { useParams } from 'next/navigation'
 import { Tables } from '../../../../../database.types'
+// James, 이거 @ 경로로 가능하면 부탁드릴게요!
 
 type Word = {
   word: string
