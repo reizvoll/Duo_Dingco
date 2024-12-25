@@ -1,4 +1,5 @@
 import { supabase } from '@/app/api/supabase'
+import { fetchPostId } from '@/app/api/updating'
 import UpdateForm from '@/components/posting/PostUpdateForm'
 
 export default async function UpdatePage({
@@ -7,17 +8,11 @@ export default async function UpdatePage({
   params: { id: string }
 }) {
   const { id } = params
+  const post = await fetchPostId(id)
 
-  // Fetch post data from Supabase
-  const { data: post, error } = await supabase
-    .from('posts')
-    .select('*')
-    .eq('id', id)
-    .single()
-
-  if (error || !post) {
+  if (!post) {
     return <div>Post not found.</div>
   }
 
-  return <UpdateForm {...post} />
+  return <UpdateForm post={post} />
 }
