@@ -15,6 +15,7 @@ export default function UpdateForm({ post }: { post: any }) {
     handleAddCard,
     handleRemoveCard,
     handleInputChange,
+    handleDeletePost,
     handleUpdateSubmit,
     initializeFields,
   } = useUpdate()
@@ -89,11 +90,12 @@ export default function UpdateForm({ post }: { post: any }) {
                 <div className="flex items-end min-h-full justify-between gap-4">
                   <div className="flex-[0.40] border-b border-white mr-4">
                     <textarea
-                      value={card.word}
+                      value={card.word.replace(/\n/g, '<br />')}
                       onChange={(e) =>
                         handleInputChange(card.id, 'word', e.target.value)
                       }
                       className="w-full bg-transparent text-white focus:outline-none resize-none overflow-hidden"
+                      style={{ whiteSpace: 'pre-wrap' }} // 줄바꿈 적용
                       rows={1}
                       onInput={(e) => {
                         const target = e.target as HTMLTextAreaElement
@@ -105,11 +107,12 @@ export default function UpdateForm({ post }: { post: any }) {
 
                   <div className="flex-[0.60] border-b border-white ml-4">
                     <textarea
-                      value={card.meaning}
+                      value={card.meaning.replace(/\n/g, '<br />')}
                       onChange={(e) =>
                         handleInputChange(card.id, 'meaning', e.target.value)
                       }
                       className="w-full bg-transparent text-white focus:outline-none resize-none overflow-hidden"
+                      style={{ whiteSpace: 'pre-wrap' }} // 줄바꿈 적용
                       rows={1}
                       onInput={(e) => {
                         const target = e.target as HTMLTextAreaElement
@@ -140,11 +143,21 @@ export default function UpdateForm({ post }: { post: any }) {
           </div>
 
           {/* 수정 버튼 */}
-          <div className="flex justify-end">
+          <div className="flex justify-end gap-4">
+            <button
+              type="button"
+              onClick={() => handleDeletePost(post.id)}
+              className={
+                'w-[100px] p-2 font-bold rounded-xl border-2 hover:bg-red-700 text-white'
+              }
+            >
+              삭제하기
+            </button>
+
             <button
               type="submit"
               disabled={!isFormCheck}
-              className={`w-[100px] p-2 font-bold rounded-xl border-2 ${
+              className={`w-[100px] p-2 font-bold rounded-xl border-2 hover:bg-blue-700 text-white ${
                 !isFormCheck ? 'text-gray-500' : ''
               } `}
             >

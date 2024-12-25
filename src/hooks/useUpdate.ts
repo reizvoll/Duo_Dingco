@@ -4,6 +4,7 @@ import { useParams, useRouter } from 'next/navigation'
 import { updatePost } from '@/app/api/post/updating'
 import { PostCard } from '@/types/PostCard'
 import Swal from 'sweetalert2'
+import { deletePostById } from '@/app/api/post/deleting'
 
 export function useUpdate() {
   const router = useRouter()
@@ -82,6 +83,38 @@ export function useUpdate() {
     }
   }
 
+  const handleDeletePost = async (id: string) => {
+    try {
+      const result = await Swal.fire({
+        title: '정말 삭제하시겠습니까?',
+        text: '삭제하면 데이터를 복구할 수 없습니다.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#d33',
+        cancelButtonColor: '#3085d6',
+        confirmButtonText: '예, 삭제합니다!',
+        cancelButtonText: '취소',
+      })
+
+      if (result.isConfirmed) {
+        await deletePostById(id)
+        await Swal.fire(
+          '삭제 완료',
+          '게시글이 성공적으로 삭제되었습니다.',
+          'success',
+        )
+        router.push('/')
+      }
+    } catch (error) {
+      console.error(error)
+      await Swal.fire('삭제 실패', '게시글 삭제에 실패했습니다.', 'error')
+    }
+
+    return {
+      handleDeletePost,
+    }
+  }
+
   const isFormCheck =
     title.trim() !== '' &&
     description.trim() !== '' &&
@@ -99,6 +132,7 @@ export function useUpdate() {
     setDescription,
     handleAddCard,
     handleRemoveCard,
+    handleDeletePost,
     handleInputChange,
     handleUpdateSubmit,
     initializeFields,
