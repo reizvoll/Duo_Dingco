@@ -61,6 +61,7 @@ export default function PostForm() {
                 <div className="flex items-center justify-between mb-2">
                   <span className="text-base font-bold">{card.id}</span>
                   <button
+                    type="button"
                     onClick={() => handleRemoveCard(card.id)}
                     className="text-white hover:text-red-500"
                   >
