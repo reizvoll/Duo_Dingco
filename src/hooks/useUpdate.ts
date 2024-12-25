@@ -3,6 +3,7 @@ import { useParams, useRouter } from 'next/navigation'
 
 import { updatePost } from '@/app/api/post/updating'
 import { PostCard } from '@/types/PostCard'
+import Swal from 'sweetalert2'
 
 export function useUpdate() {
   const router = useRouter()
@@ -27,7 +28,17 @@ export function useUpdate() {
   }
 
   const handleRemoveCard = (cardId: number) => {
-    setCards(cards.filter((card) => card.id !== cardId))
+    if (cards.length === 1) {
+      return
+    }
+
+    const updatedCards = cards.filter((card) => card.id !== cardId)
+    const reorderedCards = updatedCards.map((card, index) => ({
+      ...card,
+      id: index + 1,
+    }))
+
+    setCards(reorderedCards)
   }
 
   const handleInputChange = (
@@ -57,14 +68,27 @@ export function useUpdate() {
 
     if (result) {
       console.log('Post updated successfully')
-      router.push('/') // 수정 후 메인 페이지로 이동
+
+      Swal.fire({
+        icon: 'success',
+        title: '수정이 완료되었습니다!',
+        showConfirmButton: false,
+        timer: 2000,
+      })
+
+      setTimeout(() => {
+        router.push('/')
+      }, 2000)
     }
   }
 
   const isFormCheck =
     title.trim() !== '' &&
     description.trim() !== '' &&
-    cards.every((card) => card.word.trim() !== '' && card.meaning.trim() !== '')
+    cards.every(
+      (card) => card.word.trim() !== '' && card.meaning.trim() !== '',
+    ) &&
+    cards.length >= 4
 
   return {
     cards,

@@ -4,8 +4,11 @@ import { supabase } from '@/supabase/supabase'
 import { fetchUser, insertPost } from '@/app/api/post/posting'
 
 import { PostCard } from '@/types/PostCard'
+import { useRouter } from 'next/navigation'
+import Swal from 'sweetalert2'
 
 export function usePost() {
+  const router = useRouter()
   const [cards, setCards] = useState<PostCard[]>([
     { id: 1, word: '', meaning: '' },
   ])
@@ -35,8 +38,18 @@ export function usePost() {
     setCards([...cards, newCard])
   }
 
-  const handleRemoveCard = (id: number) => {
-    setCards(cards.filter((card) => card.id !== id))
+  const handleRemoveCard = (cardId: number) => {
+    if (cards.length === 1) {
+      return
+    }
+
+    const updatedCards = cards.filter((card) => card.id !== cardId)
+    const reorderedCards = updatedCards.map((card, index) => ({
+      ...card,
+      id: index + 1,
+    }))
+
+    setCards(reorderedCards)
   }
 
   const handleInputChange = (
@@ -81,13 +94,27 @@ export function usePost() {
       setTitle('')
       setDescription('')
       setCards([{ id: 1, word: '', meaning: '' }])
+
+      Swal.fire({
+        icon: 'success',
+        title: '등록이 완료되었습니다!',
+        showConfirmButton: false,
+        timer: 2000,
+      })
+
+      setTimeout(() => {
+        router.push('/')
+      }, 2000)
     }
   }
 
   const isFormCheck =
     title.trim() !== '' &&
     description.trim() !== '' &&
-    cards.every((card) => card.word.trim() !== '' && card.meaning.trim() !== '')
+    cards.every(
+      (card) => card.word.trim() !== '' && card.meaning.trim() !== '',
+    ) &&
+    cards.length >= 4
 
   return {
     cards,
