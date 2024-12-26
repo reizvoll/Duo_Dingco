@@ -6,27 +6,8 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { FaStar } from 'react-icons/fa6'
 import { FaRegStar } from 'react-icons/fa6'
-type Word = {
-  id: string // 단어 ID
-  words: string // 단어
-  meaning: string // 단어의 뜻
-}
-
-type Post = {
-  id: string // 학습 리스트 ID
-  title: string // 학습 리스트 제목
-  description: string // 학습 리스트 설명
-  words: Word[] // 단어 목록
-  user_id: string // 작성자 ID
-  isBookmarked?: boolean // 북마크 상태
-}
-
-type User = {
-  id: string // 유저 ID
-  nickname: string // 유저 닉네임
-  img_url: string // 유저 프로필 이미지 URL
-  created_at: string // 유저 생성 날짜
-}
+import { Post } from '@/types/commentTypes'
+import { User } from '@supabase/supabase-js'
 
 export default function LearnListPage() {
   const [posts, setPosts] = useState<Post[]>([]) // Supabase에서 가져온 posts 데이터
