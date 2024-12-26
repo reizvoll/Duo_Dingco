@@ -76,6 +76,28 @@ export function usePost() {
       return
     }
 
+    if (cards.length < 4) {
+      Swal.fire({
+        icon: 'warning',
+        title: '카드는 최소 4개 이상이어야 수정 가능합니다.',
+        showConfirmButton: true,
+      })
+      return
+    }
+
+    if (
+      !cards.every(
+        (card) => card.word.trim() !== '' && card.meaning.trim() !== '',
+      )
+    ) {
+      Swal.fire({
+        icon: 'warning',
+        title: '카드 내용을 모두 입력해주세요.',
+        showConfirmButton: true,
+      })
+      return
+    }
+
     const words = cards.map((card) => ({
       word: card.word,
       meaning: card.meaning,
@@ -106,14 +128,6 @@ export function usePost() {
     }
   }
 
-  const isFormCheck =
-    title.trim() !== '' &&
-    description.trim() !== '' &&
-    cards.every(
-      (card) => card.word.trim() !== '' && card.meaning.trim() !== '',
-    ) &&
-    cards.length >= 4
-
   return {
     cards,
     title,
@@ -124,6 +138,5 @@ export function usePost() {
     handleRemoveCard,
     handleInputChange,
     handleSubmit,
-    isFormCheck,
   }
 }

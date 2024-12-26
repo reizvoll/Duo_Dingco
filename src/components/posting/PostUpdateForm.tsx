@@ -9,7 +9,6 @@ export default function UpdateForm({ post }: { post: any }) {
     title,
     description,
     cards,
-    isFormCheck,
     setTitle,
     setDescription,
     handleAddCard,
@@ -30,6 +29,8 @@ export default function UpdateForm({ post }: { post: any }) {
       initializeFields({ ...post, words: cardsWithIds })
     }
   }, [post])
+
+  // console.log([...cards[0].meaning])
 
   return (
     <div className="h-screen overflow-y-auto">
@@ -116,7 +117,7 @@ export default function UpdateForm({ post }: { post: any }) {
                         handleInputChange(card.id, 'meaning', e.target.value)
                       }
                       className="w-full bg-transparent text-white focus:outline-none resize-none overflow-hidden whitespace-pre-wrap break-words"
-                      rows={Math.max(1, card.meaning.split('\n').length)} // \n 갯수에 따라 rows 조정
+                      rows={Math.max(1, card.meaning.split('\n').length)}
                       style={{
                         height: `${1.5 * Math.max(1, card.meaning.split('\n').length)}rem`,
                       }}
@@ -164,7 +165,6 @@ export default function UpdateForm({ post }: { post: any }) {
 
             <button
               type="submit"
-              disabled={!isFormCheck}
               className={`w-[100px] p-2 font-bold rounded-xl border-2 text-white hover:bg-blue-700`}
             >
               수정하기

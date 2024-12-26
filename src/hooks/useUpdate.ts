@@ -135,19 +135,10 @@ export function useUpdate() {
     }
   }
 
-  const isFormCheck =
-    title.trim() !== '' &&
-    description.trim() !== '' &&
-    cards.every(
-      (card) => card.word.trim() !== '' && card.meaning.trim() !== '',
-    ) &&
-    cards.length >= 4
-
   return {
     cards,
     title,
     description,
-    isFormCheck,
     setTitle,
     setDescription,
     handleAddCard,
