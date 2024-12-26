@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/supabase/supabaseClient'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-
+import { FaStar } from 'react-icons/fa6'
+import { FaRegStar } from 'react-icons/fa6'
 type Word = {
   id: string // 단어 ID
   words: string // 단어
@@ -202,19 +203,9 @@ export default function LearnListPage() {
                           }}
                         >
                           {post.isBookmarked ? (
-                            <Image
-                              src="/bookmarkon.png"
-                              alt="Bookmarked"
-                              width={30}
-                              height={30}
-                            />
+                            <FaStar className="w-[30px] h-[30px]" />
                           ) : (
-                            <Image
-                              src="/bookmarkoff.png"
-                              alt="Not Bookmarked"
-                              width={30}
-                              height={30}
-                            />
+                            <FaRegStar className="w-[30px] h-[30px]" />
                           )}
                         </button>
                       </div>
