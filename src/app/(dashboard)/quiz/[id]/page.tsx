@@ -124,7 +124,7 @@ const QuizPage = () => {
         html: `
           <p>현재 레벨: <strong>${user.Lv}</strong></p>
           <p>현재 경험치: <strong>${user.Exp}/100</strong></p>
-          <p>${post.words.length}문제 중 <strong>${correctAnswers + (isCorrect ? 1 : 0)}문제</strong>를 맞추셨습니다.</p>
+          <p>${post?.words.length}문제 중 <strong>${correctAnswers + (isCorrect ? 1 : 0)}문제</strong>를 맞추셨습니다.</p>
         `,
         icon: 'success',
         confirmButtonText: '퀴즈 리스트로 돌아가기',
@@ -154,7 +154,7 @@ const QuizPage = () => {
         html: `
           <p>현재 레벨: <strong>${user?.Lv}</strong></p>
           <p>현재 경험치: <strong>${user?.Exp}/100</strong></p>
-          <p>${post.words.length}문제 중 <strong>${correctAnswers}</strong>문제를 맞추셨습니다.</p>
+          <p>${post?.words.length}문제 중 <strong>${correctAnswers}</strong>문제를 맞추셨습니다.</p>
         `,
         icon: 'success',
         confirmButtonText: '퀴즈 리스트로 돌아가기',
