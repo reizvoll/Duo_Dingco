@@ -2,7 +2,8 @@
 
 import React, { useEffect, useState } from 'react'
 import { supabase } from '@/app/api/supabase'
-import { useParams } from 'next/navigation'
+import { useParams, useRouter } from 'next/navigation'
+import Swal from 'sweetalert2'
 import { Tables } from '../../../../database.types'
 
 type Word = {
@@ -16,6 +17,7 @@ type Post = Tables<'posts'> & {
 
 const QuizPage = () => {
   const { id } = useParams()
+  const router = useRouter()
   const [post, setPost] = useState<Post | null>(null)
   const [currentWordIndex, setCurrentWordIndex] = useState(0)
   const [currentOptions, setCurrentOptions] = useState<Word[]>([])
@@ -23,12 +25,32 @@ const QuizPage = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [selectedAnswer, setSelectedAnswer] = useState<Word | null>(null)
+  const [user, setUser] = useState<{ id: string; Exp: number; Lv: number } | null>(null)
+  const [correctAnswers, setCorrectAnswers] = useState<number>(0)
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true)
       setError(null)
       try {
+        const {
+          data: { session },
+        } = await supabase.auth.getSession()
+        if (!session) {
+          setError('로그인이 필요합니다.')
+          return
+        }
+
+        const userId = session.user.id
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('id, Exp, Lv')
+          .eq('id', userId)
+          .single()
+
+        if (userError) throw userError
+        setUser(userData)
+
         const [allWordsResponse, postResponse] = await Promise.all([
           supabase.from('posts').select('words'),
           supabase
@@ -79,7 +101,52 @@ const QuizPage = () => {
     setCurrentOptions(options)
   }
 
-  const handleNext = () => {
+  const handleNext = async () => {
+    if (!user || !selectedAnswer || !currentWord) return
+
+    const isCorrect = selectedAnswer.word === currentWord.word
+    const isLastQuestion = currentWordIndex === (post?.words.length || 1) - 1
+
+    if (isCorrect) {
+      setCorrectAnswers((prev) => prev + 1)
+
+      let newExp = user.Exp + 5
+      let newLv = user.Lv
+
+      if (newExp >= 100) {
+        newExp -= 100
+        newLv += 1
+      }
+
+      const { error: updateError } = await supabase
+        .from('users')
+        .update({ Exp: newExp, Lv: newLv })
+        .eq('id', user.id)
+
+      if (updateError) {
+        console.error('경험치 업데이트 실패:', updateError)
+        return
+      }
+
+      setUser({ ...user, Exp: newExp, Lv: newLv })
+    }
+
+    if (isLastQuestion) {
+      Swal.fire({
+        title: '퀴즈 완료!',
+        html: `
+          <p>현재 레벨: <strong>${user.Lv}</strong></p>
+          <p>현재 경험치: <strong>${user.Exp}/100</strong></p>
+          <p>${post.words.length}문제 중 <strong>${correctAnswers + (isCorrect ? 1 : 0)}문제</strong>를 맞추셨습니다.</p>
+        `,
+        icon: 'success',
+        confirmButtonText: '퀴즈 리스트로 돌아가기',
+      }).then(() => {
+        router.push('/quiz')
+      })
+      return
+    }
+
     setSelectedAnswer(null)
     setCurrentWordIndex((prevIndex) => {
       const totalWords = post?.words.length || 0
@@ -131,8 +198,8 @@ const QuizPage = () => {
                       ? option.word === currentWord?.word
                         ? 'border-green-500'
                         : selectedAnswer.word === option.word
-                          ? 'border-red-500'
-                          : 'border-white'
+                        ? 'border-red-500'
+                        : 'border-white'
                       : 'border-white'
                   }`}
                 >
@@ -147,7 +214,9 @@ const QuizPage = () => {
                 !selectedAnswer ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
-              다음
+              {currentWordIndex === (post?.words.length || 1) - 1
+                ? '완료'
+                : '다음'}
             </button>
           </div>
         )}
