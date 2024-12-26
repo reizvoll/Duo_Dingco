@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/app/api/supabase'
+import { supabase } from '@/supabase/supabaseClient'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { FaCircleArrowRight } from 'react-icons/fa6'
