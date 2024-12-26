@@ -1,8 +1,14 @@
-import { supabase } from '@/app/api/supabase'
-import { PostCard } from '@/types/PostCard'
 import { useEffect, useState } from 'react'
 
+import { supabase } from '@/supabase/supabaseClient'
+import { fetchUser, insertPost } from '@/app/api/post/posting'
+
+import { PostCard } from '@/types/PostCard'
+import { useRouter } from 'next/navigation'
+import Swal from 'sweetalert2'
+
 export function usePost() {
+  const router = useRouter()
   const [cards, setCards] = useState<PostCard[]>([
     { id: 1, word: '', meaning: '' },
   ])
@@ -13,50 +19,37 @@ export function usePost() {
   useEffect(() => {
     const mockSignIn = async () => {
       const { data, error } = await supabase.auth.signInWithPassword({
-        email: '123123@naver.com', // Mock email from your Users table
-        password: '123123', // Use a valid password for the mock user
+        email: '123123@naver.com',
+        password: '123123',
       })
 
       if (error) {
         console.error('Mock sign-in failed:', error.message)
       } else {
-        console.log('Mock user signed in:', data.user)
+        setUserId(data.user?.id || null)
       }
     }
 
-    const fetchSession = async () => {
-      await mockSignIn() // Perform mock sign-in
-      const {
-        data: { session },
-        error,
-      } = await supabase.auth.getSession()
-
-      if (error) {
-        console.error('Error fetching session:', error)
-        return
-      }
-
-      if (session?.user?.id) {
-        setUserId(session.user.id)
-      } else {
-        console.error('No active session or user ID found.')
-      }
-    }
-
-    fetchSession()
+    mockSignIn()
   }, [])
 
   const handleAddCard = () => {
-    const newCard = {
-      id: cards.length + 1,
-      word: '',
-      meaning: '',
-    }
+    const newCard = { id: cards.length + 1, word: '', meaning: '' }
     setCards([...cards, newCard])
   }
 
-  const handleRemoveCard = (id: number) => {
-    setCards(cards.filter((card) => card.id !== id))
+  const handleRemoveCard = (cardId: number) => {
+    if (cards.length === 1) {
+      return
+    }
+
+    const updatedCards = cards.filter((card) => card.id !== cardId)
+    const reorderedCards = updatedCards.map((card, index) => ({
+      ...card,
+      id: index + 1,
+    }))
+
+    setCards(reorderedCards)
   }
 
   const handleInputChange = (
@@ -75,9 +68,14 @@ export function usePost() {
     e.preventDefault()
 
     if (!userId) {
-      throw new Error(
-        'User ID is missing. This should never happen. Please ensure the user is authenticated.',
-      )
+      console.error('User not authenticated.')
+      return
+    }
+
+    const user = await fetchUser(userId)
+    if (!user) {
+      console.error('User validation failed.')
+      return
     }
 
     const words = cards.map((card) => ({
@@ -85,40 +83,38 @@ export function usePost() {
       meaning: card.meaning,
     }))
 
-    try {
-      const { data: userCheck, error: userError } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', userId)
-        .limit(1)
-        .single()
+    const result = await insertPost({
+      title,
+      description,
+      words,
+      userId: user.id,
+    })
 
-      if (userError || !userCheck) {
-        console.error('User validation failed:', userError)
-        return
-      }
+    if (result) {
+      setTitle('')
+      setDescription('')
+      setCards([{ id: 1, word: '', meaning: '' }])
 
-      const { data, error } = await supabase.from('posts').insert([
-        {
-          title,
-          description,
-          words,
-          user_id: userCheck.id, // Ensure the user exists in the users table
-        },
-      ])
+      Swal.fire({
+        icon: 'success',
+        title: '등록이 완료되었습니다!',
+        showConfirmButton: false,
+        timer: 2000,
+      })
 
-      if (error) {
-        console.error('Error inserting data:', error)
-      } else {
-        console.log('Data inserted successfully:', data)
-        setTitle('')
-        setDescription('')
-        setCards([{ id: 1, word: '', meaning: '' }])
-      }
-    } catch (err) {
-      console.error('Unexpected error:', err)
+      setTimeout(() => {
+        router.push('/')
+      }, 2000)
     }
   }
+
+  const isFormCheck =
+    title.trim() !== '' &&
+    description.trim() !== '' &&
+    cards.every(
+      (card) => card.word.trim() !== '' && card.meaning.trim() !== '',
+    ) &&
+    cards.length >= 4
 
   return {
     cards,
@@ -130,5 +126,6 @@ export function usePost() {
     handleRemoveCard,
     handleInputChange,
     handleSubmit,
+    isFormCheck,
   }
 }
