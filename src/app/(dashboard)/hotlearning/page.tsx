@@ -33,7 +33,7 @@ export default function HotLearningPage() {
         .order('created_at', { ascending: false })
       if (postError) {
         setError('posts 데이터를 가져오는 중 오류가 발생했습니다.')
-        console.error('Supabase posts fetch error:', postError.message)
+        console.error('Supabase posts fetch error:', postError)
         return
       }
 
@@ -42,7 +42,7 @@ export default function HotLearningPage() {
         .select('id, nickname, img_url, created_at')
       if (userError) {
         setError('users 데이터를 가져오는 중 오류가 발생했습니다.')
-        console.error('Supabase users fetch error:', userError.message)
+        console.error('Supabase users fetch error:', userError)
         return
       }
 
@@ -50,7 +50,7 @@ export default function HotLearningPage() {
         .from('bookmarks')
         .select('post_id')
       if (bookmarkError) {
-        console.error('Supabase bookmarks fetch error:', bookmarkError.message)
+        console.error('Supabase bookmarks fetch error:', bookmarkError)
         return
       }
 
@@ -126,12 +126,12 @@ export default function HotLearningPage() {
       <div className="flex-1 ml-20 p-28 overflow-y-auto h-screen">
         <div className="relative flex flex-col items-center justify-center">
           <div className="absolute top-14 left-40">
-            <h1 className="text-3xl font-bold pl-[390px]">
+            <h1 className="text-3xl font-bold pl-[70px]">
               🔥오늘 작성된 따끈~한 단어
             </h1>
           </div>
           <div className="flex items-center justify-center w-full mt-32">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-20">
               {posts.map((post) => {
                 const userInfo = getUserInfo(post.user_id)
 
@@ -141,10 +141,10 @@ export default function HotLearningPage() {
                     className="w-56 h-56 bg-[#2E3856] text-white rounded-lg shadow-lg"
                   >
                     <div className="w-full h-full flex flex-col p-3">
-                      <h2 className="text-lg font-semibold truncate mb-4">
+                      <h2 className="text-xl font-semibold truncate p-3">
                         {post.title}
                       </h2>
-                      <div className="text-sm text-gray-300 flex items-center justify-between mb-6">
+                      <div className="text-sm text-gray-300 flex items-center justify-between mb-1">
                         <div className="flex items-center space-x-2">
                           <Image
                             src={userInfo.img_url || '/dingco.png'}
@@ -171,12 +171,12 @@ export default function HotLearningPage() {
                       </div>
                       <div className="flex items-center justify-center mt-6">
                         <div
-                          className="text-lg rounded-lg bg-[#282E3E] text-center text-white flex items-center justify-center
+                          className="text-2xl rounded-lg bg-[#282E3E] text-center text-white flex items-center justify-center
                             cursor-pointer hover:bg-[#3f475e] transition duration-300 
-                            h-14 w-28 sm:h-16 sm:w-32 md:h-18 md:w-36 lg:h-18 lg:w-36"
+                            h-14 w-28 sm:h-20 sm:w-32 md:h-18 md:w-36 lg:h-18 lg:w-36"
                           onClick={() => handleGoToDetails(post.id)}
                         >
-                          {post.words.length} 단어
+                          {post.words.length}단어
                         </div>
                       </div>
                     </div>
