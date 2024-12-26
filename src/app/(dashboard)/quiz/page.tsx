@@ -31,9 +31,7 @@ const QuizListPage = () => {
       setLoading(true)
       setError(null)
       try {
-        const { data, error } = await supabase
-          .from('posts')
-          .select(`
+        const { data, error } = await supabase.from('posts').select(`
             id,
             title,
             words,
@@ -88,7 +86,8 @@ const QuizListPage = () => {
                 닉네임: {post.users?.nickname || '알 수 없음'}
               </p>
               <p className="text-white">
-                단어 개수: {Array.isArray(post.words) ? post.words.length : '알 수 없음'}
+                단어 개수:{' '}
+                {Array.isArray(post.words) ? post.words.length : '알 수 없음'}
               </p>
             </div>
           ))}
