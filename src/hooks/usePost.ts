@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 
-import { supabase } from '@/supabase/supabase'
+import { supabase } from '@/supabase/supabaseClient'
 import { fetchUser, insertPost } from '@/app/api/post/posting'
 
 import { PostCard } from '@/types/PostCard'
