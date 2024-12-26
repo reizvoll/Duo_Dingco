@@ -1,4 +1,4 @@
-import { supabase } from '@/supabase/supabase'
+import { supabase } from '@/supabase/supabaseClient'
 
 export async function deletePostById(id: string) {
   const { error } = await supabase.from('posts').delete().eq('id', id)
