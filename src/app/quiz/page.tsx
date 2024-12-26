@@ -5,7 +5,6 @@ import { supabase } from '@/app/api/supabase'
 import { useRouter } from 'next/navigation'
 import { Tables } from '../../../database.types'
 
-// 타입 정의
 type Word = {
   id: string
   word: string
@@ -13,7 +12,7 @@ type Word = {
 }
 
 type Post = Tables<'posts'> & {
-  words: Word[] // JSON 배열로 가정
+  words: Word[]
   users: {
     nickname: string
   }
@@ -44,10 +43,9 @@ const QuizListPage = () => {
 
         if (error) throw error
         if (data) {
-          // users가 배열로 반환되면 첫 번째 항목만 사용
           const formattedData = data.map((post: any) => ({
             ...post,
-            users: post.users[0], // 첫 번째 사용자를 가져옴
+            users: post.users[0],
           }))
           setPosts(formattedData as Post[])
         }
@@ -66,33 +64,50 @@ const QuizListPage = () => {
   }
 
   return (
-    <div className="quiz-list-page p-6">
-      <div className="mb-8">
-        <h1 className="text-4xl font-bold text-left text-white">퀴즈 풀기</h1>
-      </div>
+    <div className="min-h-screen bg-[#0A092D] text-white flex">
+      <div className="flex-1 ml-20 p-8 overflow-y-auto h-screen">
+        <div className="relative flex flex-col items-center justify-center">
+          {/* 퀴즈 리스트 페이지 제목 */}
+          <div className="absolute top-14 left-40">
+            <h1 className="text-3xl font-bold">퀴즈 풀기</h1>
+          </div>
 
-      {loading && <p className="text-center text-white">로딩 중...</p>}
-      {error && <p className="text-center text-red-500">{error}</p>}
+          {/* 카드 묶음 */}
+          <div className="flex items-center justify-center w-full mt-24">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {posts.map((post) => (
+                <div
+                  key={post.id}
+                  className="w-56 h-56 bg-[#2E3856] text-white rounded-lg shadow-lg cursor-pointer"
+                  onClick={() => handleNavigateToQuiz(post.id)}
+                >
+                  <div className="w-full h-full flex flex-col p-3">
+                    <h2 className="text-lg font-semibold truncate mb-4">
+                      {post.title}
+                    </h2>
 
-      {!loading && !error && (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {posts.map((post) => (
-            <div
-              key={post.id}
-              className="p-4 bg-[#2E3856] rounded-lg shadow cursor-pointer"
-              onClick={() => handleNavigateToQuiz(post.id)}
-            >
-              <h2 className="text-xl font-semibold text-white">{post.title}</h2>
-              <p className="text-white">
-                닉네임: {post.users?.nickname || '알 수 없음'}
-              </p>
-              <p className="text-white">
-                단어 개수: {Array.isArray(post.words) ? post.words.length : '알 수 없음'}
-              </p>
+                    <div className="text-sm text-gray-300 flex items-center justify-between mb-6">
+                      <div className="flex items-center space-x-2">
+                        <p>{post.users?.nickname || '알 수 없음'}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-center mt-6">
+                      <div
+                        className="text-lg rounded-lg bg-[#282E3E] text-center text-white flex items-center justify-center
+                          cursor-pointer hover:bg-[#3f475e] transition duration-300 
+                          h-14 w-28 sm:h-16 sm:w-32 md:h-18 md:w-36 lg:h-18 lg:w-36"
+                      >
+                        {post.words.length} 단어
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
         </div>
-      )}
+      </div>
     </div>
   )
 }
