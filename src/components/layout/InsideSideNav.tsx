@@ -70,14 +70,16 @@ export default function InsideSideNav({
           <PiListBold />
         </button>
         {menuIsOpen && (
-          <div className="ml-4">
-            <Image
-              src="/duodingco_logo.png"
-              width={60}
-              height={60}
-              alt="듀오딩코 로고"
-            />
-          </div>
+          <Link href="/" passHref>
+            <div className="ml-4 cursor-pointer">
+              <Image
+                src="/duodingco_logo.png"
+                width={60}
+                height={60}
+                alt="듀오딩코 로고"
+              />
+            </div>
+          </Link>
         )}
       </div>
 
@@ -90,26 +92,22 @@ export default function InsideSideNav({
               key={item.path}
               href={item.path}
               onClick={toggleMenu}
-              className={`flex items-center rounded-lg ${
-                isActive ? 'bg-[#4A4E69]' : 'hover:bg-[#2E3143]'
-              } ${
-                menuIsOpen
+              className={`flex items-center rounded-lg ${isActive ? 'bg-[#4A4E69]' : 'hover:bg-[#2E3143]'
+                } ${menuIsOpen
                   ? 'w-[80%] p-3 gap-4'
                   : 'w-[60px] h-[60px] justify-center'
-              }`}
+                }`}
             >
               <div
-                className={`text-4xl ${
-                  isActive ? 'text-[#AFB7FF]' : 'text-[#E0E1DD]'
-                }`}
+                className={`text-4xl ${isActive ? 'text-[#AFB7FF]' : 'text-[#E0E1DD]'
+                  }`}
               >
                 {item.icon}
               </div>
               {menuIsOpen && (
                 <span
-                  className={`text-xl ${
-                    isActive ? 'text-[#B4CFFA]' : 'text-[#E0E1DD]'
-                  }`}
+                  className={`text-xl ${isActive ? 'text-[#B4CFFA]' : 'text-[#E0E1DD]'
+                    }`}
                 >
                   {item.label}
                 </span>
@@ -123,24 +121,20 @@ export default function InsideSideNav({
       <div className="absolute bottom-10 w-full flex justify-start pl-4">
         <Link
           href="/mypage"
-          className={`flex items-center ${
-            selectedMenu === 'mypage' ? 'bg-[#4A4E69]' : 'hover:bg-[#2E3143]'
-          } ${
-            menuIsOpen
+          className={`flex items-center ${selectedMenu === 'mypage' ? 'bg-[#4A4E69]' : 'hover:bg-[#2E3143]'
+            } ${menuIsOpen
               ? 'w-[80%] p-3 gap-4'
               : 'w-[60px] h-[60px] justify-center'
-          }`}
+            }`}
         >
           <FaRegCircleUser
-            className={`text-4xl ${
-              selectedMenu === 'mypage' ? 'text-[#AFB7FF]' : 'text-[#E0E1DD]'
-            }`}
+            className={`text-4xl ${selectedMenu === 'mypage' ? 'text-[#AFB7FF]' : 'text-[#E0E1DD]'
+              }`}
           />
           {menuIsOpen && (
             <span
-              className={`text-xl ${
-                selectedMenu === 'mypage' ? 'text-[#B4CFFA]' : 'text-[#E0E1DD]'
-              }`}
+              className={`text-xl ${selectedMenu === 'mypage' ? 'text-[#B4CFFA]' : 'text-[#E0E1DD]'
+                }`}
             >
               마이페이지
             </span>

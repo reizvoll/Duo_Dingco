@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { supabase } from '@/supabase/supabaseClient'
 import { useRouter } from 'next/navigation'
-import { Tables } from '../../../database.types'
+import { Tables } from '../../../../database.types'
 import Image from 'next/image'
 
 type Word = {

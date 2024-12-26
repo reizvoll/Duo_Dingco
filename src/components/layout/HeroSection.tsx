@@ -21,9 +21,8 @@ const HeroSection = () => {
         </p>
       </div>
 
-      {/* 로그인 버튼 */}
       <div className="relative z-20">
-        <button className="mt-6 px-16 py-2 border-2 border-gray-400 text-md rounded-2xl hover:bg-gray-100 transition">
+        <button className="mt-6 px-16 py-2 border-2 border-gray-400 text-md rounded-2xl hover:bg-gray-100 hover:text-[#13132D] hover:border-transparent font-medium transition">
           로그인하기
         </button>
       </div>
