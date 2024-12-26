@@ -1,7 +1,7 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { supabase } from '@/supabase/supabase'
+import { supabase } from '@/supabase/supabaseClient'
 import { useParams } from 'next/navigation'
 import { Tables } from '../../../../../database.types'
 // James, 이거 @ 경로로 가능하면 부탁드릴게요!
