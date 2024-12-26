@@ -8,7 +8,7 @@ import { FaStar } from 'react-icons/fa6'
 import { FaRegStar } from 'react-icons/fa6'
 import { Post } from '@/types/commentTypes'
 import { User } from '@supabase/supabase-js'
-
+// 이거 푸쉬해볼게~
 export default function LearnListPage() {
   const [posts, setPosts] = useState<Post[]>([]) // Supabase에서 가져온 posts 데이터
   const [users, setUsers] = useState<User[]>([]) // Supabase에서 가져온 users 데이터
