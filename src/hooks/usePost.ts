@@ -1,4 +1,4 @@
-import { supabase } from '@/app/api/supabase'
+import { supabase } from '@/supabase/supabase'
 import { PostCard } from '@/types/PostCard'
 import { useEffect, useState } from 'react'
 
