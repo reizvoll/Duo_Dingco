@@ -5,23 +5,23 @@ import { FiLogIn, FiLogOut } from 'react-icons/fi'
 import { useModalStore } from '@/store/useModalStore'
 import Swal from 'sweetalert2'
 
-const ClientSideActions = ({ user }: { user: any }) => {
-  const { openModal, logout } = useModalStore()
+export const handleLoginRedirect = () => {
+  Swal.fire({
+    title: `로그인이 필요합니다`,
+    text: `로그인 하시겠습니까?`,
+    icon: 'question',
+    showCancelButton: true,
+    confirmButtonText: '예',
+    cancelButtonText: '아니오',
+  }).then((result) => {
+    if (result.isConfirmed) {
+      window.location.href = '/auth/login'
+    }
+  })
+}
 
-  const handleLoginRedirect = () => {
-    Swal.fire({
-      title: `로그인이 필요합니다`,
-      text: `로그인 하시겠습니까?`,
-      icon: 'question',
-      showCancelButton: true,
-      confirmButtonText: '예',
-      cancelButtonText: '아니오',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        window.location.href = '/auth/login'
-      }
-    })
-  }
+const ProtectedLogin = ({ user }: { user: any }) => {
+  const { openModal, logout } = useModalStore()
 
   const handleProfileClick = () => {
     if (user?.id) {
@@ -69,4 +69,4 @@ const ClientSideActions = ({ user }: { user: any }) => {
   )
 }
 
-export default ClientSideActions
+export default ProtectedLogin
