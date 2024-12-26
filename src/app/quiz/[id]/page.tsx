@@ -1,10 +1,11 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { supabase } from '@/app/api/supabase'
-import { useParams, useRouter } from 'next/navigation'
-import Swal from 'sweetalert2'
+import { supabase } from '@/supabase/supabaseClient'
+import { useParams } from 'next/navigation'
 import { Tables } from '../../../../database.types'
+import { useRouter } from 'next/router'
+import Swal from 'sweetalert2'
 
 type Word = {
   word: string

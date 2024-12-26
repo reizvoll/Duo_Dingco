@@ -5,12 +5,7 @@ import { useRouter } from 'next/navigation'
 import Swal from 'sweetalert2'
 import { IoIosArrowDropleft } from 'react-icons/io'
 import Image from 'next/image'
-import { createClient } from '@supabase/supabase-js'
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-)
+import { supabase } from '@/supabase/supabaseClient'
 
 export default function LoginForm() {
   const [email, setEmail] = useState('')
