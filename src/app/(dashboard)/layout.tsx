@@ -1,22 +1,20 @@
 import HeadNav from '@/components/layout/HeadNav'
 import SideNav from '@/components/layout/SideNav'
 import '@/styles/globals.css'
-import { metadata } from '../layout';
+import { getServerModalState } from '@/store/useModalStore'
 
-export { metadata }
-
-export default function DashboardLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const serverState = getServerModalState()
+
   return (
-    <html lang="en">
-      <body>
-        <HeadNav />
+      <>
+        <HeadNav user={serverState.user} />
         <SideNav />
         <main className="flex-1">{children}</main>
-      </body>
-    </html>
+      </>
   )
 }
