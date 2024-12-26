@@ -1,9 +1,10 @@
 'use client'
 
-import { usePost } from '@/hooks/usePost'
+import { useUpdate } from '@/hooks/useUpdate'
+import { useEffect } from 'react'
 import { RiDeleteBin6Line } from 'react-icons/ri'
 
-export default function PostForm() {
+export default function UpdateForm({ post }: { post: any }) {
   const {
     title,
     description,
@@ -14,17 +15,33 @@ export default function PostForm() {
     handleAddCard,
     handleRemoveCard,
     handleInputChange,
-    handleSubmit,
-  } = usePost()
+    handleDeletePost,
+    handleUpdateSubmit,
+    initializeFields,
+  } = useUpdate()
+
+  useEffect(() => {
+    if (post) {
+      const cardsWithIds = post.words.map((word: any, index: number) => ({
+        id: index + 1,
+        word: word.word,
+        meaning: word.meaning,
+      }))
+      initializeFields({ ...post, words: cardsWithIds })
+    }
+  }, [post])
 
   return (
     <div className="h-screen overflow-y-auto">
       <form
-        onSubmit={handleSubmit}
-        className="max-width-[1200px] overflow-y-auto flex items-center justify-center"
+        onSubmit={(e) => {
+          e.preventDefault()
+          handleUpdateSubmit(post.id)
+        }}
+        className="max-width-[1200px] min-h-screen flex items-center justify-center"
       >
         <div className="w-full max-w-3xl p-8 rounded-lg text-white ">
-          <h1 className="text-2xl font-bold mb-8 text-start">카드 생성하기</h1>
+          <h1 className="text-2xl font-bold mb-8 text-start">카드 수정하기</h1>
 
           {/* 제목 부분 div */}
           <div className="mb-4">
@@ -73,11 +90,12 @@ export default function PostForm() {
                 <div className="flex items-end min-h-full justify-between gap-4">
                   <div className="flex-[0.40] border-b border-white mr-4">
                     <textarea
-                      value={card.word}
+                      value={card.word.replace(/\n/g, '<br />')}
                       onChange={(e) =>
                         handleInputChange(card.id, 'word', e.target.value)
                       }
                       className="w-full bg-transparent text-white focus:outline-none resize-none overflow-hidden"
+                      style={{ whiteSpace: 'pre-wrap' }} // 줄바꿈 적용
                       rows={1}
                       onInput={(e) => {
                         const target = e.target as HTMLTextAreaElement
@@ -89,11 +107,12 @@ export default function PostForm() {
 
                   <div className="flex-[0.60] border-b border-white ml-4">
                     <textarea
-                      value={card.meaning}
+                      value={card.meaning.replace(/\n/g, '<br />')}
                       onChange={(e) =>
                         handleInputChange(card.id, 'meaning', e.target.value)
                       }
                       className="w-full bg-transparent text-white focus:outline-none resize-none overflow-hidden"
+                      style={{ whiteSpace: 'pre-wrap' }} // 줄바꿈 적용
                       rows={1}
                       onInput={(e) => {
                         const target = e.target as HTMLTextAreaElement
@@ -123,16 +142,26 @@ export default function PostForm() {
             </button>
           </div>
 
-          {/* 만들기 버튼 */}
-          <div className="flex justify-end">
+          {/* 수정 버튼 */}
+          <div className="flex justify-end gap-4">
+            <button
+              type="button"
+              onClick={() => handleDeletePost(post.id)}
+              className={
+                'w-[100px] p-2 font-bold rounded-xl border-2 hover:bg-red-700 text-white'
+              }
+            >
+              삭제하기
+            </button>
+
             <button
               type="submit"
               disabled={!isFormCheck}
-              className={`w-[100px] p-2 font-bold rounded-xl border-2 ${
+              className={`w-[100px] p-2 font-bold rounded-xl border-2 hover:bg-blue-700 text-white ${
                 !isFormCheck ? 'text-gray-500' : ''
               } `}
             >
-              만들기
+              수정하기
             </button>
           </div>
         </div>
