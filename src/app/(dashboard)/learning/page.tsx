@@ -6,12 +6,14 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { FaStar } from 'react-icons/fa6'
 import { FaRegStar } from 'react-icons/fa6'
-import { Post } from '@/types/commentTypes'
-import { User } from '@supabase/supabase-js'
+import { Bookmarks } from '@/types/commentTypes'
+import { UserData } from '@/types/user'
+
 // 이거 푸쉬해볼게~
 export default function LearnListPage() {
-  const [posts, setPosts] = useState<Post[]>([]) 
-  const [users, setUsers] = useState<User[]>([]) 
+  // 타입 지정 변동했씁니당~
+  const [posts, setPosts] = useState<Bookmarks[]>([]) 
+  const [users, setUsers] = useState<UserData[]>([]) 
   const [error, setError] = useState<string | null>(null) 
   const router = useRouter()
 
@@ -71,7 +73,7 @@ export default function LearnListPage() {
       )
 
       // posts 데이터에 isBookmarked 값 업데이트
-      const parsedPosts = (postData as Post[]).map((post) => ({
+      const parsedPosts = (postData as Bookmarks[]).map((post) => ({
         ...post,
         words:
           typeof post.words === 'string' ? JSON.parse(post.words) : post.words,
@@ -79,7 +81,7 @@ export default function LearnListPage() {
       }))
 
       setPosts(parsedPosts)
-      setUsers(userData as User[])
+      setUsers(userData as UserData[])
     }
 
     fetchData()
