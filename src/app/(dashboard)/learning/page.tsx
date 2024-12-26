@@ -4,29 +4,11 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/supabase/supabaseClient'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-
-type Word = {
-  id: string // 단어 ID
-  words: string // 단어
-  meaning: string // 단어의 뜻
-}
-
-type Post = {
-  id: string // 학습 리스트 ID
-  title: string // 학습 리스트 제목
-  description: string // 학습 리스트 설명
-  words: Word[] // 단어 목록
-  user_id: string // 작성자 ID
-  isBookmarked?: boolean // 북마크 상태
-}
-
-type User = {
-  id: string // 유저 ID
-  nickname: string // 유저 닉네임
-  img_url: string // 유저 프로필 이미지 URL
-  created_at: string // 유저 생성 날짜
-}
-
+import { FaStar } from 'react-icons/fa6'
+import { FaRegStar } from 'react-icons/fa6'
+import { Post } from '@/types/commentTypes'
+import { User } from '@supabase/supabase-js'
+// 이거 푸쉬해볼게~
 export default function LearnListPage() {
   const [posts, setPosts] = useState<Post[]>([]) // Supabase에서 가져온 posts 데이터
   const [users, setUsers] = useState<User[]>([]) // Supabase에서 가져온 users 데이터
@@ -46,7 +28,6 @@ export default function LearnListPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      // posts 데이터 가져오기
       const { data: postData, error: postError } = await supabase.from('posts')
         .select(`
           id,
@@ -58,11 +39,10 @@ export default function LearnListPage() {
 
       if (postError) {
         setError('posts 데이터를 가져오는 중 오류가 발생했습니다.')
-        console.error('Supabase posts fetch error:', postError.message)
+        console.error('Supabase posts fetch error:', postError)
         return
       }
 
-      // users 데이터 가져오기
       const { data: userData, error: userError } = await supabase.from('users')
         .select(`
           id,
@@ -73,17 +53,16 @@ export default function LearnListPage() {
 
       if (userError) {
         setError('users 데이터를 가져오는 중 오류가 발생했습니다.')
-        console.error('Supabase users fetch error:', userError.message)
+        console.error('Supabase users fetch error:', userError)
         return
       }
 
-      // 🔥 추가: bookmarks 데이터 가져오기
       const { data: bookmarkData, error: bookmarkError } = await supabase
         .from('bookmarks')
         .select('post_id')
 
       if (bookmarkError) {
-        console.error('Supabase bookmarks fetch error:', bookmarkError.message)
+        console.error('Supabase bookmarks fetch error:', bookmarkError)
         return
       }
 
@@ -205,19 +184,9 @@ export default function LearnListPage() {
                           }}
                         >
                           {post.isBookmarked ? (
-                            <Image
-                              src="/bookmarkon.png"
-                              alt="Bookmarked"
-                              width={30}
-                              height={30}
-                            />
+                            <FaStar className="w-[30px] h-[30px]" />
                           ) : (
-                            <Image
-                              src="/bookmarkoff.png"
-                              alt="Not Bookmarked"
-                              width={30}
-                              height={30}
-                            />
+                            <FaRegStar className="w-[30px] h-[30px]" />
                           )}
                         </button>
                       </div>
