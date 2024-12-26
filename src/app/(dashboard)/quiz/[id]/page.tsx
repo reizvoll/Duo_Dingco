@@ -1,11 +1,10 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { supabase } from '@/supabase/supabaseClient'
-import { useParams } from 'next/navigation'
-import { useRouter } from 'next/router'
+import { useParams, useRouter } from 'next/navigation'
 import Swal from 'sweetalert2'
 import { Tables } from '../../../../../database.types'
+import { supabase } from '@/supabase/supabaseClient'
 
 type Word = {
   word: string
@@ -31,6 +30,7 @@ const QuizPage = () => {
 
   useEffect(() => {
     const fetchData = async () => {
+
       setLoading(true)
       setError(null)
       try {
@@ -41,6 +41,7 @@ const QuizPage = () => {
           setError('로그인이 필요합니다.')
           return
         }
+        
 
         const userId = session.user.id
         const { data: userData, error: userError } = await supabase
@@ -59,6 +60,7 @@ const QuizPage = () => {
             .select('id, title, words, description')
             .eq('id', id)
             .single(),
+            console.log('id:', id)
         ])
 
         if (allWordsResponse.error) throw allWordsResponse.error
@@ -165,64 +167,75 @@ const QuizPage = () => {
   const currentWord = post?.words?.[currentWordIndex] || null
 
   return (
-    <div className="quiz-page relative flex flex-col items-center min-h-screen">
-      {!loading && !error && post && (
-        <>
-          <h1 className="absolute top-8 text-5xl font-bold text-center text-white">
-            {post.title}
-          </h1>
+<div className="quiz-page relative flex flex-col items-center min-h-screen">
+  {!loading && !error && post && (
+    <>
+      <h1 className="absolute top-8 text-5xl font-bold text-center text-white">
+        {post.title}
+      </h1>
 
-          <div className="absolute top-28 w-[46%] bg-gray-400 rounded-full">
+      <div className="absolute top-28 w-[46%] flex items-center justify-between mb-12">
+        <span className="text-white text-lg font-bold px-4 py-2 border border-white rounded-lg">
+          0
+        </span>
+
+        <div className="flex-1 mx-4 bg-gray-400 rounded-full h-4 relative">
+          <div
+            className="bg-green-500 h-4 rounded-full"
+            style={{
+              width: `${((currentWordIndex + 1) / post.words.length) * 100}%`,
+            }}
+          ></div>
+        </div>
+
+        <span className="text-white text-lg font-bold px-4 py-2 border border-white rounded-lg">
+          {post.words.length}
+        </span>
+      </div>
+    </>
+  )}
+
+  <div className="flex flex-grow items-center justify-center w-full p-12 mt-12">
+    {!loading && !error && post && (
+      <div className="relative w-[900px] h-[650px] bg-[#2E3856] p-8 rounded-lg shadow-lg text-white flex flex-col justify-between">
+        <div className="quiz-description mb-6 text-center">
+          <p className="text-4xl mt-16">{currentWord?.meaning}</p>
+        </div>
+
+        <div className="options-container grid grid-cols-2 gap-10 mt-4 mb-20">
+          {currentOptions.map((option, index) => (
             <div
-              className="bg-green-500 h-4 rounded-full"
-              style={{
-                width: `${((currentWordIndex + 1) / post.words.length) * 100}%`,
-              }}
-            ></div>
-          </div>
-        </>
-      )}
-
-      <div className="flex flex-grow items-center justify-center w-full p-6">
-        {!loading && !error && post && (
-          <div className="relative w-[900px] h-[650px] bg-[#2E3856] p-8 rounded-lg shadow-lg text-white flex flex-col justify-between">
-            <div className="quiz-description mb-6 text-center">
-              <p className="text-4xl mt-2 p-16">{currentWord?.meaning}</p>
-            </div>
-            <div className="options-container grid grid-cols-2 gap-10 mt-4 mb-20">
-              {currentOptions.map((option, index) => (
-                <div
-                  key={index}
-                  onClick={() => handleSelectAnswer(option)}
-                  className={`option text-white border p-4 rounded-lg shadow text-center font-bold cursor-pointer ${
-                    selectedAnswer
-                      ? option.word === currentWord?.word
-                        ? 'border-green-500'
-                        : selectedAnswer.word === option.word
-                        ? 'border-red-500'
-                        : 'border-white'
-                      : 'border-white'
-                  }`}
-                >
-                  {option.word}
-                </div>
-              ))}
-            </div>
-            <button
-              onClick={handleNext}
-              disabled={!selectedAnswer}
-              className={`absolute bottom-4 right-4 px-6 py-3 text-white border border-white rounded-lg hover:text-gray-200 ${
-                !selectedAnswer ? 'opacity-50 cursor-not-allowed' : ''
+              key={index}
+              onClick={() => handleSelectAnswer(option)}
+              className={`option text-white border p-4 rounded-lg shadow text-center font-bold cursor-pointer ${
+                selectedAnswer
+                  ? option.word === currentWord?.word
+                    ? 'border-green-500'
+                    : selectedAnswer.word === option.word
+                    ? 'border-red-500'
+                    : 'border-white'
+                  : 'border-white'
               }`}
             >
-              {currentWordIndex === (post?.words.length || 1) - 1
-                ? '완료'
-                : '다음'}
-            </button>
-          </div>
-        )}
+              {option.word}
+            </div>
+          ))}
+        </div>
+
+        <button
+          onClick={handleNext}
+          disabled={!selectedAnswer}
+          className={`absolute bottom-4 right-4 px-6 py-3 text-white border border-white rounded-lg hover:text-gray-200 ${
+            !selectedAnswer ? 'opacity-50 cursor-not-allowed' : ''
+          }`}
+        >
+          {currentWordIndex === (post?.words.length || 1) - 1 ? '완료' : '다음'}
+        </button>
       </div>
-    </div>
+    )}
+  </div>
+</div>
+
   )
 }
 
