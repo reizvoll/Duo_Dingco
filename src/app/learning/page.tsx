@@ -1,10 +1,9 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { supabase } from '@/supabase/supabase'
+import { supabase } from '@/supabase/supabaseClient'
 
 type Word = {
   id: string // 단어 ID

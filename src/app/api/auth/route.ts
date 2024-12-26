@@ -1,4 +1,4 @@
-import { supabase } from '@/supabase/supabase'
+import { supabase } from '@/supabase/supabaseClient'
 import { NextResponse } from 'next/server'
 
 export async function POST(request: Request) {
@@ -15,10 +15,9 @@ export async function POST(request: Request) {
     }
 
     if (data.user) {
-      // 기본 이미지 설정
       const profileImage = img_url || '/dingco.png'
 
-      // 추가 사용자 정보를 public.users 테이블에 저장
+      //사용자 정보를 users 테이블에 저장
       const { error: userError } = await supabase.from('users').insert([
         {
           id: data.user.id,
