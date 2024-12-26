@@ -55,6 +55,28 @@ export function useUpdate() {
   }
 
   const handleUpdateSubmit = async (id: string) => {
+    if (cards.length < 4) {
+      Swal.fire({
+        icon: 'warning',
+        title: '카드는 최소 4개 이상이어야 수정 가능합니다.',
+        showConfirmButton: true,
+      })
+      return
+    }
+
+    if (
+      !cards.every(
+        (card) => card.word.trim() !== '' && card.meaning.trim() !== '',
+      )
+    ) {
+      Swal.fire({
+        icon: 'warning',
+        title: '카드 내용을 모두 입력해주세요.',
+        showConfirmButton: true,
+      })
+      return
+    }
+
     const words = cards.map((card) => ({
       word: card.word,
       meaning: card.meaning,
@@ -68,18 +90,16 @@ export function useUpdate() {
     })
 
     if (result) {
-      console.log('Post updated successfully')
-
       Swal.fire({
         icon: 'success',
         title: '수정이 완료되었습니다!',
         showConfirmButton: false,
-        timer: 2000,
+        timer: 1000,
       })
 
       setTimeout(() => {
         router.push('/')
-      }, 2000)
+      }, 1000)
     }
   }
 
