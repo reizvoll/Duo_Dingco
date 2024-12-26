@@ -11,9 +11,7 @@ export function useUpdate() {
   const params = useParams()
   const id = params?.id as string
 
-  const [cards, setCards] = useState<PostCard[]>([
-    { id: 1, word: '', meaning: '' },
-  ])
+  const [cards, setCards] = useState<PostCard[]>([])
   const [title, setTitle] = useState<string>('')
   const [description, setDescription] = useState<string>('')
 
@@ -99,6 +97,7 @@ export function useUpdate() {
 
       setTimeout(() => {
         router.push('/')
+        router.refresh()
       }, 1000)
     }
   }
