@@ -90,12 +90,11 @@ export default function UpdateForm({ post }: { post: any }) {
                 <div className="flex items-end min-h-full justify-between gap-4">
                   <div className="flex-[0.40] border-b border-white mr-4">
                     <textarea
-                      value={card.word.replace(/\n/g, '<br />')}
+                      value={card.word.replace(/\n/g, '\n')}
                       onChange={(e) =>
                         handleInputChange(card.id, 'word', e.target.value)
                       }
-                      className="w-full bg-transparent text-white focus:outline-none resize-none overflow-hidden"
-                      style={{ whiteSpace: 'pre-wrap' }} // 줄바꿈 적용
+                      className="w-full bg-transparent text-white whitespace-pre-wrap focus:outline-none resize-none overflow-hidden"
                       rows={1}
                       onInput={(e) => {
                         const target = e.target as HTMLTextAreaElement
@@ -107,12 +106,11 @@ export default function UpdateForm({ post }: { post: any }) {
 
                   <div className="flex-[0.60] border-b border-white ml-4">
                     <textarea
-                      value={card.meaning.replace(/\n/g, '<br />')}
+                      value={card.meaning.replace(/\n/g, '\n')}
                       onChange={(e) =>
                         handleInputChange(card.id, 'meaning', e.target.value)
                       }
-                      className="w-full bg-transparent text-white focus:outline-none resize-none overflow-hidden"
-                      style={{ whiteSpace: 'pre-wrap' }} // 줄바꿈 적용
+                      className="w-full bg-transparent whitespace-pre-wrap text-white  break-words focus:outline-none resize-none overflow-hidden"
                       rows={1}
                       onInput={(e) => {
                         const target = e.target as HTMLTextAreaElement
