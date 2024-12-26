@@ -10,6 +10,8 @@ export default function SignUpPage() {
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     useState(false)
   const [passwordError, setPasswordError] = useState<string | null>(null)
+  const [profileImage, setProfileImage] = useState<File | null>(null)
+  const [previewUrl, setPreviewUrl] = useState<string | null>('/dingco.png') // 초기값 설정
 
   const validatePassword = (password: string): string | null => {
     if (password.length < 6) {
@@ -61,11 +63,22 @@ export default function SignUpPage() {
     }
   }
 
+  const handleProfileImageChange = (file: File | null) => {
+    if (file) {
+      setProfileImage(file)
+      const fileUrl = URL.createObjectURL(file) // 브라우저에서 파일 URL 생성
+      setPreviewUrl(fileUrl) // 미리보기 URL 업데이트
+    } else {
+      setPreviewUrl('/dingco.png') // 기본 이미지로 복원
+    }
+  }
+
   return (
     <form
       onSubmit={async (e) => {
         e.preventDefault()
         const formData = new FormData(e.currentTarget)
+        formData.append('profileImage', profileImage as File) // 프로필 이미지 추가
         await handleFormSubmit(formData)
       }}
       className="w-full max-w-md bg-[#13132D] border border-white rounded-lg p-8 relative"
@@ -80,7 +93,7 @@ export default function SignUpPage() {
         <label htmlFor="profileImage" className="cursor-pointer">
           <div className="relative h-20 w-20 bg-gray-200 rounded-full overflow-hidden border border-gray-400">
             <Image
-              src="/dingco.png"
+              src={previewUrl!} // 상태를 기반으로 이미지를 표시
               alt="프로필 이미지"
               layout="fill"
               objectFit="cover"
@@ -96,6 +109,9 @@ export default function SignUpPage() {
           type="file"
           accept="image/*"
           className="hidden"
+          onChange={(e) =>
+            handleProfileImageChange(e.target.files ? e.target.files[0] : null)
+          }
         />
       </div>
 
@@ -150,7 +166,7 @@ export default function SignUpPage() {
         <input
           type="text"
           name="nickname"
-          placeholder="닉네임"
+          placeholder="닉네임 입력"
           className="w-full p-3 border-none rounded-lg bg-[#1E1E30] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         />
