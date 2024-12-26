@@ -20,3 +20,8 @@ export const useModalStore = create<ModalState>((set) => ({
   setUser: (user) => set({ user }),
   logout: () => set({ user: null, isModalOpen: false }),
 }));
+
+// 서버 상태 초기화하는 함수 추가
+export function getServerModalState() {
+  return useModalStore.getState()
+}

@@ -3,9 +3,9 @@
 import React, { useEffect, useState } from 'react'
 import { supabase } from '@/supabase/supabaseClient'
 import { useParams } from 'next/navigation'
-import { Tables } from '../../../../database.types'
 import { useRouter } from 'next/router'
 import Swal from 'sweetalert2'
+import { Tables } from '../../../../../database.types'
 
 type Word = {
   word: string
