@@ -1,10 +1,10 @@
 'use client'
 
 import React, { useEffect, useState } from 'react'
-import { supabase } from '@/supabase/supabaseClient'
 import { useRouter } from 'next/navigation'
-import { Tables } from '../../../../database.types'
 import Image from 'next/image'
+import { Tables } from '../../../../database.types'
+import { supabase } from '@/supabase/supabaseClient'
 
 type Word = {
   id: string
@@ -35,6 +35,7 @@ const QuizListPage = () => {
       setLoading(true)
       setError(null)
       try {
+        // posts 데이터 가져오기
         const { data: postData, error: postError } = await supabase
           .from('posts')
           .select('id, title, words, user_id, created_at, description')
@@ -42,6 +43,7 @@ const QuizListPage = () => {
         if (postError) throw postError
         setPosts(postData as Post[])
 
+        // users 데이터 가져오기
         const { data: userData, error: userError } = await supabase
           .from('users')
           .select('id, nickname, img_url')
@@ -73,10 +75,12 @@ const QuizListPage = () => {
     <div className="min-h-screen bg-[#0A092D] text-white flex">
       <div className="flex-1 ml-20 p-8 overflow-y-auto h-screen">
         <div className="relative flex flex-col items-center justify-center">
+          {/* 퀴즈 리스트 페이지 제목 */}
           <div className="absolute top-14 left-40">
             <h1 className="text-3xl font-bold">퀴즈풀기</h1>
           </div>
 
+          {/* 카드 묶음 */}
           <div className="flex items-center justify-center w-full mt-24">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {posts.map((post) => {
