@@ -118,7 +118,7 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
     )
   }
 
-  const totalCards = posts.words.length;
+  const totalCards = posts.words.length
 
   const goToNextCard = () => {
     if (currentIndex < totalCards - 1) {
@@ -242,7 +242,7 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
               backfaceVisibility: 'hidden',
             }}
           >
-            <p className="text-lg">
+            <p className="text-lg p-10">
               {posts.words[currentIndex]?.meaning || '정의 없음'}
             </p>
           </div>
