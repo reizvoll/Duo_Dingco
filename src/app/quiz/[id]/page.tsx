@@ -186,7 +186,7 @@ const QuizPage = () => {
         {!loading && !error && post && (
           <div className="relative w-[900px] h-[650px] bg-[#2E3856] p-8 rounded-lg shadow-lg text-white flex flex-col justify-between">
             <div className="quiz-description mb-6 text-center">
-              <p className="text-5xl mt-2">{currentWord?.meaning}</p>
+              <p className="text-4xl mt-2 p-16">{currentWord?.meaning}</p>
             </div>
             <div className="options-container grid grid-cols-2 gap-10 mt-4 mb-20">
               {currentOptions.map((option, index) => (
