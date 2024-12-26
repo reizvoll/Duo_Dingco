@@ -10,16 +10,16 @@ import { Post } from '@/types/commentTypes'
 import { User } from '@supabase/supabase-js'
 // 이거 푸쉬해볼게~
 export default function LearnListPage() {
-  const [posts, setPosts] = useState<Post[]>([]) // Supabase에서 가져온 posts 데이터
-  const [users, setUsers] = useState<User[]>([]) // Supabase에서 가져온 users 데이터
-  const [error, setError] = useState<string | null>(null) // 에러 상태
+  const [posts, setPosts] = useState<Post[]>([]) 
+  const [users, setUsers] = useState<User[]>([]) 
+  const [error, setError] = useState<string | null>(null) 
   const router = useRouter()
 
   useEffect(() => {
     const checkSession = async () => {
       const { data, error } = await supabase.auth.getSession()
       if (error || !data.session) {
-        router.push('/auth/sigin') // 세션이 없으면 로그인 페이지로 이동
+        router.push('/auth/sigin') 
       }
       console.log('data', data)
     }
@@ -88,7 +88,7 @@ export default function LearnListPage() {
   const toggleBookmark = async (id: string) => {
     const user = await supabase.auth.getUser()
     if (!user.data.user) {
-      router.push('/auth/signin') // 유저가 없으면 로그인 페이지로 이동
+      router.push('/auth/signin') 
       return
     }
 
