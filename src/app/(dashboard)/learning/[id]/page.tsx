@@ -4,14 +4,16 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/supabase/supabaseClient'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
-import { FaCircleArrowRight } from 'react-icons/fa6'
-import { FaCircleArrowLeft } from 'react-icons/fa6'
-import { FaStar } from 'react-icons/fa'
-import { FaRegStar } from 'react-icons/fa'
+import { FaStar, FaRegStar } from 'react-icons/fa'
 import { Bookmarks } from '@/types/commentTypes'
 import { User } from '@/types/user'
+import { FaCircleArrowLeft, FaCircleArrowRight } from 'react-icons/fa6'
 
-export default function QuizDetailPage({ params }: { params: { id: string } }) {
+export default function LearnDetailPage({
+  params,
+}: {
+  params: { id: string }
+}) {
   const [posts, setPosts] = useState<Bookmarks | null>(null)
   const [user, setUser] = useState<User | null>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -32,66 +34,87 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
     }
   }
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Fetch post data
-        const { data: postData, error: postError } = await supabase
-          .from('posts')
-          .select('id, title, description, words, user_id')
-          .eq('id', id)
-          .single()
+  const fetchData = async () => {
+    try {
+      const { data: postData, error: postError } = await supabase
+        .from('posts')
+        .select(
+          'id, title, description, words, user_id, bookmarks(post_id, user_id)',
+        )
+        .eq('id', id)
+        .single()
 
-        if (postError) {
-          setError('게시글 데이터를 가져오는 중 오류가 발생했습니다.')
-          console.error('Supabase posts fetch error:', postError.message)
-          return
-        }
-
-        // Parse words
-        const parsedWords =
-          typeof postData.words === 'string'
-            ? JSON.parse(postData.words)
-            : postData.words
-
-        // Fetch user data
-        const { data: userData, error: userError } = await supabase
-          .from('users')
-          .select('id, nickname, img_url, created_at')
-          .eq('id', postData.user_id)
-          .single()
-
-        if (userError) {
-          setError('유저 데이터를 가져오는 중 오류가 발생했습니다.')
-          console.error('Supabase users fetch error:', userError.message)
-          return
-        }
-
-        const { data: bookmarkData, error: bookmarkError } = await supabase
-          .from('bookmarks')
-          .select('post_id')
-          .eq('post_id', id)
-
-        if (bookmarkError) {
-          console.error(
-            'Supabase bookmarks fetch error:',
-            bookmarkError.message,
-          )
-        }
-
-        // `isBookmarked` 상태 설정
-        const isBookmarked = !!bookmarkData?.length
-
-        setPosts({ ...postData, words: parsedWords, isBookmarked })
-        setUser(userData)
-      } catch (err) {
-        setError('데이터를 가져오는 중 문제가 발생했습니다.')
-        console.error(err)
+      if (postError) {
+        setError('게시글 데이터를 가져오는 중 오류가 발생했습니다.')
+        return
       }
-    }
 
+      const parsedWords =
+        typeof postData.words === 'string'
+          ? JSON.parse(postData.words)
+          : postData.words
+
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id, nickname, img_url, created_at')
+        .eq('id', postData.user_id)
+        .single()
+
+      if (userError) {
+        setError('유저 데이터를 가져오는 중 오류가 발생했습니다.')
+        return
+      }
+
+      const { data: userSession } = await supabase.auth.getSession()
+      const currentUser = userSession?.session?.user
+
+      const isBookmarked = postData.bookmarks.some(
+        (bookmark) => bookmark.user_id === currentUser?.id,
+      )
+
+      setPosts({ ...postData, words: parsedWords, isBookmarked })
+      setUser(userData)
+    } catch (err) {
+      setError('데이터를 가져오는 중 오류 발생')
+    }
+  }
+
+  useEffect(() => {
     fetchData()
   }, [id])
+
+  const toggleBookmark = async (id: string) => {
+    if (!posts) return
+
+    const { data: userSession } = await supabase.auth.getSession()
+    const currentUser = userSession?.session?.user
+
+    if (!currentUser) {
+      router.push('/auth/signin')
+      return
+    }
+
+    const isBookmarked = posts.isBookmarked || false
+
+    try {
+      if (isBookmarked) {
+        await supabase
+          .from('bookmarks')
+          .delete()
+          .eq('user_id', currentUser.id)
+          .eq('post_id', id)
+      } else {
+        await supabase.from('bookmarks').insert({
+          user_id: currentUser.id,
+          post_id: id,
+        })
+      }
+
+      await fetchData()
+    } catch (err) {
+      setError('북마크 처리 중 오류 발생')
+    }
+  }
 
   if (error) {
     return (
@@ -129,39 +152,6 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
     setIsFlipped(!isFlipped)
   }
 
-  const toggleBookmark = async (id: string) => {
-    if (!posts) return // posts가 null인 경우 바로 종료
-
-    const user = await supabase.auth.getUser()
-    if (!user.data.user) {
-      router.push('/auth/signin') // 유저가 없으면 로그인 페이지로 이동
-      return
-    }
-
-    const isBookmarked = posts.isBookmarked || false
-
-    if (isBookmarked) {
-      // 북마크 해제
-      await supabase
-        .from('bookmarks')
-        .delete()
-        .eq('user_id', user.data.user.id)
-        .eq('post_id', id)
-    } else {
-      // 북마크 추가
-      await supabase.from('bookmarks').insert({
-        user_id: user.data.user.id,
-        post_id: id,
-      })
-    }
-
-    // 로컬 상태 업데이트
-    setPosts({
-      ...posts,
-      isBookmarked: !isBookmarked, // 북마크 상태 토글
-    })
-  }
-
   return (
     <div className="min-h-screen bg-[#0A092D] text-white p-6 flex flex-col justify-center items-center">
       <div className="w-full max-w-3xl">
@@ -183,30 +173,24 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
         <p className="text-gray-400">
           {posts.description || '설명이 들어갈 곳입니다.'}
         </p>
-        <div className="flex items-center justify-between mt-4">
-          <p className="flex items-center p-3">
-            <Image
-              src={user.img_url || '/dingco.png'}
-              alt="Profile"
-              width={40}
-              height={40}
-              className="rounded-full"
-            />
-            <p className="p-2">{user.nickname}</p>
-          </p>
-          등록일 -{' '}
-          {new Date('2024-12-23T11:06:29.607')
-            .toLocaleDateString('ko-KR')
-            .replace(/\.$/, '')}
+        <div className="flex items-center p-3">
+          <Image
+            src={user?.img_url ? user.img_url : '/dingco.png'}
+            alt="Profile"
+            width={40}
+            height={40}
+            className="rounded-full"
+            unoptimized
+          />
+
+          <span className="p-2">{user.nickname}</span>
         </div>
       </div>
 
       <div
         className="relative w-full max-w-3xl mt-2 h-[300px] rounded-lg shadow-lg cursor-pointer"
         onClick={flipCard}
-        style={{
-          perspective: '1000px',
-        }}
+        style={{ perspective: '1000px' }}
       >
         <div
           className={`w-90 h-80 rounded-lg bg-white transform transition-transform duration-700 mt-0`}
@@ -217,9 +201,7 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
         >
           <div
             className="absolute w-full h-full flex items-center justify-center text-black bg-white rounded-lg"
-            style={{
-              backfaceVisibility: 'hidden',
-            }}
+            style={{ backfaceVisibility: 'hidden' }}
           >
             <p className="text-4xl font-bold">
               {posts.words[currentIndex]?.word || '단어 없음'}
@@ -262,7 +244,6 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
           }`}
           onClick={goToNextCard}
         >
-          {/* 리랙트아이콘 */}
           <FaCircleArrowRight className="w-[30px] h-[30px]" />
         </button>
       </div>
