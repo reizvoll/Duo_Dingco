@@ -1,7 +1,6 @@
 'use server'
 
 import { createClient } from '@/supabase/supabaseServer'
-import { redirect } from 'next/navigation'
 
 export async function handleLogin(
   formData: FormData,
@@ -35,7 +34,6 @@ export async function handleGoogleLogin(): Promise<{
         redirectTo: 'localhost:3000/auth/callback',
       },
     })
-    console.log('data', data)
 
     if (error) {
       return { success: false, message: error.message }
