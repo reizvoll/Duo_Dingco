@@ -24,7 +24,7 @@ export default function UpdateForm({ post }: { post: any }) {
       const cardsWithIds = post.words.map((word: any, index: number) => ({
         id: index + 1,
         word: word.word,
-        meaning: word.meaning,
+        meaning: word.meaning.replace(/\\n/g, '\n'),
       }))
       initializeFields({ ...post, words: cardsWithIds })
     }

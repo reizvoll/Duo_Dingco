@@ -1,15 +1,13 @@
 import { useState } from 'react'
+import { useMutation } from '@tanstack/react-query'
 import { useParams, useRouter } from 'next/navigation'
-
-import { fetchPostId, updatePost } from '@/app/api/post/updating'
+import { updatePost } from '@/app/api/post/updating'
+import { deletePostById } from '@/app/api/post/deleting'
 import { PostCard } from '@/types/PostCard'
 import Swal from 'sweetalert2'
-import { deletePostById } from '@/app/api/post/deleting'
 
 export function useUpdate() {
   const router = useRouter()
-  const params = useParams()
-  const postId = params?.id as string
 
   const [cards, setCards] = useState<PostCard[]>([])
   const [title, setTitle] = useState<string>('')
@@ -52,58 +50,27 @@ export function useUpdate() {
     )
   }
 
-  const handleUpdateSubmit = async (id: string) => {
-    if (cards.length < 4) {
-      Swal.fire({
-        icon: 'warning',
-        title: '카드는 최소 4개 이상이어야 수정 가능합니다.',
-        showConfirmButton: true,
-      })
-      return
-    }
-
-    if (
-      !cards.every(
-        (card) => card.word.trim() !== '' && card.meaning.trim() !== '',
-      )
-    ) {
-      Swal.fire({
-        icon: 'warning',
-        title: '카드 내용을 모두 입력해주세요.',
-        showConfirmButton: true,
-      })
-      return
-    }
-
-    const words = cards.map((card) => ({
-      word: card.word,
-      meaning: card.meaning,
-    }))
-
-    const result = await updatePost({
-      id,
-      title,
-      description,
-      words,
-    })
-
-    if (result) {
-      const updatePost = await fetchPostId(postId)
-
-      if (updatePost) {
-        initializeFields(updatePost)
+  const { mutate: handleUpdateSubmit } = useMutation({
+    mutationFn: async (id: string) => {
+      if (cards.length < 4) {
+        throw new Error('카드는 최소 4개 이상이어야 수정 가능합니다.')
       }
 
-      Swal.fire({
-        icon: 'success',
-        title: '수정이 완료되었습니다!',
-        showConfirmButton: false,
-        timer: 1000,
-      })
+      const words = cards.map((card) => ({
+        word: card.word,
+        meaning: card.meaning,
+      }))
+
+      return updatePost({ id, title, description, words })
+    },
+    onSuccess: () => {
+      Swal.fire('수정 완료', '수정이 완료되었습니다!', 'success')
       router.push('/')
-      router.refresh()
-    }
-  }
+    },
+    onError: (error) => {
+      Swal.fire('수정 실패', error.message, 'error')
+    },
+  })
 
   const handleDeletePost = async (id: string) => {
     try {
@@ -130,10 +97,6 @@ export function useUpdate() {
     } catch (error) {
       console.error(error)
       await Swal.fire('삭제 실패', '게시글 삭제에 실패했습니다.', 'error')
-    }
-
-    return {
-      handleDeletePost,
     }
   }
 
