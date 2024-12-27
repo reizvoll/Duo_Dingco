@@ -4,12 +4,10 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/supabase/supabaseClient'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
-import { FaCircleArrowRight } from 'react-icons/fa6'
-import { FaCircleArrowLeft } from 'react-icons/fa6'
-import { FaStar } from 'react-icons/fa'
-import { FaRegStar } from 'react-icons/fa'
+import { FaStar, FaRegStar } from 'react-icons/fa'
 import { Bookmarks } from '@/types/commentTypes'
 import { User } from '@/types/user'
+import { FaCircleArrowLeft, FaCircleArrowRight } from 'react-icons/fa6'
 
 export default function LearnDetailPage({
   params,
@@ -27,7 +25,7 @@ export default function LearnDetailPage({
   const searchParams = useSearchParams()
 
   const from = searchParams.get('from')
-  // 이거 경로 다시 해야 됨.
+
   const handleBack = () => {
     if (from === 'hotlearning') {
       router.push('/hotlearning')
@@ -36,51 +34,87 @@ export default function LearnDetailPage({
     }
   }
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // posts가져오기
-        const { data: postData, error: postError } = await supabase
-          .from('posts')
-          .select('id, title, description, words, user_id')
-          .eq('id', id)
-          .single()
-        // 'Error, JSON, length'빨간 밑줄 뜨는데 작동은 잘 됨 그래도 건들여야 하는지 의문임.
-        if (postError) {
-          setError('게시글 데이터를 가져오는 중 오류가 발생했습니다.')
-        }
+  const fetchData = async () => {
+    try {
+      const { data: postData, error: postError } = await supabase
+        .from('posts')
+        .select(
+          'id, title, description, words, user_id, bookmarks(post_id, user_id)',
+        )
+        .eq('id', id)
+        .single()
 
-        const parsedWords = postData.words
-        // users정보 가져오기
-        const { data: userData, error: userError } = await supabase
-          .from('users')
-          .select('id, nickname, img_url, created_at')
-          .eq('id', postData.user_id)
-          .single()
-
-        if (userError) {
-          setError('유저 데이터를 가져오는 중 오류가 발생했습니다.')
-        }
-        // bookmarks 가져오기
-        const { data: bookmarkData, error: bookmarkError } = await supabase
-          .from('bookmarks')
-          .select('post_id')
-          .eq('post_id', id)
-
-        if (bookmarkError) {
-          setError('북마크 데이터를 가져오는 중 오류가 발생했습니다.')
-        }
-        // bookmark길이 필요, 카드 넘기기용
-        // const isBookmarked = !!bookmarkData?.length
-        // 북마크 다시 수정해야됨
-        setPosts({ ...postData, words: parsedWords })
-        setUser(userData)
-      } catch (err) {
-        setError('데이터를 가져오는 중 오류 발생')
+      if (postError) {
+        setError('게시글 데이터를 가져오는 중 오류가 발생했습니다.')
+        return
       }
+
+      const parsedWords =
+        typeof postData.words === 'string'
+          ? JSON.parse(postData.words)
+          : postData.words
+
+      const { data: userData, error: userError } = await supabase
+        .from('users')
+        .select('id, nickname, img_url, created_at')
+        .eq('id', postData.user_id)
+        .single()
+
+      if (userError) {
+        setError('유저 데이터를 가져오는 중 오류가 발생했습니다.')
+        return
+      }
+
+      const { data: userSession } = await supabase.auth.getSession()
+      const currentUser = userSession?.session?.user
+
+      const isBookmarked = postData.bookmarks.some(
+        (bookmark) => bookmark.user_id === currentUser?.id,
+      )
+
+      setPosts({ ...postData, words: parsedWords, isBookmarked })
+      setUser(userData)
+    } catch (err) {
+      setError('데이터를 가져오는 중 오류 발생')
     }
+  }
+
+  useEffect(() => {
     fetchData()
   }, [id])
+
+  const toggleBookmark = async (id: string) => {
+    if (!posts) return
+
+    const { data: userSession } = await supabase.auth.getSession()
+    const currentUser = userSession?.session?.user
+
+    if (!currentUser) {
+      router.push('/auth/signin')
+      return
+    }
+
+    const isBookmarked = posts.isBookmarked || false
+
+    try {
+      if (isBookmarked) {
+        await supabase
+          .from('bookmarks')
+          .delete()
+          .eq('user_id', currentUser.id)
+          .eq('post_id', id)
+      } else {
+        await supabase.from('bookmarks').insert({
+          user_id: currentUser.id,
+          post_id: id,
+        })
+      }
+
+      await fetchData()
+    } catch (err) {
+      setError('북마크 처리 중 오류 발생')
+    }
+  }
 
   if (error) {
     return (
@@ -118,39 +152,6 @@ export default function LearnDetailPage({
     setIsFlipped(!isFlipped)
   }
 
-  const toggleBookmark = async (id: string) => {
-    if (!posts) return
-
-    const user = await supabase.auth.getUser()
-    if (!user.data.user) {
-      router.push('/auth/signin')
-      return
-    }
-
-    const isBookmarked = posts.isBookmarked || false
-
-    try {
-      if (isBookmarked) {
-        await supabase
-          .from('bookmarks')
-          .delete()
-          .eq('user_id', user.data.user.id)
-          .eq('post_id', id)
-      } else {
-        await supabase.from('bookmarks').insert({
-          user_id: user.data.user.id,
-          post_id: id,
-        })
-      }
-
-      setPosts({
-        ...posts,
-        isBookmarked: !isBookmarked,
-      })
-    } catch (err) {
-      setError(err instanceof Error ? err.message : '북마크 처리 중 오류 발생')
-    }
-  }
   return (
     <div className="min-h-screen bg-[#0A092D] text-white p-6 flex flex-col justify-center items-center">
       <div className="w-full max-w-3xl">
@@ -174,12 +175,14 @@ export default function LearnDetailPage({
         </p>
         <div className="flex items-center p-3">
           <Image
-            src={user.img_url || '/dingco.png'}
+            src={user?.img_url ? user.img_url : '/dingco.png'}
             alt="Profile"
             width={40}
             height={40}
             className="rounded-full"
+            unoptimized
           />
+
           <span className="p-2">{user.nickname}</span>
         </div>
       </div>
@@ -187,9 +190,7 @@ export default function LearnDetailPage({
       <div
         className="relative w-full max-w-3xl mt-2 h-[300px] rounded-lg shadow-lg cursor-pointer"
         onClick={flipCard}
-        style={{
-          perspective: '1000px',
-        }}
+        style={{ perspective: '1000px' }}
       >
         <div
           className={`w-90 h-80 rounded-lg bg-white transform transition-transform duration-700 mt-0`}
@@ -200,9 +201,7 @@ export default function LearnDetailPage({
         >
           <div
             className="absolute w-full h-full flex items-center justify-center text-black bg-white rounded-lg"
-            style={{
-              backfaceVisibility: 'hidden',
-            }}
+            style={{ backfaceVisibility: 'hidden' }}
           >
             <p className="text-4xl font-bold">
               {posts.words[currentIndex]?.word || '단어 없음'}
@@ -245,7 +244,6 @@ export default function LearnDetailPage({
           }`}
           onClick={goToNextCard}
         >
-          {/* 리랙트아이콘 */}
           <FaCircleArrowRight className="w-[30px] h-[30px]" />
         </button>
       </div>

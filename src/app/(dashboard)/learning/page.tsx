@@ -82,10 +82,7 @@ export default function LearnListPage() {
         // const bookmarkedPostIds = bookmarkData.map((bookmark) => bookmark.post_id)
 
         // postData에 isBookmarked 추가
-        if (postError) {
-          setError('posts 데이터를 가져오는 중 오류가 발생했습니다.')
-        }
-
+        
         const parsedPosts = postData.map((post) => ({
           ...post,
           words:
