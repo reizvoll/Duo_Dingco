@@ -15,14 +15,11 @@ export function usePost() {
 
   // 유저 정보를 가져오는 로직 zustand
   const user = useAuthStore((state) => state.user)
-
   useEffect(() => {
     if (!user) {
       console.error('User not authenticated.')
     }
   }, [user])
-
-  console.log(user)
 
   const handleAddCard = () => {
     const newCard = { id: cards.length + 1, word: '', meaning: '' }
@@ -57,6 +54,8 @@ export function usePost() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    console.log(user)
 
     if (!user) {
       Swal.fire({
