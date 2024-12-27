@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { FiLogIn, FiLogOut } from 'react-icons/fi'
 import { useModalStore } from '@/store/useModalStore'
 import Swal from 'sweetalert2'
+import { useUser } from '@/hooks/useUser'
 
 export const handleLoginRedirect = () => {
   Swal.fire({
@@ -20,14 +21,15 @@ export const handleLoginRedirect = () => {
   })
 }
 
-const ProtectedLogin = ({ user }: { user: any }) => {
+const ProtectedLogin = () => {
   const { openModal, logout } = useModalStore()
+  const { user } = useUser()  // useUser 훅을 사용해 user 상태 가져오기
 
   const handleProfileClick = () => {
     if (user?.id) {
-      openModal()
+      openModal()  // 로그인된 경우 프로필 모달 열기
     } else {
-      handleLoginRedirect()
+      handleLoginRedirect()  // 비로그인 상태일 경우 로그인 유도
     }
   }
 
