@@ -11,6 +11,7 @@ export async function handleSignUp(
   const nickname = formData.get('nickname') as string
   const profileImage = formData.get('profileImage') as File | null
 
+  // 비밀번호 검증
   if (password !== confirmPassword) {
     return { success: false, message: '비밀번호가 일치하지 않습니다.' }
   }
@@ -28,6 +29,7 @@ export async function handleSignUp(
   }
 
   try {
+    // 닉네임 중복 확인
     const { data: existingUser, error: checkError } = await supabase
       .from('users')
       .select('id')
@@ -46,15 +48,7 @@ export async function handleSignUp(
       return { success: false, message: '닉네임 확인 중 오류가 발생했습니다.' }
     }
 
-    const { data: userdata, error: authError } = await supabase.auth.signUp({
-      email: `${nickname}@example.com`,
-      password,
-    })
-
-    if (authError) {
-      return { success: false, message: authError.message }
-    }
-
+    // 프로필 이미지 업로드 및 URL 생성
     let publicUrl = null
     if (profileImage) {
       const { error: uploadError } = await supabase.storage
@@ -76,22 +70,20 @@ export async function handleSignUp(
       publicUrl = data?.publicUrl || null
     }
 
-    const { error: insertError } = await supabase.from('users').insert([
-      {
-        id: userdata?.user?.id,
-        nickname,
-        img_url: publicUrl || null,
-        Exp: 0,
-        Lv: 1,
+    // Supabase Auth 회원가입
+    const { error: authError } = await supabase.auth.signUp({
+      email: `${nickname}@example.com`,
+      password,
+      options: {
+        data: {
+          name: nickname,
+          avatar_url: publicUrl, // raw_user_meta_data에 프로필 이미지 URL 저장
+        },
       },
-    ])
+    })
 
-    if (insertError) {
-      console.error('Insert Error:', insertError)
-      return {
-        success: false,
-        message: '사용자 데이터를 저장하는데 실패했습니다.',
-      }
+    if (authError) {
+      return { success: false, message: authError.message }
     }
 
     return { success: true, message: '회원가입이 성공적으로 완료되었습니다!' }
