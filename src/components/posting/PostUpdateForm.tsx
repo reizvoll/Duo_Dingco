@@ -9,7 +9,6 @@ export default function UpdateForm({ post }: { post: any }) {
     title,
     description,
     cards,
-    isFormCheck,
     setTitle,
     setDescription,
     handleAddCard,
@@ -30,6 +29,12 @@ export default function UpdateForm({ post }: { post: any }) {
       initializeFields({ ...post, words: cardsWithIds })
     }
   }, [post])
+
+  const resizeTextarea = (textarea: HTMLTextAreaElement) => {
+    textarea.style.height = '1.5rem' // Reset height
+    const lineBreaks = (textarea.value.match(/\n/g) || []).length
+    textarea.style.height = `${1.5 + lineBreaks * 1.5}rem` // Adjust height
+  }
 
   return (
     <div className="h-screen overflow-y-auto">
@@ -94,14 +99,10 @@ export default function UpdateForm({ post }: { post: any }) {
                       onChange={(e) =>
                         handleInputChange(card.id, 'word', e.target.value)
                       }
-                      className="w-full bg-transparent text-white whitespace-pre-wrap focus:outline-none resize-none overflow-hidden"
-                      rows={1}
+                      rows={Math.max(1, card.meaning.split('\n').length)}
+                      className="w-full bg-transparent text-white focus:outline-none resize-none overflow-hidde whitespace-pre-wrap break-words"
                       onInput={(e) => {
-                        const target = e.target as HTMLTextAreaElement
-                        const lineBreaks = (target.value.match(/\n/g) || [])
-                          .length
-                        target.style.height = '1.5rem'
-                        target.style.height = `${1.5 + lineBreaks * 1.5}rem`
+                        resizeTextarea(e.target as HTMLTextAreaElement)
                       }}
                     />
                   </div>
@@ -112,14 +113,10 @@ export default function UpdateForm({ post }: { post: any }) {
                       onChange={(e) =>
                         handleInputChange(card.id, 'meaning', e.target.value)
                       }
-                      className="w-full bg-transparent whitespace-pre-wrap text-white  break-words focus:outline-none resize-none overflow-hidden"
-                      rows={1}
+                      rows={Math.max(1, card.meaning.split('\n').length)}
+                      className="w-full bg-transparent text-white focus:outline-none resize-none overflow-hidden whitespace-pre-wrap break-words"
                       onInput={(e) => {
-                        const target = e.target as HTMLTextAreaElement
-                        const lineBreaks = (target.value.match(/\n/g) || [])
-                          .length
-                        target.style.height = '1.5rem'
-                        target.style.height = `${1.5 + lineBreaks * 1.5}rem`
+                        resizeTextarea(e.target as HTMLTextAreaElement)
                       }}
                     />
                   </div>
@@ -144,7 +141,7 @@ export default function UpdateForm({ post }: { post: any }) {
             </button>
           </div>
 
-          {/* 수정 버튼 */}
+          {/* 수정 버튼 및 삭제 버튼*/}
           <div className="flex justify-end gap-4">
             <button
               type="button"
@@ -158,7 +155,6 @@ export default function UpdateForm({ post }: { post: any }) {
 
             <button
               type="submit"
-              disabled={!isFormCheck}
               className={`w-[100px] p-2 font-bold rounded-xl border-2 text-white hover:bg-blue-700`}
             >
               수정하기
