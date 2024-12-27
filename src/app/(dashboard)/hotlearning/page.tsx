@@ -6,9 +6,16 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { FaRegStar } from 'react-icons/fa6'
 import { FaStar } from 'react-icons/fa6'
-import { Post } from '@/types/commentTypes'
+// import { Post } from '@/types/commentTypes'
 import { User } from '@/types/user'
-
+type Post = {
+  id: string
+  title: string
+  description: string
+  words: { word: string; meaning: string }[]
+  user_id: string
+  isBookmarked?: boolean
+}
 export default function HotLearningPage() {
   const [posts, setPosts] = useState<Post[]>([])
   const [users, setUsers] = useState<User[]>([])
@@ -103,7 +110,7 @@ export default function HotLearningPage() {
       ),
     )
   }
-
+  //  이거 처리해야 됨!!!!!!!!!!!!!!!!!!comment
   const handleGoToDetails = (id: string) => {
     router.push(`/learning/${id}?from=hotlearning`)
   }
@@ -126,12 +133,12 @@ export default function HotLearningPage() {
       <div className="flex-1 ml-20 p-28 overflow-y-auto h-screen">
         <div className="relative flex flex-col items-center justify-center">
           <div className="absolute top-14 left-40">
-            <h1 className="text-3xl font-bold pl-[70px]">
+            <h1 className="text-3xl font-bold pl-[120px]">
               🔥오늘 작성된 따끈~한 단어
             </h1>
           </div>
           <div className="flex items-center justify-center w-full mt-32">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-20">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
               {posts.map((post) => {
                 const userInfo = getUserInfo(post.user_id)
 

@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
-import { Tables } from '../../../../../database.types';
+import { Tables } from '@/types/database.types'
 import { supabase } from '@/supabase/supabaseClient';
 
 type Word = {
@@ -27,7 +27,7 @@ const QuizPage = () => {
   const [selectedAnswer, setSelectedAnswer] = useState<Word | null>(null);
   const [user, setUser] = useState<{ id: string; Exp: number; Lv: number } | null>(null);
   const [correctAnswers, setCorrectAnswers] = useState<number>(0);
-  const [isAnswered, setIsAnswered] = useState(false); 
+  const [isAnswered, setIsAnswered] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -225,15 +225,14 @@ const QuizPage = () => {
                 <div
                   key={index}
                   onClick={() => handleSelectAnswer(option)}
-                  className={`option text-white border p-4 rounded-lg shadow text-center font-bold cursor-pointer ${
-                    selectedAnswer
+                  className={`option text-white border p-4 rounded-lg shadow text-center font-bold cursor-pointer ${selectedAnswer
                       ? option.word === currentWord?.word
                         ? 'border-green-500'
                         : selectedAnswer.word === option.word
-                        ? 'border-red-500'
-                        : 'border-white'
+                          ? 'border-red-500'
+                          : 'border-white'
                       : 'border-white'
-                  }`}
+                    }`}
                 >
                   {option.word}
                 </div>
@@ -250,9 +249,8 @@ const QuizPage = () => {
             <button
               onClick={handleNext}
               disabled={!selectedAnswer}
-              className={`absolute bottom-4 right-4 px-6 py-3 text-white border border-white rounded-lg hover:text-gray-200 ${
-                !selectedAnswer ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
+              className={`absolute bottom-4 right-4 px-6 py-3 text-white border border-white rounded-lg hover:text-gray-200 ${!selectedAnswer ? 'opacity-50 cursor-not-allowed' : ''
+                }`}
             >
               {currentWordIndex === (post?.words.length || 1) - 1 ? '완료' : '다음'}
             </button>

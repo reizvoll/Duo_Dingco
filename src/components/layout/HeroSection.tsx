@@ -1,9 +1,12 @@
-import Image from 'next/image';
+import dynamic from 'next/dynamic'
+import Image from 'next/image'
 
-const HeroSection = () => {
+const HeroButton = dynamic(() => import('./HeroButton'), { ssr: false })
+
+export default async function HeroSection() {
   return (
     <section className="flex flex-col items-center justify-center py-20 h-full relative">
-      {/* 로고와 텍스트를 함께 감싸기 */}
+      {/* 로고와 텍스트 */}
       <div className="relative flex flex-col items-center justify-center">
         <Image
           src="/duodingco_logo.png"
@@ -21,10 +24,9 @@ const HeroSection = () => {
         </p>
       </div>
 
+      {/* 로그인 or 학습하기 버튼 */}
       <div className="relative z-20">
-        <button className="mt-6 px-16 py-2 border-2 border-gray-400 text-md rounded-2xl hover:bg-gray-100 hover:text-[#13132D] hover:border-transparent font-medium transition">
-          로그인하기
-        </button>
+        <HeroButton />
       </div>
 
       {/* 히어로 섹션 이미지 */}
@@ -38,7 +40,5 @@ const HeroSection = () => {
         />
       </div>
     </section>
-  );
-};
-
-export default HeroSection;
+  )
+}
