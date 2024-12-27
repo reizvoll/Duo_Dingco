@@ -10,16 +10,16 @@ export const handleLogout = async () => {
     if (error) {
       throw new Error(error.message)
     }
-    // Zustand 상태 초기화
-    const clearUser = useAuthStore.getState().clearUser
+
+    const clearUser = useAuthStore.getState().clearUser // Zustand 상태 초기화
     clearUser()
 
     await Swal.fire({
       icon: 'success',
       title: '로그아웃 완료',
       text: '정상적으로 로그아웃되었습니다.',
-      timer: 3000, // 3초 동안 유지
-      timerProgressBar: true, // 진행 바 표시
+      showCancelButton: true,
+      confirmButtonText: '예',
     })
     window.location.href = '/' // 로그아웃 후 메인 페이지로 리다이렉트
   } catch (error: any) {

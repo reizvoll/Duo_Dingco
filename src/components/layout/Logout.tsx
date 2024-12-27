@@ -1,5 +1,5 @@
 import ProtectedLogin from '../layout/ProtectedLogin'
-import { handleLogout } from '@/components/auth/logoutHandler'
+import { handleLogout } from '@/components/auth/LogoutHandler'
 
 export default function Layout() {
   return (
