@@ -61,7 +61,7 @@ export default function LoginForm({
           title: '로그인 성공',
           text: result.message,
         })
-        window.location.href = '/'
+        router.push('/')
       }
     } catch {
       Swal.fire({
@@ -71,6 +71,7 @@ export default function LoginForm({
       })
     }
   }
+  console.log('FormData', FormData)
 
   const handleGoogleAuth = async () => {
     const result = await onGoogleLogin()
