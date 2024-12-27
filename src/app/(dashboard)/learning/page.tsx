@@ -8,10 +8,11 @@ import { FaStar } from 'react-icons/fa6'
 import { FaRegStar } from 'react-icons/fa6'
 import { Bookmarks } from '@/types/commentTypes'
 import { UserData } from '@/types/user'
-
+import { useAuthStore } from '@/store/auth'
 // 이거 푸쉬해볼게~
 export default function LearnListPage() {
   // 타입 지정 변동했씁니당~
+  const { user } = useAuthStore()
   const [posts, setPosts] = useState<Bookmarks[]>([])
   const [users, setUsers] = useState<UserData[]>([])
   const [error, setError] = useState<string | null>(null)
