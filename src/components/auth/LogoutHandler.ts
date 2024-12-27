@@ -11,7 +11,7 @@ export const handleLogout = async () => {
       throw new Error(error.message)
     }
 
-    const clearUser = useAuthStore.getState().clearUser // Zustand 상태 초기화
+    const clearUser = useAuthStore.getState().clearUser // Zustand 상태 초기화 (로그아웃)
     clearUser()
 
     await Swal.fire({
