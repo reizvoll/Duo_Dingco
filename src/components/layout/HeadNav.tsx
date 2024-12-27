@@ -3,7 +3,7 @@ import { GoHome } from 'react-icons/go'
 import ProtectedLogin from './ProtectedLogin'
 import ModalHandler from './ModalHandler'
 import ProtectedBookmarks from './ProtectedBookmarks'
-import { handleLogout } from '../auth/logoutHandler'
+import { handleLogout } from '../auth/LogoutHandler'
 
 export default function HeadNav() {
   return (
@@ -13,7 +13,7 @@ export default function HeadNav() {
       </Link>
       <ProtectedBookmarks /> {/* user prop 제거 */}
       <ProtectedLogin onLogout={handleLogout} />
-      {/* user prop 제거 */}
+      {/* user prop 제거 / 로그아웃 프롭스 추가 */}
       <ModalHandler />
     </div>
   )
