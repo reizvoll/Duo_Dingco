@@ -1,6 +1,7 @@
 import { supabase } from '@/supabase/supabaseClient'
+import { User } from '@/types/user'
 
-export async function fetchUser(userId: string) {
+export async function fetchUser(userId: string): Promise<User | null> {
   const { data, error } = await supabase
     .from('users')
     .select('*')
@@ -10,10 +11,9 @@ export async function fetchUser(userId: string) {
     console.error('Error fetching user:', error)
     return null
   }
-  return data
+  return data as User
 }
 
-// Insert a new post
 export async function insertPost({
   title,
   description,

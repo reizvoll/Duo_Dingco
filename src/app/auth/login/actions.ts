@@ -1,7 +1,7 @@
 'use server'
 
 import { createClient } from '@/supabase/supabaseServer'
-import { redirect } from 'next/navigation'
+import { error } from 'console'
 
 export async function handleLogin(
   formData: FormData,
@@ -21,7 +21,7 @@ export async function handleLogin(
 
   return { success: true, message: '로그인 성공' }
 }
-
+console.log(error)
 export async function handleGoogleLogin(): Promise<{
   success: boolean
   url?: string
@@ -35,7 +35,6 @@ export async function handleGoogleLogin(): Promise<{
         redirectTo: 'localhost:3000/auth/callback',
       },
     })
-    console.log('data', data)
 
     if (error) {
       return { success: false, message: error.message }
