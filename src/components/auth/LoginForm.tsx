@@ -71,6 +71,7 @@ export default function LoginForm({
       })
     }
   }
+  console.log('FormData', FormData)
 
   const handleGoogleAuth = async () => {
     const result = await onGoogleLogin()
