@@ -23,21 +23,16 @@ export async function handleSignUp(
     return {
       success: false,
       message:
-        '비밀번호가 유효하지 않습니다.6자리 이상의 영문,숫자가 포함된 비밀번호를 입력해주세요.',
+        '비밀번호가 유효하지 않습니다. 6자리 이상의 영문, 숫자가 포함된 비밀번호를 입력해주세요.',
     }
   }
 
   try {
-    // 닉네임 중복 확인
     const { data: existingUser, error: checkError } = await supabase
       .from('users')
       .select('id')
       .eq('nickname', nickname)
-      .single()
-
-    if (checkError) {
-      console.error('Check Error:', checkError)
-    }
+      .maybeSingle()
 
     if (existingUser) {
       return {
@@ -46,7 +41,11 @@ export async function handleSignUp(
       }
     }
 
-    // Supabase Auth 회원가입
+    if (checkError) {
+      console.error('Check Error:', checkError)
+      return { success: false, message: '닉네임 확인 중 오류가 발생했습니다.' }
+    }
+
     const { data: userdata, error: authError } = await supabase.auth.signUp({
       email: `${nickname}@example.com`,
       password,
@@ -55,7 +54,6 @@ export async function handleSignUp(
     if (authError) {
       return { success: false, message: authError.message }
     }
-    console.log(userdata)
 
     let publicUrl = null
     if (profileImage) {
@@ -75,22 +73,18 @@ export async function handleSignUp(
       const { data } = supabase.storage
         .from('profiles')
         .getPublicUrl(`public/${nickname}/profile.jpg`)
-
       publicUrl = data?.publicUrl || null
     }
 
-    // Public users 테이블에 데이터 삽입
-    const { error: insertError } = await supabase
-      .from('users') // Public users 테이블
-      .insert([
-        {
-          id: userdata?.user?.id,
-          nickname,
-          img_url: publicUrl || null, // 생성된 프로필 이미지 URL 저장
-          Exp: 0,
-          Lv: 1,
-        },
-      ])
+    const { error: insertError } = await supabase.from('users').insert([
+      {
+        id: userdata?.user?.id,
+        nickname,
+        img_url: publicUrl || null,
+        Exp: 0,
+        Lv: 1,
+      },
+    ])
 
     if (insertError) {
       console.error('Insert Error:', insertError)
