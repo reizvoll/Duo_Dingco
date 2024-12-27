@@ -6,6 +6,10 @@ import { useModalStore } from '@/store/useModalStore'
 import Swal from 'sweetalert2'
 import { useUser } from '@/hooks/useUser'
 
+type ProtectedLoginProps = {
+  onLogout?: () => Promise<void> // 로그아웃 함수 Prop (선택적)
+}
+
 export const handleLoginRedirect = () => {
   Swal.fire({
     title: `로그인이 필요합니다`,
@@ -21,15 +25,15 @@ export const handleLoginRedirect = () => {
   })
 }
 
-const ProtectedLogin = () => {
-  const { openModal, logout } = useModalStore()
-  const { user } = useUser()  // useUser 훅을 사용해 user 상태 가져오기
+const ProtectedLogin = ({ onLogout }: ProtectedLoginProps) => {
+  const { openModal } = useModalStore()
+  const { user } = useUser()
 
   const handleProfileClick = () => {
     if (user?.id) {
-      openModal()  // 로그인된 경우 프로필 모달 열기
+      openModal()
     } else {
-      handleLoginRedirect()  // 비로그인 상태일 경우 로그인 유도
+      handleLoginRedirect()
     }
   }
 
@@ -39,7 +43,7 @@ const ProtectedLogin = () => {
         <>
           <FiLogOut
             className="text-white w-[25px] h-[25px] cursor-pointer"
-            onClick={logout}
+            onClick={onLogout}
           />
           <div
             className="w-[38px] h-[38px] rounded-full bg-gray-400 cursor-pointer flex items-center justify-center"

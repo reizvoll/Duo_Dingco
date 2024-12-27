@@ -4,8 +4,8 @@ import { User } from '@/types/user'
 
 export function useUser() {
   const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(true) //뺴고
+  const [error, setError] = useState<string | null>(null) //빼고
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -25,7 +25,7 @@ export function useUser() {
           .from('users')
           .select('id, nickname, img_url, created_at, Exp, Lv')
           .eq('id', currentUser.id)
-          .maybeSingle()  // 수정: single() -> maybeSingle() [임시방편]
+          .maybeSingle() // 수정: single() -> maybeSingle() [임시방편]
 
         if (userError) {
           console.error('User fetch error:', userError.message)
