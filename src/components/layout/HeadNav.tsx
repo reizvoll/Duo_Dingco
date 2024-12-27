@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { GoHome } from 'react-icons/go'
 import  ProtectedLogin from './ProtectedLogin'
 import ModalHandler from './ModalHandler'
-import { User } from '@/types/user'
 import ProtectedBookmarks from './ProtectedBookmarks'
 
 export default function HeadNav() {
