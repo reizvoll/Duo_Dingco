@@ -27,7 +27,8 @@ const QuizPage = () => {
   const [selectedAnswer, setSelectedAnswer] = useState<Word | null>(null);
   const [user, setUser] = useState<{ id: string; Exp: number; Lv: number } | null>(null);
   const [correctAnswers, setCorrectAnswers] = useState<number>(0);
-  const [isAnswered, setIsAnswered] = useState(false); 
+  const [quizResults, setQuizResults] = useState<Array<{ word: string; meaning: string; current: boolean }>>([]);
+  const [isAnswered, setIsAnswered] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -88,11 +89,30 @@ const QuizPage = () => {
     setCurrentOptions(options);
   };
 
+  const saveQuizHistory = async () => {
+    if (!user || !post) return;
+
+    const { error } = await supabase.from('quiz_history').insert({
+      user_id: user.id,
+      post_id: post.id,
+      results: quizResults,
+    });
+
+    if (error) {
+      console.error('퀴즈 기록 저장 실패:', error);
+    }
+  };
+
   const handleNext = async () => {
     if (!user || !selectedAnswer || !currentWord) return;
 
     const isCorrect = selectedAnswer.word === currentWord.word;
     const isLastQuestion = currentWordIndex === (post?.words.length || 1) - 1;
+
+    setQuizResults((prev) => [
+      ...prev,
+      { word: currentWord.word, meaning: currentWord.meaning, current: isCorrect },
+    ]);
 
     if (isCorrect) {
       setCorrectAnswers((prev) => prev + 1);
@@ -119,6 +139,8 @@ const QuizPage = () => {
     }
 
     if (isLastQuestion) {
+      await saveQuizHistory();
+
       Swal.fire({
         title: '퀴즈 완료!',
         html: `
@@ -145,10 +167,17 @@ const QuizPage = () => {
     setIsAnswered(false);
   };
 
-  const handleSkip = () => {
+  const handleSkip = async () => {
     const isLastQuestion = currentWordIndex === (post?.words.length || 1) - 1;
 
+    setQuizResults((prev) => [
+      ...prev,
+      { word: currentWord.word, meaning: currentWord.meaning, current: false },
+    ]);
+
     if (isLastQuestion) {
+      await saveQuizHistory();
+
       Swal.fire({
         title: '퀴즈 완료!',
         html: `
