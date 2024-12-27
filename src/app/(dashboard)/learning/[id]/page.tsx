@@ -27,7 +27,7 @@ export default function LearnDetailPage({
   const searchParams = useSearchParams()
 
   const from = searchParams.get('from')
-
+  // 이거 경로 다시 해야 됨.
   const handleBack = () => {
     if (from === 'hotlearning') {
       router.push('/hotlearning')
@@ -39,21 +39,19 @@ export default function LearnDetailPage({
   useEffect(() => {
     const fetchData = async () => {
       try {
+        // posts가져오기
         const { data: postData, error: postError } = await supabase
           .from('posts')
           .select('id, title, description, words, user_id')
           .eq('id', id)
           .single()
-
+        // 'Error, JSON, length'빨간 밑줄 뜨는데 작동은 잘 됨 그래도 건들여야 하는지 의문임.
         if (postError) {
-          throw new Error('게시글 데이터를 가져오는 중 오류가 발생했습니다.')
+          setError('게시글 데이터를 가져오는 중 오류가 발생했습니다.')
         }
 
-        const parsedWords =
-          typeof postData.words === 'string'
-            ? JSON.parse(postData.words)
-            : postData.words
-
+        const parsedWords = postData.words
+        // users정보 가져오기
         const { data: userData, error: userError } = await supabase
           .from('users')
           .select('id, nickname, img_url, created_at')
@@ -61,29 +59,26 @@ export default function LearnDetailPage({
           .single()
 
         if (userError) {
-          throw new Error('유저 데이터를 가져오는 중 오류가 발생했습니다.')
+          setError('유저 데이터를 가져오는 중 오류가 발생했습니다.')
         }
-
+        // bookmarks 가져오기
         const { data: bookmarkData, error: bookmarkError } = await supabase
           .from('bookmarks')
           .select('post_id')
           .eq('post_id', id)
 
         if (bookmarkError) {
-          throw new Error('북마크 데이터를 가져오는 중 오류가 발생했습니다.')
+          setError('북마크 데이터를 가져오는 중 오류가 발생했습니다.')
         }
-
-        const isBookmarked = !!bookmarkData?.length
-
-        setPosts({ ...postData, words: parsedWords, isBookmarked })
+        // bookmark길이 필요, 카드 넘기기용
+        // const isBookmarked = !!bookmarkData?.length
+        // 북마크 다시 수정해야됨
+        setPosts({ ...postData, words: parsedWords })
         setUser(userData)
       } catch (err) {
-        setError(
-          err instanceof Error ? err.message : '데이터를 가져오는 중 오류 발생',
-        )
+        setError('데이터를 가져오는 중 오류 발생')
       }
     }
-
     fetchData()
   }, [id])
 
