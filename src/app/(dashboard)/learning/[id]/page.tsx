@@ -8,11 +8,11 @@ import { FaCircleArrowRight } from 'react-icons/fa6'
 import { FaCircleArrowLeft } from 'react-icons/fa6'
 import { FaStar } from 'react-icons/fa'
 import { FaRegStar } from 'react-icons/fa'
-import { Post } from '@/types/commentTypes'
+import { Bookmarks } from '@/types/commentTypes'
 import { User } from '@/types/user'
 
 export default function QuizDetailPage({ params }: { params: { id: string } }) {
-  const [posts, setPosts] = useState<Post | null>(null)
+  const [posts, setPosts] = useState<Bookmarks | null>(null)
   const [user, setUser] = useState<User | null>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isFlipped, setIsFlipped] = useState(false)
