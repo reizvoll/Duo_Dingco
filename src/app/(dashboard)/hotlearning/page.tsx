@@ -11,6 +11,8 @@ import { UserData } from '@/types/user'
 import { handleError } from './errorHandler'
 import Error from 'next/error'
 
+// 북마크 다시 처리해야 됨 오늘 졸리니까 여기까지....12/27
+
 export default function HotLearningPage() {
   const [posts, setPosts] = useState<Bookmarks[]>([])
   const [users, setUsers] = useState<UserData[]>([])
