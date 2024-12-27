@@ -119,7 +119,14 @@ export default function SignUpPage() {
         <input
           type="email"
           name="email"
-          placeholder="이메일"
+          placeholder="이메일 입력"
+          className="w-full p-3 border-none rounded-lg bg-[#1E1E30] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          required
+        />
+        <input
+          type="text"
+          name="nickname"
+          placeholder="닉네임 입력"
           className="w-full p-3 border-none rounded-lg bg-[#1E1E30] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         />
@@ -163,13 +170,6 @@ export default function SignUpPage() {
             {isConfirmPasswordVisible ? '숨기기' : '보이기'}
           </button>
         </div>
-        <input
-          type="text"
-          name="nickname"
-          placeholder="닉네임 입력"
-          className="w-full p-3 border-none rounded-lg bg-[#1E1E30] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        />
       </div>
 
       <div className="mt-6 flex justify-center">
