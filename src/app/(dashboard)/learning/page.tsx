@@ -12,22 +12,22 @@ import { UserData } from '@/types/user'
 // 이거 푸쉬해볼게~
 export default function LearnListPage() {
   // 타입 지정 변동했씁니당~
-  const [posts, setPosts] = useState<Bookmarks[]>([]) 
-  const [users, setUsers] = useState<UserData[]>([]) 
-  const [error, setError] = useState<string | null>(null) 
+  const [posts, setPosts] = useState<Bookmarks[]>([])
+  const [users, setUsers] = useState<UserData[]>([])
+  const [error, setError] = useState<string | null>(null)
   const router = useRouter()
 
   useEffect(() => {
     const checkSession = async () => {
       const { data, error } = await supabase.auth.getSession()
       if (error || !data.session) {
-        router.push('/auth/sigin') 
+        router.push('/auth/sigin')
       }
       console.log('data', data)
     }
     checkSession()
   }, [router])
-
+  //post가져옴
   useEffect(() => {
     const fetchData = async () => {
       const { data: postData, error: postError } = await supabase.from('posts')
@@ -90,7 +90,7 @@ export default function LearnListPage() {
   const toggleBookmark = async (id: string) => {
     const user = await supabase.auth.getUser()
     if (!user.data.user) {
-      router.push('/auth/signin') 
+      router.push('/auth/signin')
       return
     }
 
