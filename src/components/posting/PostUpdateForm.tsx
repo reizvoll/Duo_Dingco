@@ -141,7 +141,7 @@ export default function UpdateForm({ post }: { post: any }) {
             </button>
           </div>
 
-          {/* 수정 버튼 */}
+          {/* 수정 버튼 및 삭제 버튼*/}
           <div className="flex justify-end gap-4">
             <button
               type="button"

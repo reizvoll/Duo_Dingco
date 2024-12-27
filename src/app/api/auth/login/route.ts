@@ -19,7 +19,6 @@ export async function POST(request: Request) {
       { success: false, message: '이메일 또는 비밀번호가 잘못되었습니다.' },
       { status: 401 },
     )
-    console.log(error)
   }
 
   return NextResponse.json({ success: true, message: '로그인 성공!' })
