@@ -36,13 +36,13 @@ export async function updateSession(request: NextRequest) {
 
   if (
     !user &&
-    !request.nextUrl.pathname.startsWith('/login') && // 로그인 페이지 예외
+    !request.nextUrl.pathname.startsWith('/auth/login') && // 로그인 페이지 예외
     !request.nextUrl.pathname.startsWith('/auth') && // 인증 경로 예외
     request.nextUrl.pathname !== '/' // 홈 페이지 예외
   ) {
     // 로그인되지 않은 사용자를 리다이렉트
     const url = request.nextUrl.clone()
-    url.pathname = '/login'
+    url.pathname = '/auth/login'
     return NextResponse.redirect(url)
   }
 
