@@ -3,10 +3,10 @@
 import Link from 'next/link'
 import { MdOutlineBookmarks } from 'react-icons/md'
 import { handleLoginRedirect } from './ProtectedLogin'
-import { useUser } from '@/hooks/useUser'  // useUser 훅 import
+import { useAuthStore } from '@/store/auth'
 
 export default function ProtectedBookmarks() {
-  const { user } = useUser()  // useUser 훅 사용
+  const user = useAuthStore((state) => state.user) // useUser 훅 사용
 
   const handleProtectedLink = (e: React.MouseEvent) => {
     if (!user?.id) {

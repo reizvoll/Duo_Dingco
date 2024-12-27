@@ -4,7 +4,7 @@ import Image from 'next/image'
 import { FiLogIn, FiLogOut } from 'react-icons/fi'
 import { useModalStore } from '@/store/useModalStore'
 import Swal from 'sweetalert2'
-import { useUser } from '@/hooks/useUser'
+import { useAuthStore } from '@/store/auth'
 
 type ProtectedLoginProps = {
   onLogout?: () => Promise<void> // 로그아웃 함수 Prop (?를 줘서 선택적 기능으로 변경)
@@ -27,7 +27,7 @@ export const handleLoginRedirect = () => {
 
 const ProtectedLogin = ({ onLogout }: ProtectedLoginProps) => {
   const { openModal } = useModalStore()
-  const { user } = useUser()
+  const user = useAuthStore((state) => state.user)
 
   const handleProfileClick = () => {
     if (user?.id) {
