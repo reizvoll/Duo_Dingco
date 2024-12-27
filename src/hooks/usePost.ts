@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import { supabase } from '@/supabase/supabaseClient'
-import { fetchUser, insertPost } from '@/app/api/post/posting'
+import { insertPost } from '@/app/api/post/posting'
 import { PostCard } from '@/types/PostCard'
 import { useRouter } from 'next/navigation'
 import Swal from 'sweetalert2'
+import { useAuthStore } from '@/store/auth'
 
 export function usePost() {
   const router = useRouter()
@@ -12,24 +12,17 @@ export function usePost() {
   ])
   const [title, setTitle] = useState<string>('')
   const [description, setDescription] = useState<string>('')
-  const [userId, setUserId] = useState<string | null>(null)
+
+  // 유저 정보를 가져오는 로직 zustand
+  const user = useAuthStore((state) => state.user)
 
   useEffect(() => {
-    const mockSignIn = async () => {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: '123123@naver.com',
-        password: '123123',
-      })
-
-      if (error) {
-        console.error('Mock sign-in failed:', error.message)
-      } else {
-        setUserId(data.user?.id || null)
-      }
+    if (!user) {
+      console.error('User not authenticated.')
     }
+  }, [user])
 
-    mockSignIn()
-  }, [])
+  console.log(user)
 
   const handleAddCard = () => {
     const newCard = { id: cards.length + 1, word: '', meaning: '' }
@@ -65,14 +58,12 @@ export function usePost() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!userId) {
-      console.error('User not authenticated.')
-      return
-    }
-
-    const user = await fetchUser(userId)
     if (!user) {
-      console.error('User validation failed.')
+      Swal.fire({
+        icon: 'error',
+        title: '로그인이 필요합니다.',
+        showConfirmButton: true,
+      })
       return
     }
 
