@@ -98,8 +98,10 @@ export default function UpdateForm({ post }: { post: any }) {
                       rows={1}
                       onInput={(e) => {
                         const target = e.target as HTMLTextAreaElement
+                        const lineBreaks = (target.value.match(/\n/g) || [])
+                          .length
                         target.style.height = '1.5rem'
-                        target.style.height = `${target.scrollHeight}px`
+                        target.style.height = `${1.5 + lineBreaks * 1.5}rem`
                       }}
                     />
                   </div>
@@ -114,8 +116,10 @@ export default function UpdateForm({ post }: { post: any }) {
                       rows={1}
                       onInput={(e) => {
                         const target = e.target as HTMLTextAreaElement
+                        const lineBreaks = (target.value.match(/\n/g) || [])
+                          .length
                         target.style.height = '1.5rem'
-                        target.style.height = `${target.scrollHeight}px`
+                        target.style.height = `${1.5 + lineBreaks * 1.5}rem`
                       }}
                     />
                   </div>
@@ -155,9 +159,7 @@ export default function UpdateForm({ post }: { post: any }) {
             <button
               type="submit"
               disabled={!isFormCheck}
-              className={`w-[100px] p-2 font-bold rounded-xl border-2 hover:bg-blue-700 text-white ${
-                !isFormCheck ? 'text-gray-500' : ''
-              } `}
+              className={`w-[100px] p-2 font-bold rounded-xl border-2 text-white hover:bg-blue-700`}
             >
               수정하기
             </button>

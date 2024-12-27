@@ -1,10 +1,7 @@
 'use client'
 
-import {
-  fetchBookmarkStatus,
-  fetchProfile,
-  toggleBookmark,
-} from '@/app/api/comment/fetchDataComment'
+import { fetchBookmarkStatus, toggleBookmark } from '@/app/api/comment/bookmark'
+import { fetchProfile } from '@/app/api/comment/fetchDataComment'
 import { fetchPostId } from '@/app/api/post/updating'
 
 import { Post } from '@/types/commentTypes'
