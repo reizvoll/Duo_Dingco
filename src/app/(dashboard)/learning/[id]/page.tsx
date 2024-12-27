@@ -11,7 +11,11 @@ import { FaRegStar } from 'react-icons/fa'
 import { Bookmarks } from '@/types/commentTypes'
 import { User } from '@/types/user'
 
-export default function QuizDetailPage({ params }: { params: { id: string } }) {
+export default function LearnDetailPage({
+  params,
+}: {
+  params: { id: string }
+}) {
   const [posts, setPosts] = useState<Bookmarks | null>(null)
   const [user, setUser] = useState<User | null>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
@@ -35,7 +39,6 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch post data
         const { data: postData, error: postError } = await supabase
           .from('posts')
           .select('id, title, description, words, user_id')
@@ -43,18 +46,14 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
           .single()
 
         if (postError) {
-          setError('게시글 데이터를 가져오는 중 오류가 발생했습니다.')
-          console.error('Supabase posts fetch error:', postError.message)
-          return
+          throw new Error('게시글 데이터를 가져오는 중 오류가 발생했습니다.')
         }
 
-        // Parse words
         const parsedWords =
           typeof postData.words === 'string'
             ? JSON.parse(postData.words)
             : postData.words
 
-        // Fetch user data
         const { data: userData, error: userError } = await supabase
           .from('users')
           .select('id, nickname, img_url, created_at')
@@ -62,9 +61,7 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
           .single()
 
         if (userError) {
-          setError('유저 데이터를 가져오는 중 오류가 발생했습니다.')
-          console.error('Supabase users fetch error:', userError.message)
-          return
+          throw new Error('유저 데이터를 가져오는 중 오류가 발생했습니다.')
         }
 
         const { data: bookmarkData, error: bookmarkError } = await supabase
@@ -73,20 +70,17 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
           .eq('post_id', id)
 
         if (bookmarkError) {
-          console.error(
-            'Supabase bookmarks fetch error:',
-            bookmarkError.message,
-          )
+          throw new Error('북마크 데이터를 가져오는 중 오류가 발생했습니다.')
         }
 
-        // `isBookmarked` 상태 설정
         const isBookmarked = !!bookmarkData?.length
 
         setPosts({ ...postData, words: parsedWords, isBookmarked })
         setUser(userData)
       } catch (err) {
-        setError('데이터를 가져오는 중 문제가 발생했습니다.')
-        console.error(err)
+        setError(
+          err instanceof Error ? err.message : '데이터를 가져오는 중 오류 발생',
+        )
       }
     }
 
@@ -130,38 +124,38 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
   }
 
   const toggleBookmark = async (id: string) => {
-    if (!posts) return // posts가 null인 경우 바로 종료
+    if (!posts) return
 
     const user = await supabase.auth.getUser()
     if (!user.data.user) {
-      router.push('/auth/signin') // 유저가 없으면 로그인 페이지로 이동
+      router.push('/auth/signin')
       return
     }
 
     const isBookmarked = posts.isBookmarked || false
 
-    if (isBookmarked) {
-      // 북마크 해제
-      await supabase
-        .from('bookmarks')
-        .delete()
-        .eq('user_id', user.data.user.id)
-        .eq('post_id', id)
-    } else {
-      // 북마크 추가
-      await supabase.from('bookmarks').insert({
-        user_id: user.data.user.id,
-        post_id: id,
+    try {
+      if (isBookmarked) {
+        await supabase
+          .from('bookmarks')
+          .delete()
+          .eq('user_id', user.data.user.id)
+          .eq('post_id', id)
+      } else {
+        await supabase.from('bookmarks').insert({
+          user_id: user.data.user.id,
+          post_id: id,
+        })
+      }
+
+      setPosts({
+        ...posts,
+        isBookmarked: !isBookmarked,
       })
+    } catch (err) {
+      setError(err instanceof Error ? err.message : '북마크 처리 중 오류 발생')
     }
-
-    // 로컬 상태 업데이트
-    setPosts({
-      ...posts,
-      isBookmarked: !isBookmarked, // 북마크 상태 토글
-    })
   }
-
   return (
     <div className="min-h-screen bg-[#0A092D] text-white p-6 flex flex-col justify-center items-center">
       <div className="w-full max-w-3xl">
@@ -183,21 +177,15 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
         <p className="text-gray-400">
           {posts.description || '설명이 들어갈 곳입니다.'}
         </p>
-        <div className="flex items-center justify-between mt-4">
-          <p className="flex items-center p-3">
-            <Image
-              src={user.img_url || '/dingco.png'}
-              alt="Profile"
-              width={40}
-              height={40}
-              className="rounded-full"
-            />
-            <p className="p-2">{user.nickname}</p>
-          </p>
-          등록일 -{' '}
-          {new Date('2024-12-23T11:06:29.607')
-            .toLocaleDateString('ko-KR')
-            .replace(/\.$/, '')}
+        <div className="flex items-center p-3">
+          <Image
+            src={user.img_url || '/dingco.png'}
+            alt="Profile"
+            width={40}
+            height={40}
+            className="rounded-full"
+          />
+          <span className="p-2">{user.nickname}</span>
         </div>
       </div>
 
