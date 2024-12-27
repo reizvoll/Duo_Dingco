@@ -15,25 +15,38 @@ type Post = Tables<'posts'> & {
   words: Word[];
 };
 
+type User = {
+  id: string;
+  Exp: number;
+  Lv: number;
+};
+
+type QuizResult = {
+  word: string;
+  meaning: string;
+  current: boolean;
+};
+
 const QuizPage = () => {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const [post, setPost] = useState<Post | null>(null);
-  const [currentWordIndex, setCurrentWordIndex] = useState(0);
+  const [currentWordIndex, setCurrentWordIndex] = useState<number>(0);
   const [currentOptions, setCurrentOptions] = useState<Word[]>([]);
   const [allWords, setAllWords] = useState<Word[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedAnswer, setSelectedAnswer] = useState<Word | null>(null);
-  const [user, setUser] = useState<{ id: string; Exp: number; Lv: number } | null>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [correctAnswers, setCorrectAnswers] = useState<number>(0);
-  const [quizResults, setQuizResults] = useState<Array<{ word: string; meaning: string; current: boolean }>>([]);
-  const [isAnswered, setIsAnswered] = useState(false);
+  const [quizResults, setQuizResults] = useState<QuizResult[]>([]);
+  const [isAnswered, setIsAnswered] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
+
       try {
         const {
           data: { session },
@@ -55,7 +68,11 @@ const QuizPage = () => {
 
         const [allWordsResponse, postResponse] = await Promise.all([
           supabase.from('posts').select('words'),
-          supabase.from('posts').select('id, title, words, description').eq('id', id).single(),
+          supabase
+            .from('posts')
+            .select('id, title, words, description')
+            .eq('id', id)
+            .single(),
         ]);
 
         if (allWordsResponse.error) throw allWordsResponse.error;
@@ -73,6 +90,9 @@ const QuizPage = () => {
         if (mergedWords && post.words.length > 0) {
           setRandomOptions(post.words, post.words[0], mergedWords);
         }
+      } catch (err) {
+        console.error('데이터를 가져오는 중 오류:', err);
+        setError('데이터를 가져오는 중 오류가 발생했습니다.');
       } finally {
         setLoading(false);
       }
@@ -81,7 +101,11 @@ const QuizPage = () => {
     if (id) fetchData();
   }, [id]);
 
-  const setRandomOptions = (postWords: Word[], currentWord: Word, allWords: Word[]) => {
+  const setRandomOptions = (
+    postWords: Word[],
+    currentWord: Word,
+    allWords: Word[]
+  ) => {
     const validWords = allWords.filter((word) => word && word.word && word.meaning);
     const otherWords = validWords.filter((word) => word.word !== currentWord.word);
     const shuffledWords = [...otherWords].sort(() => 0.5 - Math.random());
@@ -104,10 +128,10 @@ const QuizPage = () => {
   };
 
   const handleNext = async () => {
-    if (!user || !selectedAnswer || !currentWord) return;
+    if (!user || !selectedAnswer || !post) return;
 
+    const currentWord = post.words[currentWordIndex];
     const isCorrect = selectedAnswer.word === currentWord.word;
-    const isLastQuestion = currentWordIndex === (post?.words.length || 1) - 1;
 
     setQuizResults((prev) => [
       ...prev,
@@ -138,69 +162,24 @@ const QuizPage = () => {
       setUser({ ...user, Exp: newExp, Lv: newLv });
     }
 
+    const isLastQuestion = currentWordIndex === post.words.length - 1;
     if (isLastQuestion) {
       await saveQuizHistory();
-
       Swal.fire({
         title: '퀴즈 완료!',
         html: `
           <p>현재 레벨: <strong>${user.Lv}</strong></p>
           <p>현재 경험치: <strong>${user.Exp}/100</strong></p>
-          <p>${post?.words.length}문제 중 <strong>${correctAnswers + (isCorrect ? 1 : 0)}문제</strong>를 맞추셨습니다.</p>
+          <p>${post.words.length}문제 중 <strong>${correctAnswers}</strong>문제를 맞추셨습니다.</p>
         `,
         icon: 'success',
         confirmButtonText: '퀴즈 리스트로 돌아가기',
-      }).then(() => {
-        router.push('/quiz');
-      });
+      }).then(() => router.push('/quiz'));
       return;
     }
 
     setSelectedAnswer(null);
-    setCurrentWordIndex((prevIndex) => {
-      const totalWords = post?.words.length || 0;
-      const nextIndex = (prevIndex + 1) % totalWords;
-      const nextWord = post?.words[nextIndex];
-      if (nextWord) setRandomOptions(post.words, nextWord, allWords);
-      return nextIndex;
-    });
-    setIsAnswered(false);
-  };
-
-  const handleSkip = async () => {
-    const isLastQuestion = currentWordIndex === (post?.words.length || 1) - 1;
-
-    setQuizResults((prev) => [
-      ...prev,
-      { word: currentWord.word, meaning: currentWord.meaning, current: false },
-    ]);
-
-    if (isLastQuestion) {
-      await saveQuizHistory();
-
-      Swal.fire({
-        title: '퀴즈 완료!',
-        html: `
-          <p>현재 레벨: <strong>${user?.Lv}</strong></p>
-          <p>현재 경험치: <strong>${user?.Exp}/100</strong></p>
-          <p>${post?.words.length}문제 중 <strong>${correctAnswers}</strong>문제를 맞추셨습니다.</p>
-        `,
-        icon: 'success',
-        confirmButtonText: '퀴즈 리스트로 돌아가기',
-      }).then(() => {
-        router.push('/quiz');
-      });
-      return;
-    }
-
-    setSelectedAnswer(null);
-    setCurrentWordIndex((prevIndex) => {
-      const totalWords = post?.words.length || 0;
-      const nextIndex = (prevIndex + 1) % totalWords;
-      const nextWord = post?.words[nextIndex];
-      if (nextWord) setRandomOptions(post.words, nextWord, allWords);
-      return nextIndex;
-    });
+    setCurrentWordIndex((prevIndex) => prevIndex + 1);
     setIsAnswered(false);
   };
 
@@ -211,21 +190,44 @@ const QuizPage = () => {
     }
   };
 
-  const currentWord = post?.words?.[currentWordIndex] || null;
+  const handleSkip = async () => {
+    if (!post || !user) return;
+
+    const currentWord = post.words[currentWordIndex];
+    setQuizResults((prev) => [
+      ...prev,
+      { word: currentWord.word, meaning: currentWord.meaning, current: false },
+    ]);
+
+    const isLastQuestion = currentWordIndex === post.words.length - 1;
+    if (isLastQuestion) {
+      await saveQuizHistory();
+      Swal.fire({
+        title: '퀴즈 완료!',
+        html: `<p>${post.words.length}문제 중 <strong>${correctAnswers}</strong>문제를 맞추셨습니다.</p>`,
+        icon: 'success',
+        confirmButtonText: '퀴즈 리스트로 돌아가기',
+      }).then(() => router.push('/quiz'));
+      return;
+    }
+
+    setSelectedAnswer(null);
+    setCurrentWordIndex((prevIndex) => prevIndex + 1);
+    setIsAnswered(false);
+  };
+
+  const currentWord = post?.words[currentWordIndex];
+
+  if (loading) return <div>로딩 중...</div>;
+  if (error) return <div>{error}</div>;
 
   return (
     <div className="quiz-page relative flex flex-col items-center min-h-screen">
-      {!loading && !error && post && (
+      {post && (
         <>
-          <h1 className="absolute top-8 text-5xl font-bold text-center text-white">
-            {post.title}
-          </h1>
-
+          <h1 className="absolute top-8 text-5xl font-bold text-center text-white">{post.title}</h1>
           <div className="absolute top-28 w-[46%] flex items-center justify-between mb-12">
-            <span className="text-white text-lg font-bold px-4 py-2 border border-white rounded-lg">
-              0
-            </span>
-
+            <span className="text-white text-lg font-bold px-4 py-2 border border-white rounded-lg">0</span>
             <div className="flex-1 mx-4 bg-gray-400 rounded-full h-4 relative">
               <div
                 className="bg-green-500 h-4 rounded-full"
@@ -234,7 +236,6 @@ const QuizPage = () => {
                 }}
               ></div>
             </div>
-
             <span className="text-white text-lg font-bold px-4 py-2 border border-white rounded-lg">
               {post.words.length}
             </span>
@@ -243,7 +244,7 @@ const QuizPage = () => {
       )}
 
       <div className="flex flex-grow items-center justify-center w-full p-12 mt-12">
-        {!loading && !error && post && (
+        {post && (
           <div className="relative w-[900px] h-[650px] bg-[#2E3856] p-8 rounded-lg shadow-lg text-white flex flex-col justify-between">
             <div className="quiz-description mb-6 text-center">
               <p className="text-4xl mt-16">{currentWord?.meaning}</p>
@@ -254,7 +255,7 @@ const QuizPage = () => {
                 <div
                   key={index}
                   onClick={() => handleSelectAnswer(option)}
-                  className={`option text-white border p-4 rounded-lg shadow text-center font-bold cursor-pointer ${
+                  className={`option text-white border ${
                     selectedAnswer
                       ? option.word === currentWord?.word
                         ? 'border-green-500'
@@ -262,7 +263,7 @@ const QuizPage = () => {
                         ? 'border-red-500'
                         : 'border-white'
                       : 'border-white'
-                  }`}
+                  } p-4 rounded-lg shadow text-center font-bold cursor-pointer`}
                 >
                   {option.word}
                 </div>
