@@ -2,40 +2,35 @@
 
 import { useState, useEffect } from 'react'
 import { supabase } from '@/supabase/supabaseClient'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
-
-type Word = {
-  id: string // 단어 ID
-  word: string // 단어
-  meaning: string // 단어의 뜻
-}
-
-type Post = {
-  id: string // 학습 리스트 ID
-  title: string // 학습 리스트 제목
-  description: string // 학습 리스트 설명
-  words: Word[] // 단어 목록
-  user_id: string // 작성자 ID
-  isBookmarked?: boolean // 북마크 상태
-}
-
-type User = {
-  id: string // 유저 ID
-  nickname: string // 유저 닉네임
-  img_url: string // 유저 프로필 이미지 URL
-  created_at: string // 유저 생성 날짜
-}
+import { FaCircleArrowRight } from 'react-icons/fa6'
+import { FaCircleArrowLeft } from 'react-icons/fa6'
+import { FaStar } from 'react-icons/fa'
+import { FaRegStar } from 'react-icons/fa'
+import { Post } from '@/types/commentTypes'
+import { User } from '@/types/user'
 
 export default function QuizDetailPage({ params }: { params: { id: string } }) {
-  const { id } = params
-  const router = useRouter()
-
   const [posts, setPosts] = useState<Post | null>(null)
   const [user, setUser] = useState<User | null>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isFlipped, setIsFlipped] = useState(false)
   const [error, setError] = useState<string | null>(null)
+
+  const { id } = params
+  const router = useRouter()
+  const searchParams = useSearchParams()
+
+  const from = searchParams.get('from')
+
+  const handleBack = () => {
+    if (from === 'hotlearning') {
+      router.push('/hotlearning')
+    } else {
+      router.push('/learning')
+    }
+  }
 
   useEffect(() => {
     const fetchData = async () => {
@@ -72,7 +67,6 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
           return
         }
 
-        // 🔥 추가: 북마크 상태 가져오기
         const { data: bookmarkData, error: bookmarkError } = await supabase
           .from('bookmarks')
           .select('post_id')
@@ -180,19 +174,9 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
             }}
           >
             {posts.isBookmarked ? (
-              <Image
-                src="/bookmarkon.png"
-                alt="Bookmarked"
-                width={25}
-                height={25}
-              />
+              <FaStar className="w-[30px] h-[30px]" />
             ) : (
-              <Image
-                src="/bookmarkoff.png"
-                alt="Not Bookmarked"
-                width={25}
-                height={25}
-              />
+              <FaRegStar className="w-[30px] h-[30px]" />
             )}
           </button>
         </div>
@@ -249,7 +233,7 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
               backfaceVisibility: 'hidden',
             }}
           >
-            <p className="text-lg">
+            <p className="text-lg p-10">
               {posts.words[currentIndex]?.meaning || '정의 없음'}
             </p>
           </div>
@@ -265,7 +249,7 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
           }`}
           onClick={goToPrevCard}
         >
-          <Image src="/left.png" alt="Previous" width={30} height={30} />
+          <FaCircleArrowLeft className="w-[30px] h-[30px]" />
         </button>
         <p className="p-10 text-2xl">
           {currentIndex + 1}/{totalCards}
@@ -278,13 +262,14 @@ export default function QuizDetailPage({ params }: { params: { id: string } }) {
           }`}
           onClick={goToNextCard}
         >
-          <Image src="/right.png" alt="Next" width={30} height={30} />
+          {/* 리랙트아이콘 */}
+          <FaCircleArrowRight className="w-[30px] h-[30px]" />
         </button>
       </div>
 
       <button
         className="px-4 py-2 bg-[#282E3E] text-white rounded hover:bg-[#3f475e] transition duration-300"
-        onClick={() => router.push('/learning')}
+        onClick={handleBack}
       >
         뒤로가기
       </button>
