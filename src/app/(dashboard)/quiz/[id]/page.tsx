@@ -27,6 +27,7 @@ const QuizPage = () => {
   const [selectedAnswer, setSelectedAnswer] = useState<Word | null>(null);
   const [user, setUser] = useState<{ id: string; Exp: number; Lv: number } | null>(null);
   const [correctAnswers, setCorrectAnswers] = useState<number>(0);
+  const [incorrectWords, setIncorrectWords] = useState<Word[]>([]);
   const [isAnswered, setIsAnswered] = useState(false);
 
   useEffect(() => {
@@ -83,8 +84,10 @@ const QuizPage = () => {
   const setRandomOptions = (postWords: Word[], currentWord: Word, allWords: Word[]) => {
     const validWords = allWords.filter((word) => word && word.word && word.meaning);
     const otherWords = validWords.filter((word) => word.word !== currentWord.word);
-    const shuffledWords = [...otherWords].sort(() => 0.5 - Math.random());
-    const options = [currentWord, ...shuffledWords.slice(0, 3)].sort(() => 0.5 - Math.random());
+    const uniqueOptions = otherWords.filter(
+      (word, index, self) => self.findIndex((w) => w.word === word.word) === index
+    ).sort(() => 0.5 - Math.random());
+    const options = [currentWord, ...uniqueOptions.slice(0, 3)].sort(() => 0.5 - Math.random());
     setCurrentOptions(options);
   };
 
@@ -93,30 +96,6 @@ const QuizPage = () => {
 
     const isCorrect = selectedAnswer.word === currentWord.word;
     const isLastQuestion = currentWordIndex === (post?.words.length || 1) - 1;
-
-    if (isCorrect) {
-      setCorrectAnswers((prev) => prev + 1);
-
-      let newExp = user.Exp + 5;
-      let newLv = user.Lv;
-
-      if (newExp >= 100) {
-        newExp -= 100;
-        newLv += 1;
-      }
-
-      const { error: updateError } = await supabase
-        .from('users')
-        .update({ Exp: newExp, Lv: newLv })
-        .eq('id', user.id);
-
-      if (updateError) {
-        console.error('경험치 업데이트 실패:', updateError);
-        return;
-      }
-
-      setUser({ ...user, Exp: newExp, Lv: newLv });
-    }
 
     if (isLastQuestion) {
       Swal.fire({
@@ -127,11 +106,48 @@ const QuizPage = () => {
           <p>${post?.words.length}문제 중 <strong>${correctAnswers + (isCorrect ? 1 : 0)}문제</strong>를 맞추셨습니다.</p>
         `,
         icon: 'success',
+        allowOutsideClick: false,
+        showCancelButton: true,
         confirmButtonText: '퀴즈 리스트로 돌아가기',
-      }).then(() => {
-        router.push('/quiz');
+        cancelButtonText: '틀린 문제 확인하기',
+      }).then((result) => {
+        if (result.isConfirmed) {
+          router.push('/quiz');
+        } else {
+          showIncorrectModal();
+        }
       });
+
+      if (!isCorrect) setIncorrectWords((prev) => [...prev, currentWord]);
       return;
+    }
+
+    if (isCorrect) {
+      setCorrectAnswers((prev) => prev + 1);
+
+      if (user.Lv < 3) {
+        let newExp = user.Exp + 10;
+        let newLv = user.Lv;
+
+        if (newExp >= 100) {
+          newExp -= 100;
+          newLv += 1;
+        }
+
+        if (newLv > 3) {
+          newExp = 0;
+          newLv = 3;
+        }
+
+        await supabase
+          .from('users')
+          .update({ Exp: newExp, Lv: newLv })
+          .eq('id', user.id);
+
+        setUser({ ...user, Exp: newExp, Lv: newLv });
+      }
+    } else {
+      setIncorrectWords((prev) => [...prev, currentWord]);
     }
 
     setSelectedAnswer(null);
@@ -145,34 +161,35 @@ const QuizPage = () => {
     setIsAnswered(false);
   };
 
-  const handleSkip = () => {
-    const isLastQuestion = currentWordIndex === (post?.words.length || 1) - 1;
-
-    if (isLastQuestion) {
-      Swal.fire({
-        title: '퀴즈 완료!',
-        html: `
-          <p>현재 레벨: <strong>${user?.Lv}</strong></p>
-          <p>현재 경험치: <strong>${user?.Exp}/100</strong></p>
-          <p>${post?.words.length}문제 중 <strong>${correctAnswers}</strong>문제를 맞추셨습니다.</p>
-        `,
-        icon: 'success',
-        confirmButtonText: '퀴즈 리스트로 돌아가기',
-      }).then(() => {
-        router.push('/quiz');
-      });
-      return;
-    }
-
-    setSelectedAnswer(null);
-    setCurrentWordIndex((prevIndex) => {
-      const totalWords = post?.words.length || 0;
-      const nextIndex = (prevIndex + 1) % totalWords;
-      const nextWord = post?.words[nextIndex];
-      if (nextWord) setRandomOptions(post.words, nextWord, allWords);
-      return nextIndex;
+  const showIncorrectModal = (words = incorrectWords) => {
+    Swal.fire({
+      title: '틀린 문제 확인',
+      html: `
+        <div style="text-align: left;">
+          ${words.map((word, index) => `<p>${index + 1}. 의미: ${word.meaning}</p>`).join('')}
+        </div>
+      `,
+      allowOutsideClick: false,
+      showCancelButton: true,
+      confirmButtonText: '뒤로가기',
+      cancelButtonText: '학습페이지로 이동하기',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: '퀴즈 완료!',
+          html: `
+            <p>현재 레벨: <strong>${user?.Lv}</strong></p>
+            <p>현재 경험치: <strong>${user?.Exp}/100</strong></p>
+            <p>${post?.words.length}문제 중 <strong>${correctAnswers}</strong>문제를 맞추셨습니다.</p>
+          `,
+          icon: 'success',
+          allowOutsideClick: false,
+          confirmButtonText: '퀴즈 리스트로 돌아가기',
+        }).then(() => router.push('/quiz'));
+      } else {
+        router.push('/learning');
+      }
     });
-    setIsAnswered(false);
   };
 
   const handleSelectAnswer = (option: Word) => {
@@ -238,13 +255,6 @@ const QuizPage = () => {
                 </div>
               ))}
             </div>
-
-            <button
-              onClick={handleSkip}
-              className="absolute bottom-4 right-28 px-6 py-3 text-white border border-white rounded-lg hover:text-gray-200"
-            >
-              건너뛰기
-            </button>
 
             <button
               onClick={handleNext}
