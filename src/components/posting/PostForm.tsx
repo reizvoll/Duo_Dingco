@@ -8,7 +8,6 @@ export default function PostForm() {
     title,
     description,
     cards,
-    isFormCheck,
     setTitle,
     setDescription,
     handleAddCard,
@@ -127,10 +126,7 @@ export default function PostForm() {
           <div className="flex justify-end">
             <button
               type="submit"
-              disabled={!isFormCheck}
-              className={`w-[100px] p-2 font-bold rounded-xl border-2 ${
-                !isFormCheck ? 'text-gray-500' : ''
-              } `}
+              className={`w-[100px] p-2 font-bold rounded-xl border-2 `}
             >
               만들기
             </button>
