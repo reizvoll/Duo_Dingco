@@ -1,8 +1,5 @@
 import { fetchPostId } from '@/app/api/post/updating'
 import UpdateForm from '@/components/posting/PostUpdateForm'
-import { cache } from 'react'
-
-export const dynamic = 'force-dynamic'
 
 export default async function UpdatePage({
   params,
@@ -11,6 +8,8 @@ export default async function UpdatePage({
 }) {
   const { id } = params
   const post = await fetchPostId(id)
+
+  console.log(post)
 
   if (!post) {
     return <div>Post not found.</div>
