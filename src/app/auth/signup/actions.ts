@@ -10,6 +10,7 @@ export async function handleSignUp(
   const confirmPassword = formData.get('confirmPassword') as string
   const nickname = formData.get('nickname') as string
   const profileImage = formData.get('profileImage') as File | null
+  const email = formData.get('email') as string
 
   // 비밀번호 검증
   if (password !== confirmPassword) {
@@ -72,7 +73,7 @@ export async function handleSignUp(
 
     // Supabase Auth 회원가입
     const { error: authError } = await supabase.auth.signUp({
-      email: `${nickname}@example.com`,
+      email,
       password,
       options: {
         data: {
