@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 
-import { updatePost } from '@/app/api/post/updating'
+import { fetchPostId, updatePost } from '@/app/api/post/updating'
 import { PostCard } from '@/types/PostCard'
 import Swal from 'sweetalert2'
 import { deletePostById } from '@/app/api/post/deleting'
@@ -9,11 +9,9 @@ import { deletePostById } from '@/app/api/post/deleting'
 export function useUpdate() {
   const router = useRouter()
   const params = useParams()
-  const id = params?.id as string
+  const postId = params?.id as string
 
-  const [cards, setCards] = useState<PostCard[]>([
-    { id: 1, word: '', meaning: '' },
-  ])
+  const [cards, setCards] = useState<PostCard[]>([])
   const [title, setTitle] = useState<string>('')
   const [description, setDescription] = useState<string>('')
 
@@ -90,16 +88,20 @@ export function useUpdate() {
     })
 
     if (result) {
+      const updatePost = await fetchPostId(postId)
+
+      if (updatePost) {
+        initializeFields(updatePost)
+      }
+
       Swal.fire({
         icon: 'success',
         title: '수정이 완료되었습니다!',
         showConfirmButton: false,
         timer: 1000,
       })
-
-      setTimeout(() => {
-        router.push('/')
-      }, 1000)
+      router.push('/')
+      router.refresh()
     }
   }
 
@@ -135,19 +137,10 @@ export function useUpdate() {
     }
   }
 
-  const isFormCheck =
-    title.trim() !== '' &&
-    description.trim() !== '' &&
-    cards.every(
-      (card) => card.word.trim() !== '' && card.meaning.trim() !== '',
-    ) &&
-    cards.length >= 4
-
   return {
     cards,
     title,
     description,
-    isFormCheck,
     setTitle,
     setDescription,
     handleAddCard,
