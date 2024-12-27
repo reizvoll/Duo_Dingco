@@ -3,3 +3,10 @@ export interface User {
     img_url?: string;
     nickname: string;
   }
+
+export interface UserData {
+    id: string;
+    img_url?: string;
+    nickname: string;
+    created_at: string;
+  }
