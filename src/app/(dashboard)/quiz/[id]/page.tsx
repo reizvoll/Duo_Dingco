@@ -5,6 +5,8 @@ import { useParams, useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
 import { supabase } from '@/supabase/supabaseClient';
 import { Tables } from '@/types/database.types';
+import { getSession, fetchUserData, fetchPostData } from '@/app/api/quiz/fetchDataQuiz';
+
 
 type Word = {
   word: string;
@@ -34,50 +36,33 @@ const QuizPage = () => {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
+  
       try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
+        const session = await getSession();
         if (!session) {
           setError('로그인이 필요합니다.');
           return;
         }
-
-        const userId = session.user.id;
-        const { data: userData, error: userError } = await supabase
-          .from('users')
-          .select('id, Exp, Lv')
-          .eq('id', userId)
-          .single();
-
-        if (userError) throw userError;
+  
+        const userData = await fetchUserData(session.user.id);
         setUser(userData);
-
-        const [allWordsResponse, postResponse] = await Promise.all([
-          supabase.from('posts').select('words'),
-          supabase.from('posts').select('id, title, words, description').eq('id', id).single(),
-        ]);
-
-        if (allWordsResponse.error) throw allWordsResponse.error;
-        if (postResponse.error) throw postResponse.error;
-
-        const mergedWords = allWordsResponse.data
-          ?.map((post) => post.words)
-          .flat() as Word[];
-
+  
+        const idString = Array.isArray(id) ? id[0] : id;
+        const { mergedWords, post } = await fetchPostData(idString);
         setAllWords(mergedWords);
-
-        const post = postResponse.data as Post;
         setPost(post);
-
+  
         if (mergedWords && post.words.length > 0) {
           setRandomOptions(post.words, post.words[0], mergedWords);
         }
+      } catch (error) {
+        console.error(error);
+        setError('데이터를 가져오는 중 문제가 발생했습니다.');
       } finally {
         setLoading(false);
       }
     };
-
+  
     if (id) fetchData();
   }, [id]);
 
