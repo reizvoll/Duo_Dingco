@@ -1,10 +1,10 @@
 'use client'
 
-import { useUser } from '@/hooks/useUser'
+import { useAuthStore } from '@/store/auth'
 import Link from 'next/link'
 
 export default function HeroButton() {
-  const user = useUser()
+  const user = useAuthStore((state) => state.user)
 
   return user ? (
     <Link href="/learning">

@@ -7,12 +7,6 @@ export interface Post {
   words: { word: string; meaning: string }[]
 }
 
-export interface User {
-  id: string
-  name: string
-  img_url: string
-}
-
 export interface BookmarkStatus {
   postId: string
   userId: string
