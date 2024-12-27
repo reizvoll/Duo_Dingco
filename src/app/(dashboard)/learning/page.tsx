@@ -67,16 +67,14 @@ export default function LearnListPage() {
         console.error('Supabase bookmarks fetch error:', bookmarkError)
         return
       }
+      console.log('bookmarkData', bookmarkData)
+      //bookmarkData에서 post_id만 추출
+      const bookmarkedPostIds = bookmarkData.map((bookmark) => bookmark.post_id)
 
-      const bookmarkedPostIds = bookmarkData?.map(
-        (bookmark) => bookmark.post_id,
-      )
-
-      // posts 데이터에 isBookmarked 값 업데이트
+      // postData에 isBookmarked 추가
       const parsedPosts = (postData as Bookmarks[]).map((post) => ({
         ...post,
-        words:
-          typeof post.words === 'string' ? JSON.parse(post.words) : post.words,
+        words: post.words,
         isBookmarked: bookmarkedPostIds?.includes(post.id) || false,
       }))
 
