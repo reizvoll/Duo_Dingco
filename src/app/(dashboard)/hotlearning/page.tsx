@@ -38,21 +38,21 @@ export default function HotLearningPage() {
           .order('created_at', { ascending: false })
 
         if (postError)
-          throw new Error('posts 데이터를 가져오는 중 오류가 발생했습니다.')
+          setError('posts 데이터를 가져오는 중 오류가 발생했습니다.')
 
         const { data: userData, error: userError } = await supabase
           .from('users')
           .select('id, nickname, img_url, created_at')
 
         if (userError)
-          throw new Error('users 데이터를 가져오는 중 오류가 발생했습니다.')
+          setError('users 데이터를 가져오는 중 오류가 발생했습니다.')
 
         const { data: bookmarkData, error: bookmarkError } = await supabase
           .from('bookmarks')
           .select('post_id')
 
         if (bookmarkError)
-          throw new Error('bookmarks 데이터를 가져오는 중 오류가 발생했습니다.')
+          setError('bookmarks 데이터를 가져오는 중 오류가 발생했습니다.')
 
         const bookmarkedPostIds = bookmarkData?.map(
           (bookmark) => bookmark.post_id,
