@@ -4,29 +4,25 @@ import { useState, useEffect } from 'react'
 import { supabase } from '@/supabase/supabaseClient'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { FaRegStar } from 'react-icons/fa6'
 import { FaStar } from 'react-icons/fa6'
-// import { Post } from '@/types/commentTypes'
-import { User } from '@/types/user'
-type Post = {
-  id: string
-  title: string
-  description: string
-  words: { word: string; meaning: string }[]
-  user_id: string
-  isBookmarked?: boolean
-}
+import { FaRegStar } from 'react-icons/fa6'
+import { Bookmarks } from '@/types/commentTypes'
+import { UserData } from '@/types/user'
+import { handleError } from './errorHandler'
+import Error from 'next/error'
+
 export default function HotLearningPage() {
-  const [posts, setPosts] = useState<Post[]>([])
-  const [users, setUsers] = useState<User[]>([])
+  const [posts, setPosts] = useState<Bookmarks[]>([])
+  const [users, setUsers] = useState<UserData[]>([])
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
 
   useEffect(() => {
+    // 로그인 안했어? 바로 게라웃
     const checkSession = async () => {
       const { data, error } = await supabase.auth.getSession()
       if (error || !data.session) {
-        router.push('/auth/signin') // 세션이 없으면 로그인 페이지로 이동
+        router.push('/auth/signin')
       }
     }
     checkSession()
@@ -34,46 +30,48 @@ export default function HotLearningPage() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const { data: postData, error: postError } = await supabase
-        .from('posts')
-        .select('id, title, description, words, user_id')
-        .order('created_at', { ascending: false })
-      if (postError) {
-        setError('posts 데이터를 가져오는 중 오류가 발생했습니다.')
-        console.error('Supabase posts fetch error:', postError)
-        return
+      //에러핸들러 hotlearn 폴더에 넣어둔 거 가져와서 뿌림
+      try {
+        const { data: postData, error: postError } = await supabase
+          .from('posts')
+          .select('id, title, description, words, user_id')
+          .order('created_at', { ascending: false })
+
+        if (postError)
+          throw new Error('posts 데이터를 가져오는 중 오류가 발생했습니다.')
+
+        const { data: userData, error: userError } = await supabase
+          .from('users')
+          .select('id, nickname, img_url, created_at')
+
+        if (userError)
+          throw new Error('users 데이터를 가져오는 중 오류가 발생했습니다.')
+
+        const { data: bookmarkData, error: bookmarkError } = await supabase
+          .from('bookmarks')
+          .select('post_id')
+
+        if (bookmarkError)
+          throw new Error('bookmarks 데이터를 가져오는 중 오류가 발생했습니다.')
+
+        const bookmarkedPostIds = bookmarkData?.map(
+          (bookmark) => bookmark.post_id,
+        )
+
+        const parsedPosts = (postData as Bookmarks[]).map((post) => ({
+          ...post,
+          words:
+            typeof post.words === 'string'
+              ? JSON.parse(post.words)
+              : post.words,
+          isBookmarked: bookmarkedPostIds?.includes(post.id) || false,
+        }))
+
+        setPosts(parsedPosts)
+        setUsers(userData as UserData[])
+      } catch (error) {
+        setError(handleError(error)) // 에러 핸들러 호출
       }
-
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('id, nickname, img_url, created_at')
-      if (userError) {
-        setError('users 데이터를 가져오는 중 오류가 발생했습니다.')
-        console.error('Supabase users fetch error:', userError)
-        return
-      }
-
-      const { data: bookmarkData, error: bookmarkError } = await supabase
-        .from('bookmarks')
-        .select('post_id')
-      if (bookmarkError) {
-        console.error('Supabase bookmarks fetch error:', bookmarkError)
-        return
-      }
-
-      const bookmarkedPostIds = bookmarkData?.map(
-        (bookmark) => bookmark.post_id,
-      )
-
-      const parsedPosts = (postData as Post[]).map((post) => ({
-        ...post,
-        words:
-          typeof post.words === 'string' ? JSON.parse(post.words) : post.words,
-        isBookmarked: bookmarkedPostIds?.includes(post.id) || false,
-      }))
-
-      setPosts(parsedPosts)
-      setUsers(userData as User[])
     }
 
     fetchData()
@@ -82,7 +80,7 @@ export default function HotLearningPage() {
   const toggleBookmark = async (id: string) => {
     const user = await supabase.auth.getUser()
     if (!user.data.user) {
-      router.push('/auth/signin') // 유저가 없으면 로그인 페이지로 이동
+      router.push('/auth/signin') // 로그인 페이지로 리다이렉트
       return
     }
 
@@ -91,26 +89,30 @@ export default function HotLearningPage() {
 
     const isBookmarked = post.isBookmarked
 
-    if (isBookmarked) {
-      await supabase
-        .from('bookmarks')
-        .delete()
-        .eq('user_id', user.data.user.id)
-        .eq('post_id', id)
-    } else {
-      await supabase.from('bookmarks').insert({
-        user_id: user.data.user.id,
-        post_id: id,
-      })
-    }
+    try {
+      if (isBookmarked) {
+        await supabase
+          .from('bookmarks')
+          .delete()
+          .eq('user_id', user.data.user.id)
+          .eq('post_id', id)
+      } else {
+        await supabase.from('bookmarks').insert({
+          user_id: user.data.user.id,
+          post_id: id,
+        })
+      }
 
-    setPosts((prev) =>
-      prev.map((post) =>
-        post.id === id ? { ...post, isBookmarked: !post.isBookmarked } : post,
-      ),
-    )
+      setPosts((prev) =>
+        prev.map((post) =>
+          post.id === id ? { ...post, isBookmarked: !post.isBookmarked } : post,
+        ),
+      )
+    } catch (error) {
+      setError(handleError(error)) // 에러 핸들러 호출
+    }
   }
-  //  이거 처리해야 됨!!!!!!!!!!!!!!!!!!comment
+
   const handleGoToDetails = (id: string) => {
     router.push(`/learning/${id}?from=hotlearning`)
   }
