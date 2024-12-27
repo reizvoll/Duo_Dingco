@@ -90,34 +90,42 @@ export default function UpdateForm({ post }: { post: any }) {
                 <div className="flex items-end min-h-full justify-between gap-4">
                   <div className="flex-[0.40] border-b border-white mr-4">
                     <textarea
-                      value={card.word.replace(/\n/g, '<br />')}
+                      value={card.word}
                       onChange={(e) =>
                         handleInputChange(card.id, 'word', e.target.value)
                       }
-                      className="w-full bg-transparent text-white focus:outline-none resize-none overflow-hidden"
-                      style={{ whiteSpace: 'pre-wrap' }} // 줄바꿈 적용
-                      rows={1}
+                      className="w-full bg-transparent text-white focus:outline-none resize-none overflow-hidde whitespace-pre-wrap break-words"
+                      rows={Math.max(1, card.word.split('\n').length)}
+                      style={{
+                        height: `${1.5 * Math.max(1, card.word.split('\n').length)}rem`,
+                      }}
                       onInput={(e) => {
                         const target = e.target as HTMLTextAreaElement
+                        const lineBreaks = (target.value.match(/\n/g) || [])
+                          .length
                         target.style.height = '1.5rem'
-                        target.style.height = `${target.scrollHeight}px`
+                        target.style.height = `${1.5 + lineBreaks * 1.5}rem`
                       }}
                     />
                   </div>
 
                   <div className="flex-[0.60] border-b border-white ml-4">
                     <textarea
-                      value={card.meaning.replace(/\n/g, '<br />')}
+                      value={card.meaning}
                       onChange={(e) =>
                         handleInputChange(card.id, 'meaning', e.target.value)
                       }
-                      className="w-full bg-transparent text-white focus:outline-none resize-none overflow-hidden"
-                      style={{ whiteSpace: 'pre-wrap' }} // 줄바꿈 적용
-                      rows={1}
+                      className="w-full bg-transparent text-white focus:outline-none resize-none overflow-hidden whitespace-pre-wrap break-words"
+                      rows={Math.max(1, card.meaning.split('\n').length)} // \n 갯수에 따라 rows 조정
+                      style={{
+                        height: `${1.5 * Math.max(1, card.meaning.split('\n').length)}rem`,
+                      }}
                       onInput={(e) => {
                         const target = e.target as HTMLTextAreaElement
+                        const lineBreaks = (target.value.match(/\n/g) || [])
+                          .length
                         target.style.height = '1.5rem'
-                        target.style.height = `${target.scrollHeight}px`
+                        target.style.height = `${1.5 + lineBreaks * 1.5}rem`
                       }}
                     />
                   </div>
@@ -157,9 +165,7 @@ export default function UpdateForm({ post }: { post: any }) {
             <button
               type="submit"
               disabled={!isFormCheck}
-              className={`w-[100px] p-2 font-bold rounded-xl border-2 hover:bg-blue-700 text-white ${
-                !isFormCheck ? 'text-gray-500' : ''
-              } `}
+              className={`w-[100px] p-2 font-bold rounded-xl border-2 text-white hover:bg-blue-700`}
             >
               수정하기
             </button>

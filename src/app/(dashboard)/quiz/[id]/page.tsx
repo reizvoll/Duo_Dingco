@@ -3,8 +3,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Swal from 'sweetalert2';
-import { supabase } from '@/supabase/supabaseClient';
 import { Tables } from '../../../../../database.types';
+import { supabase } from '@/supabase/supabaseClient';
 
 type Word = {
   word: string;
