@@ -19,7 +19,6 @@ export const handleLogout = async () => {
       title: '로그아웃 완료',
       text: '정상적으로 로그아웃되었습니다.',
       showCancelButton: true,
-      confirmButtonText: '예',
     })
     window.location.href = '/' // 로그아웃 후 메인 페이지로 리다이렉트
   } catch (error: any) {
