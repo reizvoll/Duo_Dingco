@@ -4,6 +4,11 @@ import Image from 'next/image'
 import { FiLogIn, FiLogOut } from 'react-icons/fi'
 import { useModalStore } from '@/store/useModalStore'
 import Swal from 'sweetalert2'
+import { useUser } from '@/hooks/useUser'
+
+type ProtectedLoginProps = {
+  onLogout?: () => Promise<void> // 로그아웃 함수 Prop (?를 줘서 선택적 기능으로 변경)
+}
 
 export const handleLoginRedirect = () => {
   Swal.fire({
@@ -20,8 +25,9 @@ export const handleLoginRedirect = () => {
   })
 }
 
-const ProtectedLogin = ({ user }: { user: any }) => {
-  const { openModal, logout } = useModalStore()
+const ProtectedLogin = ({ onLogout }: ProtectedLoginProps) => {
+  const { openModal } = useModalStore()
+  const { user } = useUser()
 
   const handleProfileClick = () => {
     if (user?.id) {
@@ -37,7 +43,7 @@ const ProtectedLogin = ({ user }: { user: any }) => {
         <>
           <FiLogOut
             className="text-white w-[25px] h-[25px] cursor-pointer"
-            onClick={logout}
+            onClick={onLogout} //로그아웃 동작 연결
           />
           <div
             className="w-[38px] h-[38px] rounded-full bg-gray-400 cursor-pointer flex items-center justify-center"
