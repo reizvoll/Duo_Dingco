@@ -2,11 +2,11 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import Swal from 'sweetalert2';
-import { supabase } from '@/supabase/supabaseClient';
 import { Tables } from '@/types/database.types';
 import { getSession, fetchUserData, fetchPostData } from '@/app/api/quiz/fetchDataQuiz';
-
+import { showQuizCompletionAlert } from '@/utils/quizAlert';
+import { goToNextQuestion, updateUserExpAndLevel } from '@/utils/quizHelpers';
+import { showIncorrectModal } from '@/utils/quizModal';
 
 type Word = {
   word: string;
@@ -36,22 +36,22 @@ const QuizPage = () => {
     const fetchData = async () => {
       setLoading(true);
       setError(null);
-  
+
       try {
         const session = await getSession();
         if (!session) {
           setError('로그인이 필요합니다.');
           return;
         }
-  
+
         const userData = await fetchUserData(session.user.id);
         setUser(userData);
-  
+
         const idString = Array.isArray(id) ? id[0] : id;
         const { mergedWords, post } = await fetchPostData(idString);
         setAllWords(mergedWords);
         setPost(post);
-  
+
         if (mergedWords && post.words.length > 0) {
           setRandomOptions(post.words, post.words[0], mergedWords);
         }
@@ -62,7 +62,7 @@ const QuizPage = () => {
         setLoading(false);
       }
     };
-  
+
     if (id) fetchData();
   }, [id]);
 
@@ -82,99 +82,51 @@ const QuizPage = () => {
     const isCorrect = selectedAnswer.word === currentWord.word;
     const isLastQuestion = currentWordIndex === (post?.words.length || 1) - 1;
 
-    if (isLastQuestion) {
-      Swal.fire({
-        title: '퀴즈 완료!',
-        html: `
-          <p>현재 레벨: <strong>${user.Lv}</strong></p>
-          <p>현재 경험치: <strong>${user.Exp}/100</strong></p>
-          <p>${post?.words.length}문제 중 <strong>${correctAnswers + (isCorrect ? 1 : 0)}문제</strong>를 맞추셨습니다.</p>
-        `,
-        icon: 'success',
-        allowOutsideClick: false,
-        showCancelButton: true,
-        confirmButtonText: '퀴즈 리스트로 돌아가기',
-        cancelButtonText: '틀린 문제 확인하기',
-      }).then((result) => {
-        if (result.isConfirmed) {
-          router.push('/quiz');
-        } else {
-          showIncorrectModal();
-        }
-      });
+    const updatedIncorrectWords = isCorrect ? incorrectWords : [...incorrectWords, currentWord];
 
-      if (!isCorrect) setIncorrectWords((prev) => [...prev, currentWord]);
+    if (isLastQuestion) {
+      if (!isCorrect) {
+        setIncorrectWords(updatedIncorrectWords);
+      }
+
+      await showQuizCompletionAlert(
+        user.Lv,
+        user.Exp,
+        post?.words.length || 0,
+        correctAnswers + (isCorrect ? 1 : 0),
+        () => router.push('/quiz'),
+        () =>
+          handleShowIncorrectModal(updatedIncorrectWords)
+      );
+
       return;
     }
 
     if (isCorrect) {
       setCorrectAnswers((prev) => prev + 1);
-
-      if (user.Lv < 3) {
-        let newExp = user.Exp + 10;
-        let newLv = user.Lv;
-
-        if (newExp >= 100) {
-          newExp -= 100;
-          newLv += 1;
-        }
-
-        if (newLv > 3) {
-          newExp = 0;
-          newLv = 3;
-        }
-
-        await supabase
-          .from('users')
-          .update({ Exp: newExp, Lv: newLv })
-          .eq('id', user.id);
-
-        setUser({ ...user, Exp: newExp, Lv: newLv });
-      }
+      await updateUserExpAndLevel(user, setUser);
     } else {
-      setIncorrectWords((prev) => [...prev, currentWord]);
+      setIncorrectWords(updatedIncorrectWords);
     }
 
     setSelectedAnswer(null);
-    setCurrentWordIndex((prevIndex) => {
-      const totalWords = post?.words.length || 0;
-      const nextIndex = (prevIndex + 1) % totalWords;
-      const nextWord = post?.words[nextIndex];
-      if (nextWord) setRandomOptions(post.words, nextWord, allWords);
-      return nextIndex;
-    });
+    goToNextQuestion(currentWordIndex, setCurrentWordIndex, post?.words || [], setRandomOptions, allWords);
     setIsAnswered(false);
   };
 
-  const showIncorrectModal = (words = incorrectWords) => {
-    Swal.fire({
-      title: '틀린 문제 확인',
-      html: `
-        <div style="text-align: left;">
-          ${words.map((word, index) => `<p>${index + 1}. 의미: ${word.meaning}</p>`).join('')}
-        </div>
-      `,
-      allowOutsideClick: false,
-      showCancelButton: true,
-      confirmButtonText: '뒤로가기',
-      cancelButtonText: '학습페이지로 이동하기',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        Swal.fire({
-          title: '퀴즈 완료!',
-          html: `
-            <p>현재 레벨: <strong>${user?.Lv}</strong></p>
-            <p>현재 경험치: <strong>${user?.Exp}/100</strong></p>
-            <p>${post?.words.length}문제 중 <strong>${correctAnswers}</strong>문제를 맞추셨습니다.</p>
-          `,
-          icon: 'success',
-          allowOutsideClick: false,
-          confirmButtonText: '퀴즈 리스트로 돌아가기',
-        }).then(() => router.push('/quiz'));
-      } else {
-        router.push('/learning');
-      }
-    });
+  const handleShowIncorrectModal = (words: Word[]) => {
+    showIncorrectModal(
+      words,
+      user,
+      post?.words.length || 0,
+      correctAnswers,
+      () => router.push('/quiz'),
+      () => router.push('/learning')
+    );
+  };
+
+  const handleBack = () => {
+    router.push('/quiz'); // 퀴즈 리스트로 이동
   };
 
   const handleSelectAnswer = (option: Word) => {
@@ -190,7 +142,7 @@ const QuizPage = () => {
     <div className="quiz-page relative flex flex-col items-center min-h-screen">
       {!loading && !error && post && (
         <>
-          <h1 className="absolute top-8 text-5xl font-bold text-center text-white">
+          <h1 className="absolute top-8 text-4xl font-bold text-center text-white mt-4">
             {post.title}
           </h1>
 
@@ -215,11 +167,18 @@ const QuizPage = () => {
         </>
       )}
 
+      <button
+        onClick={handleBack}
+        className="absolute top-4 left-4 px-6 py-3 ml-80 mt-24 text-white border border-white rounded-lg hover:text-gray-200"
+      >
+        뒤로가기
+      </button>
+
       <div className="flex flex-grow items-center justify-center w-full p-12 mt-12">
         {!loading && !error && post && (
           <div className="relative w-[900px] h-[650px] bg-[#2E3856] p-8 rounded-lg shadow-lg text-white flex flex-col justify-between">
             <div className="quiz-description mb-6 text-center">
-              <p className="text-4xl mt-16">{currentWord?.meaning}</p>
+              <p className="text-3xl mt-24">{currentWord?.meaning}</p>
             </div>
 
             <div className="options-container grid grid-cols-2 gap-10 mt-4 mb-20">
@@ -227,7 +186,7 @@ const QuizPage = () => {
                 <div
                   key={index}
                   onClick={() => handleSelectAnswer(option)}
-                  className={`option text-white border p-4 rounded-lg shadow text-center font-bold cursor-pointer ${selectedAnswer
+                  className={`option text-white border-4 p-4 rounded-lg shadow text-center font-bold cursor-pointer ${selectedAnswer
                       ? option.word === currentWord?.word
                         ? 'border-green-500'
                         : selectedAnswer.word === option.word
