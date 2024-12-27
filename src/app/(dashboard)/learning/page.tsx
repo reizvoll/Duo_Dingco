@@ -30,56 +30,76 @@ export default function LearnListPage() {
   //post가져옴
   useEffect(() => {
     const fetchData = async () => {
-      const { data: postData, error: postError } = await supabase.from('posts')
-        .select(`
+      try {
+        const user = await supabase.auth.getUser()
+        const userId = user.data.user?.id
+
+        if (!userId) {
+          setError('로그인이 필요합니다.')
+        }
+
+        const { data: postData, error: postError } = await supabase.from(
+          'posts',
+        ).select(`
           id,
           title,
           description,
           words,
-          user_id
+          user_id,
+          users(*),
+          bookmarks(post_id, user_id)
         `)
 
-      if (postError) {
-        setError('posts 데이터를 가져오는 중 오류가 발생했습니다.')
-        console.error('Supabase posts fetch error:', postError)
-        return
+        if (postError) {
+          setError('posts 데이터를 가져오는 중 오류가 발생했습니다.')
+        }
+
+        // const { data: userData, error: userError } = await supabase.from('users')
+        //   .select(`
+        //     id,
+        //     nickname,
+        //     img_url,
+        //     created_at
+        //   `)
+
+        // if (userError) {
+        //   setError('users 데이터를 가져오는 중 오류가 발생했습니다.')
+        //   console.error('Supabase users fetch error:', userError)
+        //   return
+        // }
+
+        // const { data: bookmarkData, error: bookmarkError } = await supabase
+        //   .from('bookmarks')
+        //   .select('post_id')
+
+        // if (bookmarkError) {
+        //   console.error('Supabase bookmarks fetch error:', bookmarkError)
+        //   return
+        // }
+        // console.log('bookmarkData', bookmarkData)
+        //bookmarkData에서 post_id만 추출
+        // const bookmarkedPostIds = bookmarkData.map((bookmark) => bookmark.post_id)
+
+        // postData에 isBookmarked 추가
+        if (postError) {
+          setError('posts 데이터를 가져오는 중 오류가 발생했습니다.')
+        }
+
+        const parsedPosts = postData.map((post) => ({
+          ...post,
+          words:
+            typeof post.words === 'string'
+              ? JSON.parse(post.words)
+              : post.words,
+          isBookmarked: post.bookmarks.some(
+            (bookmark) => bookmark.user_id === userId,
+          ),
+        }))
+
+        setPosts(parsedPosts)
+      } catch (err) {
+        setError('데이터를 가져오는 중 오류 발생')
       }
-
-      const { data: userData, error: userError } = await supabase.from('users')
-        .select(`
-          id,
-          nickname,
-          img_url,
-          created_at
-        `)
-
-      if (userError) {
-        setError('users 데이터를 가져오는 중 오류가 발생했습니다.')
-        console.error('Supabase users fetch error:', userError)
-        return
-      }
-
-      const { data: bookmarkData, error: bookmarkError } = await supabase
-        .from('bookmarks')
-        .select('post_id')
-
-      if (bookmarkError) {
-        console.error('Supabase bookmarks fetch error:', bookmarkError)
-        return
-      }
-      console.log('bookmarkData', bookmarkData)
-      //bookmarkData에서 post_id만 추출
-      const bookmarkedPostIds = bookmarkData.map((bookmark) => bookmark.post_id)
-
-      // postData에 isBookmarked 추가
-      const parsedPosts = (postData as Bookmarks[]).map((post) => ({
-        ...post,
-        words: post.words,
-        isBookmarked: bookmarkedPostIds?.includes(post.id) || false,
-      }))
-
-      setPosts(parsedPosts)
-      setUsers(userData as UserData[])
     }
 
     fetchData()
