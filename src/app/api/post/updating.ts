@@ -23,7 +23,7 @@ export async function updatePost({
   id: string
   title: string
   description: string
-  words: any[]
+  words: Array<{ word: string; meaning: string }>
 }) {
   const { data, error } = await supabase
     .from('posts')
