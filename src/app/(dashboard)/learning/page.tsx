@@ -24,7 +24,6 @@ export default function LearnListPage() {
       if (error || !data.session) {
         router.push('/auth/sigin')
       }
-      console.log('data', data)
     }
     checkSession()
   }, [router])
