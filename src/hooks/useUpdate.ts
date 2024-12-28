@@ -1,13 +1,17 @@
 import { useState } from 'react'
-import { useMutation } from '@tanstack/react-query'
-import { useParams, useRouter } from 'next/navigation'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useRouter } from 'next/navigation'
+
 import { updatePost } from '@/app/api/post/updating'
 import { deletePostById } from '@/app/api/post/deleting'
+
 import { PostCard } from '@/types/PostCard'
+
 import Swal from 'sweetalert2'
 
 export function useUpdate() {
   const router = useRouter()
+  const queryclient = useQueryClient()
 
   const [cards, setCards] = useState<PostCard[]>([])
   const [title, setTitle] = useState<string>('')
@@ -72,31 +76,45 @@ export function useUpdate() {
     },
   })
 
-  const handleDeletePost = async (id: string) => {
-    try {
-      const result = await Swal.fire({
-        title: '정말 삭제하시겠습니까?',
-        text: '삭제하면 데이터를 복구할 수 없습니다.',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#d33',
-        cancelButtonColor: '#3085d6',
-        confirmButtonText: '예, 삭제합니다!',
-        cancelButtonText: '취소',
-      })
-
-      if (result.isConfirmed) {
-        await deletePostById(id)
-        await Swal.fire(
-          '삭제 완료',
-          '게시글이 성공적으로 삭제되었습니다.',
-          'success',
-        )
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return deletePostById(id)
+    },
+    onSuccess: () => {
+      Swal.fire({
+        icon: 'success',
+        title: '삭제 완료',
+        text: '게시글이 성공적으로 삭제되었습니다.',
+        confirmButtonText: '확인',
+      }).then(() => {
+        queryclient.invalidateQueries({ queryKey: ['posts'] })
         router.push('/')
-      }
-    } catch (error) {
-      console.error(error)
-      await Swal.fire('삭제 실패', '게시글 삭제에 실패했습니다.', 'error')
+      })
+    },
+    onError: () => {
+      Swal.fire({
+        icon: 'error',
+        title: '삭제 실패',
+        text: '게시글 삭제에 실패했습니다.',
+        confirmButtonText: '확인',
+      })
+    },
+  })
+
+  const handleDeletePost = async (id: string) => {
+    const result = await Swal.fire({
+      title: '정말 삭제하시겠습니까?',
+      text: '삭제하면 데이터를 복구할 수 없습니다.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: '예, 삭제합니다!',
+      cancelButtonText: '취소',
+    })
+
+    if (result.isConfirmed) {
+      deleteMutation.mutate(id)
     }
   }
 
