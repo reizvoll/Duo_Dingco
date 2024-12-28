@@ -9,9 +9,6 @@ import { FaRegStar } from 'react-icons/fa6'
 import { Bookmarks } from '@/types/commentTypes'
 import { UserData } from '@/types/user'
 import { handleError } from './errorHandler'
-import Error from 'next/error'
-
-// 북마크 다시 처리해야 됨 오늘 졸리니까 여기까지....12/27
 
 export default function HotLearningPage() {
   const [posts, setPosts] = useState<Bookmarks[]>([])
@@ -114,9 +111,9 @@ export default function HotLearningPage() {
       setError(handleError(error)) // 에러 핸들러 호출
     }
   }
-
+  // 상세정보페이지로 이동하는 함수~!~!~!
   const handleGoToDetails = (id: string) => {
-    router.push(`/learning/${id}?from=hotlearning`)
+    router.push(`/comment/${id}`)
   }
 
   const getUserInfo = (userId: string) => {
@@ -134,15 +131,17 @@ export default function HotLearningPage() {
 
   return (
     <div className="min-h-screen bg-[#0A092D] text-white flex">
-      <div className="flex-1 ml-20 p-28 overflow-y-auto h-screen">
+      <div className="flex-1 ml-20 p-8 overflow-y-auto h-screen">
         <div className="relative flex flex-col items-center justify-center">
           <div className="absolute top-14 left-40">
-            <h1 className="text-3xl font-bold pl-[120px]">
+            <h1 className="text-3xl font-bold pl-[390px]">
               🔥오늘 작성된 따끈~한 단어
             </h1>
           </div>
-          <div className="flex items-center justify-center w-full mt-32">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+
+          {/* 카드 묶음 */}
+          <div className="flex items-center justify-center w-full mt-24">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {posts.map((post) => {
                 const userInfo = getUserInfo(post.user_id)
 
@@ -152,10 +151,11 @@ export default function HotLearningPage() {
                     className="w-56 h-56 bg-[#2E3856] text-white rounded-lg shadow-lg"
                   >
                     <div className="w-full h-full flex flex-col p-3">
-                      <h2 className="text-xl font-semibold truncate p-3">
+                      <h2 className="text-lg font-semibold truncate mb-4">
                         {post.title}
                       </h2>
-                      <div className="text-sm text-gray-300 flex items-center justify-between mb-1">
+
+                      <div className="text-sm text-gray-300 flex items-center justify-between mb-6">
                         <div className="flex items-center space-x-2">
                           <Image
                             src={userInfo.img_url || '/dingco.png'}
@@ -180,14 +180,15 @@ export default function HotLearningPage() {
                           )}
                         </button>
                       </div>
+
                       <div className="flex items-center justify-center mt-6">
                         <div
-                          className="text-2xl rounded-lg bg-[#282E3E] text-center text-white flex items-center justify-center
-                            cursor-pointer hover:bg-[#3f475e] transition duration-300 
-                            h-14 w-28 sm:h-20 sm:w-32 md:h-18 md:w-36 lg:h-18 lg:w-36"
+                          className="text-lg rounded-lg bg-[#282E3E] text-center text-white flex items-center justify-center
+                              cursor-pointer hover:bg-[#3f475e] transition duration-300 
+                              h-14 w-28 sm:h-16 sm:w-32 md:h-18 md:w-36 lg:h-18 lg:w-36"
                           onClick={() => handleGoToDetails(post.id)}
                         >
-                          {post.words.length}단어
+                          {post.words.length} 단어
                         </div>
                       </div>
                     </div>
