@@ -111,9 +111,9 @@ export default function HotLearningPage() {
       setError(handleError(error)) // 에러 핸들러 호출
     }
   }
-
+  // 상세정보페이지로 이동하는 함수~!~!~!
   const handleGoToDetails = (id: string) => {
-    router.push('/comment')
+    router.push(`/comment/${id}`)
   }
 
   const getUserInfo = (userId: string) => {
