@@ -73,9 +73,6 @@ export async function handleSignUp(
 
       publicUrl = uploadedData?.publicUrl || null
     }
-    console.log('raw_user_meta_data:', {
-      avatar_url: publicUrl || null, // 이 값이 null인지 확인
-    })
 
     // Supabase Auth 회원가입
     const { error: authError } = await supabase.auth.signUp({
@@ -84,6 +81,7 @@ export async function handleSignUp(
       options: {
         data: {
           name: nickname,
+          avatar_url: publicUrl || null, // publicUrl이 null일 경우, img_url 기본값(dingco.png) 사용
         },
       },
     })
