@@ -8,7 +8,7 @@ import { FaStar, FaRegStar } from 'react-icons/fa'
 import { FaCircleArrowLeft, FaCircleArrowRight } from 'react-icons/fa6'
 import { Bookmarks } from '@/types/commentTypes'
 import { useAuthStore } from '@/store/auth'
-
+import Swal from 'sweetalert2'
 
 // 림졍🔥 여기도 설명필요해? 일단 달아볼게
 export default function LearnDetailPage({
@@ -55,7 +55,7 @@ export default function LearnDetailPage({
         setError('게시글 데이터를 가져오는 중 오류가 발생했습니다.')
         return
       }
-
+      console.log('user', user)
       // 단어 데이터 파싱
       const parsedWords =
         typeof postData.words === 'string'
@@ -171,7 +171,19 @@ export default function LearnDetailPage({
   const flipCard = () => {
     setIsFlipped(!isFlipped)
   }
-
+  const handleComplete = async () => {
+    try {
+      await Swal.fire({
+        title: '🎉 학습 완료!',
+        text: '모든 카드를 학습하셨습니다!',
+        icon: 'success',
+        confirmButtonText: '확인',
+      })
+      router.push('/learning')
+    } catch (err) {
+      console.error('Swal 오류:', err)
+    }
+  }
   return (
     <div className="min-h-screen bg-[#0A092D] text-white p-6 flex flex-col justify-center items-center">
       <div className="w-full max-w-3xl">
@@ -265,13 +277,22 @@ export default function LearnDetailPage({
           <FaCircleArrowRight className="w-[30px] h-[30px]" />
         </button>
       </div>
-
-      <button
-        className="px-4 py-2 bg-[#282E3E] text-white rounded hover:bg-[#3f475e] transition duration-300"
-        onClick={handleBack}
-      >
-        뒤로가기
-      </button>
+      {/* 내가 야심차게 준비한 부분!! 마지막 장수일 때, 완료하기 버튼이 뜨면서 클릭 시 학습 완료!알럿! */}
+      {currentIndex === totalCards - 1 ? (
+        <button
+          className="px-4 py-2 bg-[#282E3E] text-white rounded hover:bg-[#3f475e] transition duration-300"
+          onClick={handleComplete}
+        >
+          완료하기
+        </button>
+      ) : (
+        <button
+          className="px-4 py-2 bg-[#282E3E] text-white rounded hover:bg-[#3f475e] transition duration-300"
+          onClick={handleBack}
+        >
+          뒤로가기
+        </button>
+      )}
     </div>
   )
 }
