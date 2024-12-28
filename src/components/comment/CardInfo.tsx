@@ -1,13 +1,10 @@
 'use client'
 
 import { fetchBookmarkStatus, toggleBookmark } from '@/app/api/comment/bookmark'
-import { fetchProfile } from '@/app/api/comment/fetchDataComment'
+import { fetchProfile } from '@/app/api/comment/fetchDataInfo'
 import { fetchPostId } from '@/app/api/post/updating'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 
-import { Post } from '@/types/commentTypes'
-import { User } from '@/types/user'
-
-import { useEffect, useState } from 'react'
 import { RiStarFill, RiStarLine } from 'react-icons/ri'
 
 interface cardInfoProps {
@@ -16,33 +13,63 @@ interface cardInfoProps {
 }
 
 export default function CardInfo({ postId, userId }: cardInfoProps) {
-  const [post, setPost] = useState<Post | null>(null)
-  const [profile, setProfile] = useState<User | null>(null)
-  const [isBookmarked, setIsBookmarked] = useState<boolean>(false)
+  const queryClient = useQueryClient()
+  const {
+    data: post,
+    isPending: isPostPending,
+    isError: isPostError,
+  } = useQuery({
+    queryKey: ['post', postId],
+    queryFn: () => fetchPostId(postId),
+    enabled: !!postId,
+  })
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const postIdData = await fetchPostId(postId)
-      const profileData = postIdData
-        ? await fetchProfile(postIdData.user_id)
-        : null
-      const bookmarkStatus = await fetchBookmarkStatus(postId, userId)
+  const {
+    data: profile,
+    isPending: isProfilePending,
+    isError: isProfileError,
+  } = useQuery({
+    queryKey: ['profile', userId],
+    queryFn: () => fetchProfile(userId!),
+    enabled: !!userId,
+  })
 
-      setPost(postIdData)
-      setProfile(profileData)
-      setIsBookmarked(Boolean(bookmarkStatus))
-    }
-
-    fetchData()
-  }, [postId, userId])
+  const {
+    data: isBookmarked,
+    isPending: isBookmarkedPending,
+    isError: isBookmarkedError,
+  } = useQuery({
+    queryKey: ['bookmark', postId, userId],
+    queryFn: () => fetchBookmarkStatus(postId, userId),
+    enabled: !!postId && !!userId,
+    select: (data) => Boolean(data),
+  })
 
   const handleBookmarkToggle = async () => {
-    await toggleBookmark(postId, userId, isBookmarked)
-    setIsBookmarked(!isBookmarked)
+    if (isBookmarked) {
+      await toggleBookmark(postId, userId, true)
+    } else {
+      await toggleBookmark(postId, userId, false)
+    }
+    queryClient.invalidateQueries({ queryKey: ['bookmark', postId, userId] })
   }
 
-  if (!post || !profile) {
-    return <div>Loading...</div>
+  if (isPostPending || isProfilePending || isBookmarkedPending) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-3xl font-bold text-center">Loading...</p>
+      </div>
+    )
+  }
+
+  if (isPostError || isProfileError || isBookmarkedError || !post || !profile) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p className="text-3xl font-bold text-center">
+          Error loading card information.
+        </p>
+      </div>
+    )
   }
 
   return (
@@ -77,7 +104,7 @@ export default function CardInfo({ postId, userId }: cardInfoProps) {
         <div className="w-[500px] h-[350px] flex items-center flex-col justify-center bg-gray-900 rounded-lg">
           <div className="w-72 h-60 bg-gray-700 rounded-lg flex items-center justify-center">
             <div className="bg-gray-800 text-white text-lg font-bold py-2 px-6 rounded-lg">
-              {post.words.length}단어
+              {[post.words].length}단어
             </div>
           </div>
           <button

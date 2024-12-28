@@ -21,7 +21,7 @@ export async function toggleBookmark(
   postId: string,
   userId: string,
   isBookmarked: boolean,
-) {
+): Promise<boolean> {
   if (isBookmarked) {
     const { error } = await supabase
       .from('bookmarks')
@@ -31,6 +31,7 @@ export async function toggleBookmark(
 
     if (error) {
       console.error('Error removing bookmark:', error.message)
+      return false
     }
   } else {
     const { error } = await supabase
@@ -39,6 +40,8 @@ export async function toggleBookmark(
 
     if (error) {
       console.error('Error adding bookmark:', error.message)
+      return false
     }
   }
+  return true
 }
