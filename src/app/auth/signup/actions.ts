@@ -45,13 +45,14 @@ export async function handleSignUp(
     }
 
     if (checkError) {
-      console.error('Check Error:', checkError)
+      console.error('닉네임 확인 중 오류 발생:', checkError)
       return { success: false, message: '닉네임 확인 중 오류가 발생했습니다.' }
     }
 
-    // 프로필 이미지 업로드 및 URL 생성
+    // 프로필 이미지 업로드
     let publicUrl = null
-    if (profileImage) {
+
+    if (profileImage && profileImage.size > 0) {
       const { error: uploadError } = await supabase.storage
         .from('profiles')
         .upload(`public/${nickname}/profile.jpg`, profileImage, {
@@ -59,16 +60,18 @@ export async function handleSignUp(
         })
 
       if (uploadError) {
+        console.error('프로필 이미지 업로드 실패:', uploadError)
         return {
           success: false,
           message: '프로필 이미지 업로드에 실패했습니다.',
         }
       }
 
-      const { data } = supabase.storage
+      const { data: uploadedData } = supabase.storage
         .from('profiles')
         .getPublicUrl(`public/${nickname}/profile.jpg`)
-      publicUrl = data?.publicUrl || null
+
+      publicUrl = uploadedData?.publicUrl || null
     }
 
     // Supabase Auth 회원가입
@@ -78,18 +81,19 @@ export async function handleSignUp(
       options: {
         data: {
           name: nickname,
-          avatar_url: publicUrl, // raw_user_meta_data에 프로필 이미지 URL 저장
+          avatar_url: publicUrl || null, // publicUrl이 null일 경우, img_url 기본값(dingco.png) 사용
         },
       },
     })
 
     if (authError) {
+      console.error('회원가입 중 인증 오류:', authError)
       return { success: false, message: authError.message }
     }
 
     return { success: true, message: '회원가입이 성공적으로 완료되었습니다!' }
   } catch (error) {
-    console.error('회원가입 오류:', error)
+    console.error('회원가입 중 알 수 없는 오류:', error)
     return { success: false, message: '회원가입 중 오류가 발생했습니다.' }
   }
 }
