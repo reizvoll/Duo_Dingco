@@ -7,14 +7,13 @@ import { useAuthStore } from '@/store/auth'
 
 export function usePost() {
   const router = useRouter()
+  const user = useAuthStore((state) => state.user)
   const [cards, setCards] = useState<PostCard[]>([
     { id: 1, word: '', meaning: '' },
   ])
   const [title, setTitle] = useState<string>('')
   const [description, setDescription] = useState<string>('')
 
-  // 유저 정보를 가져오는 로직 zustand
-  const user = useAuthStore((state) => state.user)
   useEffect(() => {
     if (!user) {
       console.error('User not authenticated.')
@@ -55,21 +54,10 @@ export function usePost() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    console.log(user)
-
     if (!user) {
       Swal.fire({
         icon: 'error',
         title: '로그인이 필요합니다.',
-        showConfirmButton: true,
-      })
-      return
-    }
-
-    if (cards.length < 4) {
-      Swal.fire({
-        icon: 'warning',
-        title: '카드는 최소 4개 이상이어야 수정 가능합니다.',
         showConfirmButton: true,
       })
       return
@@ -83,6 +71,15 @@ export function usePost() {
       Swal.fire({
         icon: 'warning',
         title: '카드 내용을 모두 입력해주세요.',
+        showConfirmButton: true,
+      })
+      return
+    }
+
+    if (cards.length < 4) {
+      Swal.fire({
+        icon: 'warning',
+        title: '카드는 최소 4개 이상이어야 수정 가능합니다.',
         showConfirmButton: true,
       })
       return
