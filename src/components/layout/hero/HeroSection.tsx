@@ -1,7 +1,7 @@
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 
-const HeroButton = dynamic(() => import('./hero/HeroButton'), { ssr: false })
+const HeroButton = dynamic(() => import('./HeroButton'), { ssr: false })
 
 export default async function HeroSection() {
   return (
