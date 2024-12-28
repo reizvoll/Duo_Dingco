@@ -1,5 +1,4 @@
 'use client'
-
 import { useState } from 'react'
 import Swal from 'sweetalert2'
 import Image from 'next/image'
@@ -11,7 +10,7 @@ export default function SignUpPage() {
     useState(false)
   const [passwordError, setPasswordError] = useState<string | null>(null)
   const [profileImage, setProfileImage] = useState<File | null>(null)
-  const [previewUrl, setPreviewUrl] = useState<string | null>('/dingco.png') // 초기값 설정
+  const [previewUrl, setPreviewUrl] = useState<string | null>('/dingco.png')
 
   const validatePassword = (password: string): string | null => {
     if (password.length < 6) {
@@ -45,6 +44,10 @@ export default function SignUpPage() {
       return
     }
 
+    if (profileImage && profileImage.size > 0) {
+      formData.append('profileImage', profileImage)
+    }
+
     const result = await handleSignUp(formData)
 
     if (result.success) {
@@ -52,6 +55,7 @@ export default function SignUpPage() {
         icon: 'success',
         title: '회원가입 완료',
         text: result.message,
+        showCancelButton: true,
       })
       window.location.href = '/auth/login'
     } else {
@@ -64,12 +68,12 @@ export default function SignUpPage() {
   }
 
   const handleProfileImageChange = (file: File | null) => {
-    if (file) {
+    if (file && file.size > 0) {
       setProfileImage(file)
-      const fileUrl = URL.createObjectURL(file) // 브라우저에서 파일 URL 생성
-      setPreviewUrl(fileUrl) // 미리보기 URL 업데이트
+      const fileUrl = URL.createObjectURL(file)
+      setPreviewUrl(fileUrl)
     } else {
-      setPreviewUrl('/dingco.png') // 기본 이미지로 복원
+      setPreviewUrl('/dingco.png')
     }
   }
 
@@ -78,7 +82,6 @@ export default function SignUpPage() {
       onSubmit={async (e) => {
         e.preventDefault()
         const formData = new FormData(e.currentTarget)
-        formData.append('profileImage', profileImage as File) // 프로필 이미지 추가
         await handleFormSubmit(formData)
       }}
       className="w-full max-w-md bg-[#13132D] border border-white rounded-lg p-8 relative"
@@ -93,10 +96,10 @@ export default function SignUpPage() {
         <label htmlFor="profileImage" className="cursor-pointer">
           <div className="relative h-20 w-20 bg-gray-200 rounded-full overflow-hidden border border-gray-400">
             <Image
-              src={previewUrl!} // 상태를 기반으로 이미지를 표시
+              src={previewUrl!}
               alt="프로필 이미지"
-              layout="fill"
-              objectFit="cover"
+              fill
+              style={{ objectFit: 'cover' }}
             />
           </div>
           <p className="text-center text-gray-400 text-sm mt-2">

@@ -24,7 +24,6 @@ export default function LearnListPage() {
       if (error || !data.session) {
         router.push('/auth/sigin')
       }
-      console.log('data', data)
     }
     checkSession()
   }, [router])
@@ -82,8 +81,8 @@ export default function LearnListPage() {
         // const bookmarkedPostIds = bookmarkData.map((bookmark) => bookmark.post_id)
 
         // postData에 isBookmarked 추가
-        
-        const parsedPosts = postData.map((post) => ({
+
+        const parsedPosts = postData!.map((post) => ({
           ...post,
           words:
             typeof post.words === 'string'
