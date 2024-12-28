@@ -34,8 +34,8 @@ export default function LearnListPage() {
   useEffect(() => {
     const fetchData = async () => {
       if (!user) {
-        setError('로그인이 필요합니다.') // 유저가 없는 경우 에러 상태 설정
-        setIsPending(false) // 로딩 종료
+        router.push('/auth/login') // 로그인 페이지로 즉시 리다이렉트
+        setError('로그인 후 이용할 수 있습니다.') // 에러 상태 설정
         return
       }
       // 2. posts 데이터 가져오기
