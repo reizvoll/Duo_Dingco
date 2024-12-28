@@ -1,13 +1,13 @@
 import { create } from "zustand";
-import { User, UserData } from "../types/user";
+import { UserData } from "../types/user";
 
-// 상태 타입 정의
+// 상태 타입 정의 (마이페이지는 왜 말썽일까)
 interface ModalState {
   isModalOpen: boolean;
   user: UserData | null;
   openModal: () => void;
   closeModal: () => void;
-  setUser: (user: User) => void;
+  setUser: (user: UserData) => void;
   clearUser: () => void;
 }
 
