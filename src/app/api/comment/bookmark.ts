@@ -1,20 +1,4 @@
 import { supabase } from '@/supabase/supabaseClient'
-import { User } from '@/types/user'
-
-export const fetchProfile = async (userId: string) => {
-  const { data, error } = await supabase
-    .from('users')
-    .select('id, nickname, img_url')
-    .eq('id', userId)
-    .single()
-
-  if (error) {
-    console.error('Error fetching author:', error.message)
-    return null
-  }
-
-  return data as User
-}
 
 export async function fetchBookmarkStatus(postId: string, userId: string) {
   const { data, error } = await supabase
@@ -22,22 +6,20 @@ export async function fetchBookmarkStatus(postId: string, userId: string) {
     .select('*')
     .eq('post_id', postId)
     .eq('user_id', userId)
-    .single()
+    .maybeSingle()
 
-  if (error && error.code !== 'PGRST116') {
-    // Ignore no rows found error
-    console.error('Error fetching bookmark status:', error.message)
+  if (error) {
     return null
   }
 
-  return data
+  return data ? true : false
 }
 
 export async function toggleBookmark(
   postId: string,
   userId: string,
   isBookmarked: boolean,
-) {
+): Promise<boolean> {
   if (isBookmarked) {
     const { error } = await supabase
       .from('bookmarks')
@@ -47,6 +29,7 @@ export async function toggleBookmark(
 
     if (error) {
       console.error('Error removing bookmark:', error.message)
+      return false
     }
   } else {
     const { error } = await supabase
@@ -55,6 +38,8 @@ export async function toggleBookmark(
 
     if (error) {
       console.error('Error adding bookmark:', error.message)
+      return false
     }
   }
+  return true
 }
