@@ -5,17 +5,17 @@ import { supabase } from '@/supabase/supabaseClient'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import { FaStar, FaRegStar } from 'react-icons/fa'
-import { Bookmarks } from '@/types/commentTypes'
-import { User } from '@/types/user'
 import { FaCircleArrowLeft, FaCircleArrowRight } from 'react-icons/fa6'
+import { Bookmarks } from '@/types/commentTypes'
+import { useAuthStore } from '@/store/auth'
 
 export default function LearnDetailPage({
   params,
 }: {
   params: { id: string }
 }) {
+  const { user, setUser, clearUser } = useAuthStore()
   const [posts, setPosts] = useState<Bookmarks | null>(null)
-  const [user, setUser] = useState<User | null>(null)
   const [currentIndex, setCurrentIndex] = useState(0)
   const [isFlipped, setIsFlipped] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -65,31 +65,43 @@ export default function LearnDetailPage({
         return
       }
 
-      const { data: userSession } = await supabase.auth.getSession()
-      const currentUser = userSession?.session?.user
-
       const isBookmarked = postData.bookmarks.some(
-        (bookmark) => bookmark.user_id === currentUser?.id,
+        (bookmark) => bookmark.user_id === user?.id,
       )
 
       setPosts({ ...postData, words: parsedWords, isBookmarked })
-      setUser(userData)
     } catch (err) {
       setError('데이터를 가져오는 중 오류 발생')
     }
   }
 
   useEffect(() => {
+    const checkSession = async () => {
+      const { data, error } = await supabase.auth.getSession()
+      if (error || !data.session) {
+        clearUser()
+        router.push('/auth/signin')
+        return
+      }
+
+      const supabaseUser = data.session.user
+      if (supabaseUser) {
+        setUser({
+          id: supabaseUser.id,
+          email: supabaseUser.email,
+          img_url: supabaseUser.user_metadata?.img_url || '',
+        })
+      }
+    }
+
+    checkSession()
     fetchData()
-  }, [id])
+  }, [id, router, setUser, clearUser])
 
   const toggleBookmark = async (id: string) => {
     if (!posts) return
 
-    const { data: userSession } = await supabase.auth.getSession()
-    const currentUser = userSession?.session?.user
-
-    if (!currentUser) {
+    if (!user) {
       router.push('/auth/signin')
       return
     }
@@ -101,11 +113,11 @@ export default function LearnDetailPage({
         await supabase
           .from('bookmarks')
           .delete()
-          .eq('user_id', currentUser.id)
+          .eq('user_id', user.id)
           .eq('post_id', id)
       } else {
         await supabase.from('bookmarks').insert({
-          user_id: currentUser.id,
+          user_id: user.id,
           post_id: id,
         })
       }
@@ -124,7 +136,7 @@ export default function LearnDetailPage({
     )
   }
 
-  if (!posts || !user) {
+  if (!posts) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#0A092D] text-white">
         <p>로딩 중...</p>
@@ -175,15 +187,13 @@ export default function LearnDetailPage({
         </p>
         <div className="flex items-center p-3">
           <Image
-            src={user?.img_url ? user.img_url : '/dingco.png'}
+            src={user?.img_url || '/dingco.png'}
             alt="Profile"
             width={40}
             height={40}
             className="rounded-full"
-            unoptimized
           />
-
-          <span className="p-2">{user.nickname}</span>
+          <span className="p-2">{user?.nickname || 'Unknown User'}</span>
         </div>
       </div>
 
