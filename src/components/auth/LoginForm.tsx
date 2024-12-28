@@ -60,6 +60,7 @@ export default function LoginForm({
           icon: 'success',
           title: '로그인 성공',
           text: result.message,
+          showCancelButton: true,
         })
         router.push('/')
       }
