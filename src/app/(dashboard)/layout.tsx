@@ -1,4 +1,4 @@
-import SideNav from '@/components/layout/SideNav'
+import SideNav from '@/components/layout/navigation/SideNav'
 import '@/styles/globals.css'
 import Headers from '@/components/layout/Headers'
 

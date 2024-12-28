@@ -7,7 +7,7 @@ import { useAuthStore } from '@/store/auth';
 import { useModalStore } from '@/store/useModalStore';
 import useFetchUser from '@/hooks/useFetchUser';
 
-export default function MyPage() {
+export default function MyPageModal() {
   const { isModalOpen, closeModal } = useModalStore();
   const { user, clearUser } = useAuthStore();
   const { loading } = useFetchUser();
