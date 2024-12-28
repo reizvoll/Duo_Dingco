@@ -81,7 +81,7 @@ export default function LearnDetailPage({
       const { data, error } = await supabase.auth.getSession()
       if (error || !data.session) {
         clearUser() // 세션이 없으면 유저 초기화
-        router.push('/auth/signin')
+        router.push('/auth/login')
         return
       }
       // 세션이 있으면 유저 정보 설정
@@ -106,7 +106,7 @@ export default function LearnDetailPage({
   // 북마크 토글 (추가/삭제)
   const toggleBookmark = async (id: string) => {
     if (!posts || !user) {
-      router.push('/auth/signin')
+      router.push('/auth/login')
       return
     }
 
