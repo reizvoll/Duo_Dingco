@@ -1,14 +1,14 @@
 import { create } from "zustand";
-import { User } from "../types/user";
+import { User, UserData } from "../types/user";
 
 // 상태 타입 정의
 interface ModalState {
   isModalOpen: boolean;
-  user: User | null;
+  user: UserData | null;
   openModal: () => void;
   closeModal: () => void;
   setUser: (user: User) => void;
-  logout: () => void;
+  clearUser: () => void;
 }
 
 // Zustand 스토어 생성
@@ -18,7 +18,7 @@ export const useModalStore = create<ModalState>((set) => ({
   openModal: () => set({ isModalOpen: true }),
   closeModal: () => set({ isModalOpen: false }),
   setUser: (user) => set({ user }),
-  logout: () => set({ user: null, isModalOpen: false }),
+  clearUser: () => set({ user: null, isModalOpen: false }),
 }));
 
 // 서버 상태 초기화하는 함수 추가
