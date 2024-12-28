@@ -113,7 +113,7 @@ export default function HotLearningPage() {
   }
 
   const handleGoToDetails = (id: string) => {
-    router.push('/comment')
+    router.push(`/comment/${id}`)
   }
 
   const getUserInfo = (userId: string) => {
