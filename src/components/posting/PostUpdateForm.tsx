@@ -95,7 +95,7 @@ export default function UpdateForm({ post }: { post: any }) {
                 <div className="flex items-end min-h-full justify-between gap-4">
                   <div className="flex-[0.40] border-b border-white mr-4">
                     <textarea
-                      value={card.word}
+                      value={card.word.replace(/\n/g, '\n')}
                       onChange={(e) =>
                         handleInputChange(card.id, 'word', e.target.value)
                       }
@@ -109,7 +109,7 @@ export default function UpdateForm({ post }: { post: any }) {
 
                   <div className="flex-[0.60] border-b border-white ml-4">
                     <textarea
-                      value={card.meaning}
+                      value={card.meaning.replace(/\n/g, '\n')}
                       onChange={(e) =>
                         handleInputChange(card.id, 'meaning', e.target.value)
                       }
