@@ -1,11 +1,14 @@
 'use client'
 
-import { useRouter, useParams } from 'next/navigation'
-import { fetchPostId } from '@/app/api/post/updating'
-import UpdateForm from '@/components/posting/PostUpdateForm'
-import { useQuery } from '@tanstack/react-query'
-import Swal from 'sweetalert2'
 import { useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
+import { useRouter, useParams } from 'next/navigation'
+
+import { fetchPostId } from '@/app/api/post/updating'
+
+import UpdateForm from '@/components/posting/PostUpdateForm'
+
+import Swal from 'sweetalert2'
 
 export default function UpdatePage() {
   const params = useParams()
