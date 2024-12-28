@@ -1,25 +1,16 @@
 'use client'
 
-import { useParams, useRouter } from 'next/navigation'
-
-import CardInfo from '@/components/comment/CardInfo'
+import { useParams } from 'next/navigation'
 import { useAuthStore } from '@/store/auth'
-import { useEffect } from 'react'
+import CardInfo from '@/components/comment/CardInfo'
 
 export default function CommentPage() {
+  const user = useAuthStore((state) => state.user)
   const params = useParams()
-  const router = useRouter()
   const postId = params?.id as string
 
-  const user = useAuthStore((state) => state.user)
-
-  useEffect(() => {
-    if (!user) {
-      router.push('/auth/login')
-    }
-  }, [user, router])
-
-  if (!user) {
+  if (!user || !user.id) {
+    console.log(Error)
     return null
   }
   const userId = user.id
@@ -35,7 +26,7 @@ export default function CommentPage() {
   }
 
   return (
-    <div className="px-4 py-8 max-w-[1200px] mx-auto">
+    <div className="px-4 py-8 max-w-[1200px] mx-auto bg-transparent">
       <CardInfo postId={postId} userId={userId} />
     </div>
   )
