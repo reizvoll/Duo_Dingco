@@ -6,15 +6,13 @@ export async function fetchBookmarkStatus(postId: string, userId: string) {
     .select('*')
     .eq('post_id', postId)
     .eq('user_id', userId)
-    .single()
+    .maybeSingle()
 
-  if (error && error.code !== 'PGRST116') {
-    // Ignore no rows found error
-    console.error('Error fetching bookmark status:', error.message)
+  if (error) {
     return null
   }
 
-  return data
+  return data ? true : false
 }
 
 export async function toggleBookmark(

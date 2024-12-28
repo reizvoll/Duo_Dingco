@@ -5,37 +5,42 @@ import { supabase } from '@/supabase/supabaseClient'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import { FaStar, FaRegStar } from 'react-icons/fa'
-import { Bookmarks } from '@/types/commentTypes'
-import { User } from '@/types/user'
 import { FaCircleArrowLeft, FaCircleArrowRight } from 'react-icons/fa6'
+import { Bookmarks } from '@/types/commentTypes'
+import { useAuthStore } from '@/store/auth'
+import Swal from 'sweetalert2'
 
+// 림졍🔥 여기도 설명필요해? 일단 달아볼게
 export default function LearnDetailPage({
   params,
 }: {
   params: { id: string }
 }) {
-  const [posts, setPosts] = useState<Bookmarks | null>(null)
-  const [user, setUser] = useState<User | null>(null)
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [isFlipped, setIsFlipped] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  const { id } = params
+  //clearUser는 Zustand 스토어에서 유저 정보를 초기화(세션이 만료되거나 유효하지 않을 때)
+  const { user, setUser, clearUser } = useAuthStore()
+  const [posts, setPosts] = useState<Bookmarks | null>(null) // 게시글 데이터
+  const [currentIndex, setCurrentIndex] = useState(0) // 현재 카드 인덱스
+  const [isFlipped, setIsFlipped] = useState(false) // 카드 뒤집힘 상태
+  const [error, setError] = useState<string | null>(null) // 에러 메시지
+  // 페이지 라우팅 관련
+  const { id } = params // 동적 세그먼트에서 받은 게시글 ID
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  const from = searchParams.get('from')
-
+  // 뒤로가기 버튼 동작
   const handleBack = () => {
-    if (from === 'hotlearning') {
-      router.push('/hotlearning')
-    } else {
-      router.push('/learning')
-    }
+    router.push('/learning')
   }
-
+  // 게시글 데이터 가져오기
   const fetchData = async () => {
     try {
+      // 세션과 사용자 확인
+      if (!user) {
+        setError('사용자 세션이 없습니다.')
+        return
+      }
+
+      // Supabase에서 데이터 가져오기
       const { data: postData, error: postError } = await supabase
         .from('posts')
         .select(
@@ -44,73 +49,88 @@ export default function LearnDetailPage({
         .eq('id', id)
         .single()
 
+      // 데이터 요청 에러 처리
       if (postError) {
+        console.error('데이터 요청 오류:', postError)
         setError('게시글 데이터를 가져오는 중 오류가 발생했습니다.')
         return
       }
-
+      console.log('user', user)
+      // 단어 데이터 파싱
       const parsedWords =
         typeof postData.words === 'string'
           ? JSON.parse(postData.words)
           : postData.words
 
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('id, nickname, img_url, created_at')
-        .eq('id', postData.user_id)
-        .single()
-
-      if (userError) {
-        setError('유저 데이터를 가져오는 중 오류가 발생했습니다.')
-        return
-      }
-
-      const { data: userSession } = await supabase.auth.getSession()
-      const currentUser = userSession?.session?.user
-
+      // 북마크 상태 확인
       const isBookmarked = postData.bookmarks.some(
-        (bookmark) => bookmark.user_id === currentUser?.id,
+        (bookmark) => bookmark.user_id === user.id,
       )
 
+      // 상태 업데이트
       setPosts({ ...postData, words: parsedWords, isBookmarked })
-      setUser(userData)
+      setError(null) // 오류 상태 초기화
     } catch (err) {
+      console.error('fetchData 오류:', err)
       setError('데이터를 가져오는 중 오류 발생')
     }
   }
-
+  // 세션 확인 및 유저 정보 설정
   useEffect(() => {
-    fetchData()
-  }, [id])
+    const checkSession = async () => {
+      const { data, error } = await supabase.auth.getSession()
+      if (error || !data.session) {
+        clearUser() // 세션이 없으면 유저 초기화
+        router.push('/auth/login')
+        return
+      }
+      // 세션이 있으면 유저 정보 설정
+      const supabaseUser = data.session.user
+      if (supabaseUser) {
+        setUser({
+          id: supabaseUser.id,
+          email: supabaseUser.email,
+          img_url: supabaseUser.user_metadata?.img_url || '',
+        })
+      }
+    }
 
+    checkSession()
+  }, [router, setUser, clearUser])
+  // 유저가 있는 경우 데이터 가져오기
+  useEffect(() => {
+    if (user) {
+      fetchData()
+    }
+  }, [user, id]) // user가 업데이트된 후 fetchData 실행
+  // 북마크 토글 (추가/삭제)
   const toggleBookmark = async (id: string) => {
-    if (!posts) return
-
-    const { data: userSession } = await supabase.auth.getSession()
-    const currentUser = userSession?.session?.user
-
-    if (!currentUser) {
-      router.push('/auth/signin')
+    if (!posts || !user) {
+      router.push('/auth/login')
       return
     }
 
-    const isBookmarked = posts.isBookmarked || false
+    const isBookmarked = posts.isBookmarked
 
     try {
+      // 북마크 상태 업데이트
       if (isBookmarked) {
         await supabase
           .from('bookmarks')
           .delete()
-          .eq('user_id', currentUser.id)
+          .eq('user_id', user.id)
           .eq('post_id', id)
       } else {
         await supabase.from('bookmarks').insert({
-          user_id: currentUser.id,
+          user_id: user.id,
           post_id: id,
         })
       }
 
-      await fetchData()
+      // 로컬 상태 업데이트
+      setPosts((prev) =>
+        prev ? { ...prev, isBookmarked: !isBookmarked } : null,
+      )
     } catch (err) {
       setError('북마크 처리 중 오류 발생')
     }
@@ -124,7 +144,7 @@ export default function LearnDetailPage({
     )
   }
 
-  if (!posts || !user) {
+  if (!posts) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#0A092D] text-white">
         <p>로딩 중...</p>
@@ -151,7 +171,19 @@ export default function LearnDetailPage({
   const flipCard = () => {
     setIsFlipped(!isFlipped)
   }
-
+  const handleComplete = async () => {
+    try {
+      await Swal.fire({
+        title: '🎉 학습 완료!',
+        text: '모든 카드를 학습하셨습니다!',
+        icon: 'success',
+        confirmButtonText: '확인',
+      })
+      router.push('/learning')
+    } catch (err) {
+      console.error('Swal 오류:', err)
+    }
+  }
   return (
     <div className="min-h-screen bg-[#0A092D] text-white p-6 flex flex-col justify-center items-center">
       <div className="w-full max-w-3xl">
@@ -175,15 +207,13 @@ export default function LearnDetailPage({
         </p>
         <div className="flex items-center p-3">
           <Image
-            src={user?.img_url ? user.img_url : '/dingco.png'}
+            src={user?.img_url || '/dingco.png'}
             alt="Profile"
             width={40}
             height={40}
             className="rounded-full"
-            unoptimized
           />
-
-          <span className="p-2">{user.nickname}</span>
+          <span className="p-2">{user?.nickname || 'Unknown User'}</span>
         </div>
       </div>
 
@@ -247,13 +277,22 @@ export default function LearnDetailPage({
           <FaCircleArrowRight className="w-[30px] h-[30px]" />
         </button>
       </div>
-
-      <button
-        className="px-4 py-2 bg-[#282E3E] text-white rounded hover:bg-[#3f475e] transition duration-300"
-        onClick={handleBack}
-      >
-        뒤로가기
-      </button>
+      {/* 내가 야심차게 준비한 부분!! 마지막 장수일 때, 완료하기 버튼이 뜨면서 클릭 시 학습 완료!알럿! */}
+      {currentIndex === totalCards - 1 ? (
+        <button
+          className="px-4 py-2 bg-[#282E3E] text-white rounded hover:bg-[#3f475e] transition duration-300"
+          onClick={handleComplete}
+        >
+          완료하기
+        </button>
+      ) : (
+        <button
+          className="px-4 py-2 bg-[#282E3E] text-white rounded hover:bg-[#3f475e] transition duration-300"
+          onClick={handleBack}
+        >
+          뒤로가기
+        </button>
+      )}
     </div>
   )
 }
