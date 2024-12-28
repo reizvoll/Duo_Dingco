@@ -19,6 +19,7 @@ export default function UpdatePage() {
     data: post,
     isPending,
     isError,
+    isFetched,
   } = useQuery({
     queryKey: ['post', postId],
     queryFn: async () => {
@@ -34,7 +35,7 @@ export default function UpdatePage() {
   })
 
   useEffect(() => {
-    if (isError || !post) {
+    if (isFetched && (isError || !post)) {
       Swal.fire({
         icon: 'error',
         title: '유효하지 않은 ID입니다.',

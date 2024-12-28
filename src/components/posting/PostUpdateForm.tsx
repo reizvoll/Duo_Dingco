@@ -100,7 +100,7 @@ export default function UpdateForm({ post }: { post: any }) {
                         handleInputChange(card.id, 'word', e.target.value)
                       }
                       rows={Math.max(1, card.meaning.split('\n').length)}
-                      className="w-full bg-transparent text-white focus:outline-none resize-none overflow-hidde whitespace-pre-wrap break-words"
+                      className="w-full bg-transparent text-white focus:outline-none resize-none overflow-hidden "
                       onInput={(e) => {
                         resizeTextarea(e.target as HTMLTextAreaElement)
                       }}
@@ -114,7 +114,7 @@ export default function UpdateForm({ post }: { post: any }) {
                         handleInputChange(card.id, 'meaning', e.target.value)
                       }
                       rows={Math.max(1, card.meaning.split('\n').length)}
-                      className="w-full bg-transparent text-white focus:outline-none resize-none overflow-hidden whitespace-pre-wrap break-words"
+                      className="w-full bg-transparent text-white focus:outline-none resize-none overflow-hidden"
                       onInput={(e) => {
                         resizeTextarea(e.target as HTMLTextAreaElement)
                       }}
