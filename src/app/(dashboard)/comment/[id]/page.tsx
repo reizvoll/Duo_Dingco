@@ -1,21 +1,17 @@
 'use client'
 
-import { fetchProfile } from '@/app/api/comment/fetchDataComment'
+import { useParams } from 'next/navigation'
+
 import CardInfo from '@/components/comment/CardInfo'
 import CommentForm from '@/components/comment/CommentForm'
-
-import { useParams } from 'next/navigation'
-import { useState } from 'react'
+import { useAuthStore } from '@/store/auth'
 
 export default function CommentPage() {
   const params = useParams()
   const postId = params?.id as string
-  const [userId, setUserId] = useState<string>()
 
-  const fetchUser = async () => {
-    const data = await fetchProfile(userId)
-    setUserId(data)
-  }
+  const user = useAuthStore((state) => state.user)
+  const userId = user!.id
 
   if (!postId) {
     return <div>잘못된 접근입니다. 게시글 ID가 없습니다.</div>
