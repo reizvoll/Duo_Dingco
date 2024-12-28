@@ -7,35 +7,39 @@ import Image from 'next/image'
 import { FaStar } from 'react-icons/fa6'
 import { FaRegStar } from 'react-icons/fa6'
 import { Bookmarks } from '@/types/commentTypes'
-import { useAuthStore } from '@/store/auth' // Zustand 스토어 사용
-
+import { useAuthStore } from '@/store/auth'
+//test중새고해도 별채워져있어야함
+// 잘들어 림졍🔥 지금부터 주석으로 하나하나 설명해줄게
 export default function LearnListPage() {
-  const { user, clearUser } = useAuthStore() // Zustand 스토어에서 유저 정보 가져오기
-  const [posts, setPosts] = useState<Bookmarks[]>([])
-  const [error, setError] = useState<string | null>(null)
+  //clearUser는 Zustand 스토어에서 유저 정보를 초기화(세션이 만료되거나 유효하지 않을 때)
+  const { user, clearUser } = useAuthStore()
+  const [posts, setPosts] = useState<Bookmarks[]>([]) // 게시글 목록을 상태로 저장
+  const [error, setError] = useState<string | null>(null) // 에러 메시지 상태
+  const [isPending, setIsPending] = useState(true) // 로딩 상태
   const router = useRouter()
 
-  // 유저 세션 확인 및 로그인 유지
+  // 1.유저 세션 확인 및 로그인 유지
   useEffect(() => {
     const checkSession = async () => {
-      const { data, error } = await supabase.auth.getSession()
+      const { data, error } = await supabase.auth.getSession() // 세션 정보 가져오기
       if (error || !data.session) {
-        clearUser()
-        router.push('/auth/signin')
+        clearUser() // 유효하지 않은 세션일 경우 유저 정보 초기화
+        router.push('/auth/signin') // 로그인 페이지로 리다이렉트
         return
       }
+      setIsPending(false) // 유저 상태 확인 완료
     }
     checkSession()
   }, [router, clearUser])
-
-  // posts 데이터 가져오기
   useEffect(() => {
     const fetchData = async () => {
       if (!user) {
-        setError('로그인이 필요합니다.')
+        setError('로그인이 필요합니다.') // 유저가 없는 경우 에러 상태 설정
+        setIsPending(false) // 로딩 종료
         return
       }
-
+      // 2. posts 데이터 가져오기
+      //외래 키 관계를 통해 bookmarks 테이블에서 현재 post와 관련된 데이터를 함께 불러옴
       try {
         const { data: postData, error: postError } = await supabase.from(
           'posts',
@@ -47,13 +51,15 @@ export default function LearnListPage() {
           user_id,
           users(*),
           bookmarks(post_id, user_id)
-        `)
+        `) // posts 데이터를 가져옴
 
         if (postError) {
           setError('posts 데이터를 가져오는 중 오류가 발생했습니다.')
+          setIsPending(false) // 로딩 종료
           return
         }
-
+        // 이부분은 map, post, bookmark에 빨간밑줄생기는데 채채님이 클론해서 확인하신 결과, 빨간밑줄이 없다고 하셨어.
+        // 난 마우스 호버해도 타입 안뜨는데 채채님은 뜨신다~
         const parsedPosts = postData.map((post) => ({
           ...post,
           words:
@@ -62,56 +68,71 @@ export default function LearnListPage() {
               : post.words,
           isBookmarked: post.bookmarks.some(
             (bookmark) => bookmark.user_id === user.id,
-          ),
+          ), // 현재 사용자의 북마크 여부 판단
         }))
 
-        setPosts(parsedPosts)
+        setPosts(parsedPosts) // 상태에 posts 설정
+        setError(null) // 오류 상태 초기화
+        setIsPending(false) // 로딩 종료
       } catch (err) {
-        setError('데이터를 가져오는 중 오류 발생')
+        setError('데이터를 가져오는 중 오류 발생') // 예외 처리
+        setIsPending(false) // 로딩 종료
       }
     }
 
     fetchData()
   }, [user]) // user가 있을 때만 실행
 
-  // 북마크 토글
+  // 3. 북마크 토글
   const toggleBookmark = async (id: string) => {
     if (!user) {
-      router.push('/auth/signin')
+      router.push('/auth/signin') // 유저가 없으면 로그인 페이지로 이동
       return
     }
-
+    // 현재 게시글 정보 가져오기
     const post = posts.find((p) => p.id === id)
     if (!post) return
 
-    const isBookmarked = post.isBookmarked
-
+    //북마크를 추가하거나 삭제하여, 현재 사용자가 특정 게시글을 북마크 상태로 유지
+    const isBookmarked = post.isBookmarked // 북마크 여부 확인
     try {
       if (isBookmarked) {
+        // 북마크 삭제 요청
         await supabase
           .from('bookmarks')
           .delete()
           .eq('user_id', user.id)
           .eq('post_id', id)
       } else {
+        // 북마크 추가 요청
         await supabase.from('bookmarks').insert({
           user_id: user.id,
           post_id: id,
         })
       }
-
+      // 상태 업데이트
+      // 이전 상태의 posts를 순회하며, 해당 post의 id가 클릭한 post의 id와 같다면
       setPosts((prev) =>
         prev.map((post) =>
+          // isBookmarked 상태를 반전시켜 업데이트하고, 나머지는 그대로 유지
           post.id === id ? { ...post, isBookmarked: !post.isBookmarked } : post,
         ),
       )
     } catch (err) {
-      setError('북마크 처리 중 오류 발생')
+      setError('북마크 처리 중 오류 발생') // 예외 처리
     }
   }
-
+  //4. 동적세그먼트로 이동
   const handleGoToDetails = (id: string) => {
-    router.push(`/learning/${id}`)
+    router.push(`/learning/${id}`) // 상세 페이지로 이동
+  }
+
+  if (isPending) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#0A092D] text-white">
+        <p>로딩 중...</p>
+      </div>
+    )
   }
 
   if (error) {
