@@ -12,7 +12,7 @@ import { useAuthStore } from '@/store/auth'
 // 잘들어 림졍🔥 지금부터 주석으로 하나하나 설명해줄게
 export default function LearnListPage() {
   //clearUser는 Zustand 스토어에서 유저 정보를 초기화(세션이 만료되거나 유효하지 않을 때)
-  const { user, clearUser } = useAuthStore()
+  const { user, setUser, clearUser } = useAuthStore()
   const [posts, setPosts] = useState<Bookmarks[]>([]) // 게시글 목록을 상태로 저장
   const [error, setError] = useState<string | null>(null) // 에러 메시지 상태
   const [isPending, setIsPending] = useState(true) // 로딩 상태
@@ -21,24 +21,40 @@ export default function LearnListPage() {
   // 1.유저 세션 확인 및 로그인 유지
   useEffect(() => {
     const checkSession = async () => {
-      const { data, error } = await supabase.auth.getSession() // 세션 정보 가져오기
+      // 이미 user가 존재하면 세션 확인 건너뛰기
+      if (user) {
+        setIsPending(false)
+        return
+      }
+
+      const { data, error } = await supabase.auth.getSession()
       if (error || !data.session) {
         clearUser() // 유효하지 않은 세션일 경우 유저 정보 초기화
-        router.push('/auth/signin') // 로그인 페이지로 리다이렉트
+        router.push('/auth/login') // 로그인 페이지로 리다이렉트
         return
       }
-      setIsPending(false) // 유저 상태 확인 완료
+
+      // 세션이 유효하면 Zustand에 사용자 정보 설정
+      const supabaseUser = data.session.user
+      setUser({
+        id: supabaseUser.id,
+        email: supabaseUser.email,
+        nickname: supabaseUser.user_metadata?.nickname || 'Unknown User',
+        img_url: supabaseUser.user_metadata?.img_url || '/default-avatar.png',
+        // Exp: supabaseUser.user_metadata?.Exp || 0,
+        // Lv: supabaseUser.user_metadata?.Lv || 1,
+      })
+      setIsPending(false) // 로딩 완료
     }
     checkSession()
-  }, [router, clearUser])
+  }, [router, clearUser, setUser, user]) // user 상태를 의존성에 추가
+
+  console.log('user', user)
+  // 2. posts 데이터 가져오기
   useEffect(() => {
     const fetchData = async () => {
-      if (!user) {
-        setError('로그인이 필요합니다.') // 유저가 없는 경우 에러 상태 설정
-        setIsPending(false) // 로딩 종료
-        return
-      }
-      // 2. posts 데이터 가져오기
+      if (!user) return // 유저가 없으면 데이터를 가져오지 않음
+
       //외래 키 관계를 통해 bookmarks 테이블에서 현재 post와 관련된 데이터를 함께 불러옴
       try {
         const { data: postData, error: postError } = await supabase.from(
@@ -86,10 +102,11 @@ export default function LearnListPage() {
   // 3. 북마크 토글
   const toggleBookmark = async (id: string) => {
     if (!user) {
-      router.push('/auth/signin') // 유저가 없으면 로그인 페이지로 이동
+      router.push('/auth/login') // 유저가 없으면 로그인 페이지로 이동
       return
     }
     // 현재 게시글 정보 가져오기
+
     const post = posts.find((p) => p.id === id)
     if (!post) return
 
@@ -150,11 +167,11 @@ export default function LearnListPage() {
         <div className="relative flex flex-col items-center justify-center">
           {/* 학습 페이지 제목 */}
           <div className="absolute top-14 left-40">
-            <h1 className="text-3xl font-bold">학습하기</h1>
+            <h1 className="text-3xl font-bold pl-[240px]">학습하기</h1>
           </div>
 
-          {/* 카드 묶음 */}
-          <div className="flex items-center justify-center w-full mt-24">
+          {/* 카드 묶음 mt-44넣어서 hotlearn이랑 일관성있게 만듦*/}
+          <div className="flex items-center justify-center w-full mt-44">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {posts.map((post) => (
                 <div
