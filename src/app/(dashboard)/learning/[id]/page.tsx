@@ -9,33 +9,38 @@ import { FaCircleArrowLeft, FaCircleArrowRight } from 'react-icons/fa6'
 import { Bookmarks } from '@/types/commentTypes'
 import { useAuthStore } from '@/store/auth'
 
+
+// 림졍🔥 여기도 설명필요해? 일단 달아볼게
 export default function LearnDetailPage({
   params,
 }: {
   params: { id: string }
 }) {
+  //clearUser는 Zustand 스토어에서 유저 정보를 초기화(세션이 만료되거나 유효하지 않을 때)
   const { user, setUser, clearUser } = useAuthStore()
-  const [posts, setPosts] = useState<Bookmarks | null>(null)
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [isFlipped, setIsFlipped] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-
-  const { id } = params
+  const [posts, setPosts] = useState<Bookmarks | null>(null) // 게시글 데이터
+  const [currentIndex, setCurrentIndex] = useState(0) // 현재 카드 인덱스
+  const [isFlipped, setIsFlipped] = useState(false) // 카드 뒤집힘 상태
+  const [error, setError] = useState<string | null>(null) // 에러 메시지
+  // 페이지 라우팅 관련
+  const { id } = params // 동적 세그먼트에서 받은 게시글 ID
   const router = useRouter()
   const searchParams = useSearchParams()
 
-  const from = searchParams.get('from')
-
+  // 뒤로가기 버튼 동작
   const handleBack = () => {
-    if (from === 'hotlearning') {
-      router.push('/hotlearning')
-    } else {
-      router.push('/learning')
-    }
+    router.push('/learning')
   }
-
+  // 게시글 데이터 가져오기
   const fetchData = async () => {
     try {
+      // 세션과 사용자 확인
+      if (!user) {
+        setError('사용자 세션이 없습니다.')
+        return
+      }
+
+      // Supabase에서 데이터 가져오기
       const { data: postData, error: postError } = await supabase
         .from('posts')
         .select(
@@ -44,46 +49,42 @@ export default function LearnDetailPage({
         .eq('id', id)
         .single()
 
+      // 데이터 요청 에러 처리
       if (postError) {
+        console.error('데이터 요청 오류:', postError)
         setError('게시글 데이터를 가져오는 중 오류가 발생했습니다.')
         return
       }
 
+      // 단어 데이터 파싱
       const parsedWords =
         typeof postData.words === 'string'
           ? JSON.parse(postData.words)
           : postData.words
 
-      const { data: userData, error: userError } = await supabase
-        .from('users')
-        .select('id, nickname, img_url, created_at')
-        .eq('id', postData.user_id)
-        .single()
-
-      if (userError) {
-        setError('유저 데이터를 가져오는 중 오류가 발생했습니다.')
-        return
-      }
-
+      // 북마크 상태 확인
       const isBookmarked = postData.bookmarks.some(
-        (bookmark) => bookmark.user_id === user?.id,
+        (bookmark) => bookmark.user_id === user.id,
       )
 
+      // 상태 업데이트
       setPosts({ ...postData, words: parsedWords, isBookmarked })
+      setError(null) // 오류 상태 초기화
     } catch (err) {
+      console.error('fetchData 오류:', err)
       setError('데이터를 가져오는 중 오류 발생')
     }
   }
-
+  // 세션 확인 및 유저 정보 설정
   useEffect(() => {
     const checkSession = async () => {
       const { data, error } = await supabase.auth.getSession()
       if (error || !data.session) {
-        clearUser()
+        clearUser() // 세션이 없으면 유저 초기화
         router.push('/auth/signin')
         return
       }
-
+      // 세션이 있으면 유저 정보 설정
       const supabaseUser = data.session.user
       if (supabaseUser) {
         setUser({
@@ -95,20 +96,24 @@ export default function LearnDetailPage({
     }
 
     checkSession()
-    fetchData()
-  }, [id, router, setUser, clearUser])
-
+  }, [router, setUser, clearUser])
+  // 유저가 있는 경우 데이터 가져오기
+  useEffect(() => {
+    if (user) {
+      fetchData()
+    }
+  }, [user, id]) // user가 업데이트된 후 fetchData 실행
+  // 북마크 토글 (추가/삭제)
   const toggleBookmark = async (id: string) => {
-    if (!posts) return
-
-    if (!user) {
+    if (!posts || !user) {
       router.push('/auth/signin')
       return
     }
 
-    const isBookmarked = posts.isBookmarked || false
+    const isBookmarked = posts.isBookmarked
 
     try {
+      // 북마크 상태 업데이트
       if (isBookmarked) {
         await supabase
           .from('bookmarks')
@@ -122,7 +127,10 @@ export default function LearnDetailPage({
         })
       }
 
-      await fetchData()
+      // 로컬 상태 업데이트
+      setPosts((prev) =>
+        prev ? { ...prev, isBookmarked: !isBookmarked } : null,
+      )
     } catch (err) {
       setError('북마크 처리 중 오류 발생')
     }
