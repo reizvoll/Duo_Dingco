@@ -32,7 +32,7 @@ export const updateUserExpAndLevel = async (
   ) => {
     if (!user) return;
   
-    const expGained = 10;
+    const expGained = 5;
     const newExp = (user.Exp ?? 0) + expGained;
   
     // user.Lv = 1 | 2 | 3 중 하나

@@ -17,39 +17,45 @@ export default function MyPageProfile() {
   const level = user?.Lv ?? 1;
   
   return (
-    <div className="max-w-5xl mx-auto p-8">
+    <div className="max-w-custom mx-auto p-8">
       {/* 프로필 섹션 */}
-      <div className="flex items-center justify-between mb-12">
-        <div className="flex items-center space-x-6">
-          <div className="relative w-24 h-24">
+      <div className="flex items-center mb-12 gap-16">
+        <div className="flex items-center gap-8">
+          {/* 프로필 이미지 */}
+          <div className="relative w-24 h-24 flex-shrink-0">
             <Image
               src={user?.img_url || '/dingco.png'}
               alt="Profile Image"
               layout="fill"
-              className="rounded-full object-cover"
+              className="rounded-full border object-cover"
             />
           </div>
-          <div>
+
+          {/* 유저 정보 */}
+          <div className="flex justify-center items-center gap-4">
             <h1 className="text-3xl font-bold text-white">{user?.nickname || '유저'}</h1>
 
-            {/* 레벨 / 이미지 섹션 */}
-            <div className="flex items-center space-x-2 mt-2">
-              <p className="text-xl text-gray-400 flex items-center">
+            {/* 레벨 및 레벨 이미지 */}
+            <div className="flex items-center space-x-1 mt-2">
+              <div className="text-xl text-gray-400 flex items-center">
                 Lv. {level}
-                <span className="ml-2">
-                  <ProfileImage level={level} />
-                </span>
-              </p>
+              </div>
+              <div className="ml-1 flex items-center">
+                <ProfileImage level={level} />
+              </div>
             </div>
 
-            <p className="text-md text-gray-400">Exp: {user?.Exp ?? 0}</p>
+            {/* 경험치 */}
+            <div className="text-md text-gray-400">
+              Exp: {user?.Exp ?? 0}
+            </div>
           </div>
         </div>
 
         {/* 프로필 수정 버튼 */}
         <button
           onClick={openModal}
-          className="px-4 py-2 border rounded-lg text-white hover:bg-gray-700"
+          className="px-6 py-3 border rounded-lg text-white hover:bg-gray-700 flex-shrink-0 ml-12"
         >
           수정하기
         </button>
