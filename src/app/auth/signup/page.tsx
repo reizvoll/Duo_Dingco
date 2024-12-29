@@ -1,53 +1,19 @@
 'use client'
+
 import { useState } from 'react'
 import Swal from 'sweetalert2'
 import Image from 'next/image'
 import { handleSignUp } from './actions'
+import { IoIosArrowDropleft } from 'react-icons/io'
 
 export default function SignUpPage() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const [isConfirmPasswordVisible, setIsConfirmPasswordVisible] =
     useState(false)
-  const [passwordError, setPasswordError] = useState<string | null>(null)
   const [profileImage, setProfileImage] = useState<File | null>(null)
   const [previewUrl, setPreviewUrl] = useState<string | null>('/dingco.png')
 
-  const validatePassword = (password: string): string | null => {
-    if (password.length < 6) {
-      return '비밀번호는 6자 이상이어야 합니다.'
-    }
-    if (!/[a-z]/.test(password)) {
-      return '비밀번호에 영문 소문자가 포함되어야 합니다.'
-    }
-    if (!/[0-9]/.test(password)) {
-      return '비밀번호에 숫자가 포함되어야 합니다.'
-    }
-    return null
-  }
-
   const handleFormSubmit = async (formData: FormData) => {
-    const password = formData.get('password') as string
-    const confirmPassword = formData.get('confirmPassword') as string
-
-    const validationError = validatePassword(password)
-    if (validationError) {
-      setPasswordError(validationError)
-      return
-    }
-
-    if (password !== confirmPassword) {
-      Swal.fire({
-        icon: 'error',
-        title: '비밀번호 오류',
-        text: '비밀번호가 일치하지 않습니다.',
-      })
-      return
-    }
-
-    if (profileImage && profileImage.size > 0) {
-      formData.append('profileImage', profileImage)
-    }
-
     const result = await handleSignUp(formData)
 
     if (result.success) {
@@ -55,7 +21,6 @@ export default function SignUpPage() {
         icon: 'success',
         title: '회원가입 완료',
         text: result.message,
-        showCancelButton: true,
       })
       window.location.href = '/auth/login'
     } else {
@@ -68,10 +33,9 @@ export default function SignUpPage() {
   }
 
   const handleProfileImageChange = (file: File | null) => {
-    if (file && file.size > 0) {
+    if (file) {
       setProfileImage(file)
-      const fileUrl = URL.createObjectURL(file)
-      setPreviewUrl(fileUrl)
+      setPreviewUrl(URL.createObjectURL(file))
     } else {
       setPreviewUrl('/dingco.png')
     }
@@ -82,17 +46,26 @@ export default function SignUpPage() {
       onSubmit={async (e) => {
         e.preventDefault()
         const formData = new FormData(e.currentTarget)
+        if (profileImage) formData.append('profileImage', profileImage)
         await handleFormSubmit(formData)
       }}
       className="w-full max-w-md bg-[#13132D] border border-white rounded-lg p-8 relative"
-      encType="multipart/form-data"
+      style={{ width: '400px', height: '670px' }}
     >
-      <h2 className="text-2xl font-bold text-center mt-7 text-white mb-2">
+      <button
+        onClick={() => window.history.back()}
+        className="absolute top-6 left-6 text-white text-xl"
+        type="button"
+      >
+        <IoIosArrowDropleft size={30} />
+      </button>
+
+      <h2 className="text-2xl font-bold text-center mt-10 text-white mb-2">
         가입하기
       </h2>
-      <p className="text-center text-gray-400 mb-10">정보를 입력해주세요.</p>
+      <p className="text-center text-gray-400 mb-6">정보를 입력해주세요.</p>
 
-      <div className="flex justify-center mb-10">
+      <div className="flex justify-center mb-8">
         <label htmlFor="profileImage" className="cursor-pointer">
           <div className="relative h-20 w-20 bg-gray-200 rounded-full overflow-hidden border border-gray-400">
             <Image
@@ -123,14 +96,14 @@ export default function SignUpPage() {
           type="email"
           name="email"
           placeholder="이메일 입력"
-          className="w-full p-3 border-none rounded-lg bg-[#1E1E30] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full p-3 rounded-lg bg-[#1E1E30] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         />
         <input
           type="text"
           name="nickname"
           placeholder="닉네임 입력"
-          className="w-full p-3 border-none rounded-lg bg-[#1E1E30] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full p-3 rounded-lg bg-[#1E1E30] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         />
         <div className="relative">
@@ -138,13 +111,8 @@ export default function SignUpPage() {
             type={isPasswordVisible ? 'text' : 'password'}
             name="password"
             placeholder="비밀번호"
-            className={`w-full p-3 border-none rounded-lg bg-[#1E1E30] text-white placeholder-gray-400 focus:outline-none ${
-              passwordError
-                ? 'ring-red-500 focus:ring-red-500'
-                : 'focus:ring-blue-500'
-            }`}
+            className="w-full p-3 rounded-lg bg-[#1E1E30] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
-            onChange={(e) => setPasswordError(validatePassword(e.target.value))}
           />
           <button
             type="button"
@@ -153,16 +121,13 @@ export default function SignUpPage() {
           >
             {isPasswordVisible ? '숨기기' : '보이기'}
           </button>
-          {passwordError && (
-            <p className="text-red-500 text-sm mt-1">{passwordError}</p>
-          )}
         </div>
         <div className="relative">
           <input
             type={isConfirmPasswordVisible ? 'text' : 'password'}
             name="confirmPassword"
             placeholder="비밀번호 확인"
-            className="w-full p-3 border-none rounded-lg bg-[#1E1E30] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full p-3 rounded-lg bg-[#1E1E30] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
           <button
@@ -174,11 +139,10 @@ export default function SignUpPage() {
           </button>
         </div>
       </div>
-
-      <div className="mt-6 flex justify-center">
+      <div className="mt-8 flex justify-center">
         <button
           type="submit"
-          className="w-2/4 bg-[#1E1E30] m-6 text-white p-3 rounded-full hover:bg-[#282847] text-center"
+          className="w-2/4 bg-[#1E1E30] text-white py-3 rounded-full hover:bg-[#282847] text-center"
         >
           회원가입
         </button>
