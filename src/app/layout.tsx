@@ -5,7 +5,7 @@ import QueryProvider from '@/components/providers/RqProvider'
 export const metadata: Metadata = {
   title: 'Duo-Dingco',
   description:
-    '낱말카드로 코딩 관련 내용을 쉽게 배울 수 있도록 도와주는 학습 플랫폼',
+    '낱말카드로 코딩 내용을 쉽게 학습할 수 있도록 도와주는 웹 어플리케이션',
   icons: {
     icon: '/dingco.png',
   },
