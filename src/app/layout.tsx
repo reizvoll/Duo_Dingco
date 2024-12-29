@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import '@/styles/globals.css'
 import QueryProvider from '@/components/providers/RqProvider'
+import ComponentWithBoundary from '@/components/error/ComponentBounday'
 
 export const metadata: Metadata = {
   title: 'Duo-Dingco',
@@ -20,7 +21,9 @@ export default function RootLayout({
     <html lang="en">
       <body>
         <QueryProvider>
-          <main className="flex-1">{children}</main>
+          <ComponentWithBoundary>
+            <main className="flex-1">{children}</main>
+          </ComponentWithBoundary>
         </QueryProvider>
       </body>
     </html>

@@ -7,12 +7,11 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode
 }) {
-
   return (
-      <>
-        <Headers />
-        <SideNav />
-        <main className="flex-1">{children}</main>
-      </>
+    <>
+      <Headers />
+      <SideNav />
+      <main className="flex-1">{children}</main>
+    </>
   )
 }
