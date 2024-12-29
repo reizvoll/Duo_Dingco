@@ -40,12 +40,11 @@ export default function MyPageModal() {
               alt="Profile"
               width={80}
               height={80}
-              className="rounded-full object-cover"
+              className="rounded-full border border-gray-500 object-cover"
             />
           </div>
           <p className="mt-4 text-sm text-gray-500">닉네임: {user.nickname}</p>
-          <p className="text-sm text-gray-500">Lv. {user.Lv ?? '알 수 없음'}</p>
-          <p className="text-sm text-gray-500">Exp. {user.Exp ?? 0}</p>
+          <p className="text-sm text-gray-500">Lv. {user.Lv ?? '알 수 없음'} /exp. {user.Exp ?? 0}</p>
         </div>
 
         <div className="mt-6 flex justify-center">
