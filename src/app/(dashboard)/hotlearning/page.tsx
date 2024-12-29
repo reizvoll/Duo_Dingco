@@ -25,7 +25,7 @@ export default function HotLearningPage() {
       const { data, error } = await supabase.auth.getSession()
       if (error || !data.session) {
         clearUser() // 로그인 세션이 없으면 유저 정보 초기화
-        router.push('/auth/signin') // 로그인 페이지로 이동
+        router.push('/auth/login') // 로그인 페이지로 이동
         return
       }
 
@@ -52,33 +52,39 @@ export default function HotLearningPage() {
           .select('id, title, description, words, user_id')
           .order('created_at', { ascending: false })
 
-        if (postError)
+        if (postError) {
           setError('posts 데이터를 가져오는 중 오류가 발생했습니다.')
+          return
+        }
 
         // 사용자 데이터 가져오기
         const { data: userData, error: userError } = await supabase
           .from('users')
           .select('id, nickname, img_url, created_at')
 
-        if (userError)
+        if (userError) {
           setError('users 데이터를 가져오는 중 오류가 발생했습니다.')
+          return
+        }
 
-        // 북마크 데이터 가져오기
+        // 북마크 데이터 가져오기 (현재 유저의 북마크만 가져오기)
         const { data: bookmarkData, error: bookmarkError } = await supabase
           .from('bookmarks')
           .select('post_id')
+          .eq('user_id', user.id) // 현재 로그인된 유저의 북마크만 가져오기
 
-        if (bookmarkError)
-          setError('bookmarks 데이터를 가져오는 중 오류가 발생했습니다.')
+        if (bookmarkError) {
+          setError('북마크 데이터를 가져오는 중 오류가 발생했습니다.')
+          return
+        }
 
-        // 이부분도 map,bookmark,JSON 빨간밑줄 생기는데 채채님이 클론하실땐 안뜨고, 타입도 호버하면 뜨신대.,..
         // 북마크된 게시글 ID 추출
         const bookmarkedPostIds = bookmarkData?.map(
           (bookmark) => bookmark.post_id,
         )
 
         // 게시글 데이터에 북마크 정보 추가
-        const parsedPosts = (postData as Bookmarks[]).map((post) => ({
+        const parsedPosts = postData.map((post) => ({
           ...post,
           words:
             typeof post.words === 'string'
@@ -89,51 +95,61 @@ export default function HotLearningPage() {
 
         setPosts(parsedPosts) // 게시글 상태 업데이트
         setUsers(userData as UserData[]) // 사용자 정보 상태 업데이트
+        setError(null)
       } catch (error) {
-        setError('북마크 데이터를 처리하는 중 오류가 발생했습니다.')
+        setError('데이터를 가져오는 중 오류가 발생했습니다.')
       }
     }
 
-    fetchData()
-  }, [])
+    if (user) {
+      fetchData()
+    }
+  }, [user]) // user가 변경될 때마다 실행
 
   // 북마크 토글 함수 (클릭하면 북마크 추가/삭제)
   const toggleBookmark = async (id: string) => {
     if (!user) {
-      router.push('/auth/signin') // 로그인 상태가 아니면 로그인 페이지로 이동
+      router.push('/auth/login')
       return
     }
 
-    // 현재 클릭한 게시글 찾기
-    const post = posts.find((p) => p.id === id)
-    if (!post) return
-
-    const isBookmarked = post.isBookmarked // 현재 북마크 상태 확인
-
     try {
+      const post = posts.find((p) => p.id === id)
+      if (!post) return
+
+      const isBookmarked = post.isBookmarked
+
       if (isBookmarked) {
-        // 북마크 삭제
         await supabase
           .from('bookmarks')
           .delete()
           .eq('user_id', user.id)
           .eq('post_id', id)
       } else {
-        // 북마크 추가
         await supabase.from('bookmarks').insert({
           user_id: user.id,
           post_id: id,
         })
       }
 
-      // 상태 업데이트로 화면에 즉시 반영
+      // Supabase와 동기화된 데이터 가져오기
+      const { data: bookmarkData } = await supabase
+        .from('bookmarks')
+        .select('post_id')
+        .eq('user_id', user.id)
+
+      const bookmarkedPostIds = bookmarkData?.map(
+        (bookmark) => bookmark.post_id,
+      )
+
       setPosts((prev) =>
-        prev.map((post) =>
-          post.id === id ? { ...post, isBookmarked: !post.isBookmarked } : post,
-        ),
+        prev.map((post) => ({
+          ...post,
+          isBookmarked: bookmarkedPostIds?.includes(post.id) || false,
+        })),
       )
     } catch (error) {
-      setError(handleError(error)) // 에러 핸들러 호출
+      setError('북마크 상태를 변경할 수 없습니다.')
     }
   }
 
