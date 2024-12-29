@@ -158,42 +158,51 @@ const QuizPage = () => {
   };
 
   return (
-    <div className="quiz-page relative flex flex-col items-center min-h-screen">
+    <div className="quiz-page relative flex flex-col items-center min-h-screen scale-90 origin-center max-w-custom mx-auto">
       {!loading && !error && post && (
         <>
-          <h1 className="absolute top-8 text-4xl font-bold text-center text-white mt-4">
-            {truncateText(post.title, 30)}
-          </h1>
-
-          <div className="absolute top-28 w-[46%] flex items-center justify-between mb-12">
-            <span className="text-white text-lg font-bold px-4 py-2 border border-white rounded-lg">
-              0
-            </span>
-
-            <div className="flex-1 mx-4 bg-gray-400 rounded-full h-4 relative">
+          {/* 제목 + 뒤로가기 버튼 컨테이너 */}
+          <div className="flex items-center justify-between w-full absolute top-8 px-40">
+            <button
+              onClick={handleBack}
+              className="px-6 py-3 text-white border border-white rounded-lg hover:text-gray-200"
+            >
+              뒤로가기
+            </button>
+  
+            <h1 className="text-4xl font-bold text-center text-white flex-grow">
+              {truncateText(post.title, 30)}
+            </h1>
+  
+            <div className="w-[120px]">{/* 우측 여백 조절용 */}</div>
+          </div>
+  
+          {/* 게이지 바 섹션 */}
+          <div className="absolute top-32 w-[60%] flex flex-col items-center mb-12">
+            <div className="flex items-center justify-between w-full mb-2">
+              <span className="text-white text-lg font-bold px-4 py-2 border border-white rounded-lg">
+                0
+              </span>
+  
+              <span className="text-white text-lg font-bold px-4 py-2 border border-white rounded-lg">
+                {post.words.length}
+              </span>
+            </div>
+  
+            <div className="w-full bg-gray-400 rounded-full h-6 relative">
               <div
-                className="bg-green-500 h-4 rounded-full"
+                className="bg-green-500 h-6 rounded-full"
                 style={{
                   width: `${((currentWordIndex + 1) / post.words.length) * 100}%`,
                 }}
               ></div>
             </div>
-
-            <span className="text-white text-lg font-bold px-4 py-2 border border-white rounded-lg">
-              {post.words.length}
-            </span>
           </div>
         </>
       )}
-
-      <button
-        onClick={handleBack}
-        className="absolute top-4 left-4 px-6 py-3 ml-80 mt-24 text-white border border-white rounded-lg hover:text-gray-200"
-      >
-        뒤로가기
-      </button>
-
-      <div className="flex flex-grow items-center justify-center w-full p-12 mt-12">
+  
+      {/* 퀴즈 카드 섹션 */}
+      <div className="flex flex-grow items-center justify-center w-full p-12 mt-48">
         {!loading && !error && post && (
           <div className="relative w-[900px] h-[650px] bg-[#2E3856] p-8 rounded-lg shadow-lg text-white flex flex-col justify-between">
             <div className="quiz-description mb-6 text-center">
@@ -201,31 +210,33 @@ const QuizPage = () => {
                 {currentWord?.meaning && truncateText(currentWord.meaning, 100)}
               </p>
             </div>
-
+  
             <div className="options-container grid grid-cols-2 gap-10 mt-4 mb-20">
               {currentOptions.map((option, index) => (
                 <div
                   key={index}
                   onClick={() => handleSelectAnswer(option)}
-                  className={`option text-white border-4 p-4 rounded-lg shadow text-center font-bold cursor-pointer ${selectedAnswer
-                    ? option.word === currentWord?.word
-                      ? 'border-green-500'
-                      : selectedAnswer.word === option.word
+                  className={`option text-white border-4 p-4 rounded-lg shadow text-center font-bold cursor-pointer ${
+                    selectedAnswer
+                      ? option.word === currentWord?.word
+                        ? 'border-green-500'
+                        : selectedAnswer.word === option.word
                         ? 'border-red-500'
                         : 'border-white'
-                    : 'border-white'
-                    }`}
+                      : 'border-white'
+                  }`}
                 >
                   {truncateText(option.word, 40)}
                 </div>
               ))}
             </div>
-
+  
             <button
               onClick={handleNext}
               disabled={!selectedAnswer}
-              className={`absolute bottom-4 right-4 px-6 py-3 text-white border border-white rounded-lg hover:text-gray-200 ${!selectedAnswer ? 'opacity-50 cursor-not-allowed' : ''
-                }`}
+              className={`absolute bottom-4 right-4 px-6 py-3 text-white border border-white rounded-lg hover:text-gray-200 ${
+                !selectedAnswer ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
             >
               {currentWordIndex === (post?.words.length || 1) - 1 ? '완료' : '다음'}
             </button>
@@ -233,7 +244,7 @@ const QuizPage = () => {
         )}
       </div>
     </div>
-  );
+  )
 }
 
 export default QuizPage;
