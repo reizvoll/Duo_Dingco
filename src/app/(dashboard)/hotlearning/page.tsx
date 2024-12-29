@@ -25,7 +25,7 @@ export default function HotLearningPage() {
       const { data, error } = await supabase.auth.getSession()
       if (error || !data.session) {
         clearUser() // 로그인 세션이 없으면 유저 정보 초기화
-        router.push('/auth/signin') // 로그인 페이지로 이동
+        router.push('/auth/login') // 로그인 페이지로 이동
         return
       }
 
@@ -71,7 +71,6 @@ export default function HotLearningPage() {
         if (bookmarkError)
           setError('bookmarks 데이터를 가져오는 중 오류가 발생했습니다.')
 
-        // 이부분도 map,bookmark,JSON 빨간밑줄 생기는데 채채님이 클론하실땐 안뜨고, 타입도 호버하면 뜨신대.,..
         // 북마크된 게시글 ID 추출
         const bookmarkedPostIds = bookmarkData?.map(
           (bookmark) => bookmark.post_id,
@@ -100,17 +99,17 @@ export default function HotLearningPage() {
   // 북마크 토글 함수 (클릭하면 북마크 추가/삭제)
   const toggleBookmark = async (id: string) => {
     if (!user) {
-      router.push('/auth/signin') // 로그인 상태가 아니면 로그인 페이지로 이동
+      router.push('/auth/login') // 로그인 상태가 아니면 로그인 페이지로 이동
       return
     }
 
-    // 현재 클릭한 게시글 찾기
-    const post = posts.find((p) => p.id === id)
-    if (!post) return
-
-    const isBookmarked = post.isBookmarked // 현재 북마크 상태 확인
-
     try {
+      // 북마크 추가/삭제
+      const post = posts.find((p) => p.id === id)
+      if (!post) return
+
+      const isBookmarked = post.isBookmarked // 현재 북마크 상태 확인
+
       if (isBookmarked) {
         // 북마크 삭제
         await supabase
@@ -126,14 +125,23 @@ export default function HotLearningPage() {
         })
       }
 
-      // 상태 업데이트로 화면에 즉시 반영
+      // 서버에서 최신 데이터 가져와서 상태 업데이트
+      const { data: bookmarkData } = await supabase
+        .from('bookmarks')
+        .select('post_id')
+
+      const bookmarkedPostIds = bookmarkData?.map(
+        (bookmark) => bookmark.post_id,
+      )
+
       setPosts((prev) =>
-        prev.map((post) =>
-          post.id === id ? { ...post, isBookmarked: !post.isBookmarked } : post,
-        ),
+        prev.map((post) => ({
+          ...post,
+          isBookmarked: bookmarkedPostIds?.includes(post.id) || false,
+        })),
       )
     } catch (error) {
-      setError(handleError(error)) // 에러 핸들러 호출
+      setError('북마크 처리 중 오류 발생')
     }
   }
 
