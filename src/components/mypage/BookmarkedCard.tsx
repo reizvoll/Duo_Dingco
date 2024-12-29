@@ -1,4 +1,4 @@
-import { Post } from '@/types/mypageTypes'
+import { Post } from '@/types/MypageTypes'
 import Image from 'next/image'
 import { FaStar, FaRegStar } from 'react-icons/fa6'
 
@@ -34,15 +34,8 @@ export default function BookmarkedCard({
         <p className="text-gray-300">{post.users.nickname}</p>
 
         {/* 북마크 토글 버튼 */}
-        <button
-          onClick={() => onToggleBookmark(post.id)}
-          className="ml-auto"
-        >
-          {post.isBookmarked ? (
-            <FaStar size={30} />
-          ) : (
-            <FaRegStar size={30} />
-          )}
+        <button onClick={() => onToggleBookmark(post.id)} className="ml-auto">
+          {post.isBookmarked ? <FaStar size={30} /> : <FaRegStar size={30} />}
         </button>
       </div>
 
