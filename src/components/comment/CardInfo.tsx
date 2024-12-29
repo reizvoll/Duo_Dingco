@@ -76,9 +76,9 @@ export default function CardInfo({ postId, userId }: cardInfoProps) {
     <div className="m-16 text-white p-6 rounded-lg mb-8">
       <h1 className="text-3xl font-bold mb-12">카드 정보</h1>
       <div className="flex justify-between items-center mb-6">
-        {/* 왼쪽 부분 세션션 */}
+        {/* 왼쪽 부분 세션 */}
         <div className="w-[400px] h-[300px] flex flex-col">
-          {/* 제목과 내용 북마크크 */}
+          {/* 제목과 내용 북마크 */}
           <div className="flex justify-between items-center">
             <h2 className="text-2xl font-bold">{post.title}</h2>
             <button onClick={handleBookmarkToggle} className="text-yellow-400">
