@@ -34,20 +34,19 @@ export default function LearnListPage() {
         return
       }
 
-      // 세션이 유효하면 Zustand에 사용자 정보 설정
+      // 세션이 유효하면 Zustand에 사용자 정보 설정 (동일하게 만들어줌..)
       const supabaseUser = data.session.user
-      setUser({
-        id: supabaseUser.id,
-        email: supabaseUser.email,
-        nickname: supabaseUser.user_metadata?.nickname || 'Unknown User',
-        img_url: supabaseUser.user_metadata?.img_url || '/default-avatar.png',
-        // Exp: supabaseUser.user_metadata?.Exp || 0,
-        // Lv: supabaseUser.user_metadata?.Lv || 1,
-      })
-      setIsPending(false) // 로딩 완료
+      if (supabaseUser) {
+        setUser({
+          id: supabaseUser.id,
+          email: supabaseUser.email || '',
+          nickname: supabaseUser.user_metadata?.nickname, //에러떠서 추가해줌
+          img_url: supabaseUser.user_metadata?.img_url || '', // 프로필 이미지
+        })
+      }
     }
     checkSession()
-  }, [router, clearUser, setUser, user]) // user 상태를 의존성에 추가
+  }, [router, setUser, clearUser])
 
   console.log('user', user)
   // 2. posts 데이터 가져오기
