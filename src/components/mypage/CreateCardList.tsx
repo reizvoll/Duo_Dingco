@@ -115,7 +115,7 @@ export default function MyPageCards() {
   if (posts.length === 0) {
     return (
       <div className="flex flex-col items-center mt-12">
-        <h1 className="text-3xl font-bold text-white mb-8">
+        <h1 className="text-2xl font-semi-bold text-white mb-8">
           작성한 게시글이 없습니다.
         </h1>
       </div>
@@ -123,70 +123,72 @@ export default function MyPageCards() {
   }
 
   return (
-    <div className="flex flex-col items-center mt-12">
-      <h1 className="text-3xl font-bold text-white mb-8">내가 작성한 카드</h1>
-
-      <div className="flex items-center gap-4">
-        {/* 왼쪽버튼 */}
+    <div className="flex flex-col items-start mt-12 max-w-custom mx-auto">
+      <h1 className="text-2xl font-semi-bold text-white mb-8 self-start">
+        내가 작성한 카드
+      </h1>
+  
+      <div className="flex items-center w-full gap-4 relative">
+        {/* 왼쪽 버튼 */}
         <button
           onClick={() => currentIndex > 0 && setCurrentIndex(currentIndex - 1)}
           disabled={currentIndex === 0}
           className={`p-2 ${currentIndex === 0 ? 'text-gray-500' : 'text-white'}`}
         >
-          <FaCircleArrowLeft size={36} />
+          <FaCircleArrowLeft size={24} />
         </button>
-
-        {/* 본문 내용 */}
-        {posts
-          .slice(currentIndex, currentIndex + maxVisibleCards)
-          .map((myPost) => (
-            <div
-              key={myPost.id}
-              className="w-56 h-56 bg-[#2E3856] rounded-lg shadow-lg p-4 flex flex-col justify-between relative"
-            >
-              <div>
-                <div className="cardContent">
-                  <h2 className="text-white text-lg font-semibold truncate mb-2">
-                    {myPost.title}
-                  </h2>
-
-                  <p className="text-xs text-gray-400 mb-4">
-                    작성일: {new Date(myPost.created_at).toLocaleDateString()}
-                  </p>
-                  <div className="flex items-center justify-center m-6">
-                    <div
-                      className="text-lg rounded-lg bg-[#282E3E] text-center text-white flex items-center justify-center
-                                cursor-pointer hover:bg-[#3f475e] transition duration-300 
-                                h-14 w-28 sm:h-16 sm:w-32 md:h-18 md:w-36 lg:h-18 lg:w-36"
-                      onClick={() => handleGoToDetails(myPost.id)}
-                    >
-                      {myPost.wordCount || 0} 단어
+  
+        {/* 카드 목록 (왼쪽부터 렌더링) */}
+        <div className="flex gap-6 overflow-x-auto scrollbar-hide relative">
+          {posts
+            .slice(currentIndex, currentIndex + maxVisibleCards)
+            .map((myPost) => (
+              <div key={myPost.id} className="flex flex-col items-center">
+                <div
+                  className="w-56 h-56 bg-[#2E3856] rounded-lg shadow-lg p-6 flex flex-col justify-between relative"
+                >
+                  <div>
+                    <h2 className="text-lg font-semibold truncate mb-2 text-white">
+                      {myPost.title}
+                    </h2>
+                    <p className="text-xs text-gray-400 mb-4">
+                      작성일: {new Date(myPost.created_at).toLocaleDateString()}
+                    </p>
+                    <div className="flex items-center justify-center m-6">
+                      <div
+                        className="text-lg rounded-lg bg-[#282E3E] text-center flex items-center justify-center
+                          cursor-pointer hover:bg-[#3f475e] transition duration-300 mt-7
+                          h-14 w-28 sm:h-16 sm:w-32"
+                        onClick={() => handleGoToDetails(myPost.id)}
+                      >
+                        {myPost.wordCount || 0} 단어
+                      </div>
                     </div>
                   </div>
                 </div>
+  
+                {/* 수정/삭제 버튼 (카드 밖으로) */}
+                <div className="flex justify-center gap-4 mt-4">
+                  <button
+                    type="button"
+                    onClick={() => handleDeletePost(myPost.id)}
+                    className="w-[100px] p-2 font-bold rounded-xl border-2 hover:bg-red-700 text-white"
+                  >
+                    삭제하기
+                  </button>
+  
+                  <button
+                    type="button"
+                    onClick={() => router.push(`/update/${myPost.id}`)}
+                    className="w-[100px] p-2 font-bold rounded-xl border-2 text-white hover:bg-blue-700"
+                  >
+                    수정하기
+                  </button>
+                </div>
               </div>
-
-              {/* 수정 삭제 버튼 */}
-              <div className="flex justify-between gap-4 mt-8">
-                <button
-                  type="button"
-                  onClick={() => handleDeletePost(myPost.id)}
-                  className="w-[100px] p-2 font-bold rounded-xl border-2 hover:bg-red-700 text-white"
-                >
-                  삭제하기
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => router.push(`/update/${myPost.id}`)}
-                  className="w-[100px] p-2 font-bold rounded-xl border-2 text-white hover:bg-blue-700"
-                >
-                  수정하기
-                </button>
-              </div>
-            </div>
-          ))}
-
+            ))}
+        </div>
+  
         {/* 오른쪽 버튼 */}
         <button
           onClick={() =>
@@ -196,7 +198,7 @@ export default function MyPageCards() {
           disabled={currentIndex >= posts.length - maxVisibleCards}
           className={`p-2 ${currentIndex >= posts.length - maxVisibleCards ? 'text-gray-500' : 'text-white'}`}
         >
-          <FaCircleArrowRight size={36} />
+          <FaCircleArrowRight size={24} />
         </button>
       </div>
     </div>

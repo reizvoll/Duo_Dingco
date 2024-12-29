@@ -104,7 +104,7 @@ export default function CardInfo({ postId, userId }: CardInfoProps) {
         </div>
 
         {/* 오른쪽 부분 세션 */}
-        <div className="w-[400px] h-[300px] flex items-center flex-col justify-center bg-gray-900 rounded-lg">
+        <div className="w-[400px] h-[300px] flex items-center flex-col justify-center bg-gray-900 rounded-lg -translate-y-10">
           <div className="w-72 h-40 bg-gray-700 rounded-lg flex items-center justify-center">
             <div className="bg-[#0A092D] text-white text-lg tracking-wide font-bold py-2 px-6 rounded-lg">
               {typeof post.words === 'string' || Array.isArray(post.words)

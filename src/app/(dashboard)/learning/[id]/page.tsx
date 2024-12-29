@@ -84,20 +84,19 @@ export default function LearnDetailPage({
         router.push('/auth/login')
         return
       }
-      // 세션이 있으면 유저 정보 설정 (+ 따끈단어 페이지와 로직 통일!)
+      // 세션이 있으면 유저 정보 설정
       const supabaseUser = data.session.user
       if (supabaseUser) {
         setUser({
           id: supabaseUser.id,
-          email: supabaseUser.email || '',
-          nickname: supabaseUser.user_metadata?.nickname, //에러떠서 추가해줌
-          img_url: supabaseUser.user_metadata?.img_url || '', // 프로필 이미지
+          email: supabaseUser.email,
+          img_url: supabaseUser.user_metadata?.img_url || '',
         })
       }
     }
+
     checkSession()
   }, [router, setUser, clearUser])
-
   // 유저가 있는 경우 데이터 가져오기
   useEffect(() => {
     if (user) {
