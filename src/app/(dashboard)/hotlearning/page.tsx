@@ -52,24 +52,31 @@ export default function HotLearningPage() {
           .select('id, title, description, words, user_id')
           .order('created_at', { ascending: false })
 
-        if (postError)
+        if (postError) {
           setError('posts 데이터를 가져오는 중 오류가 발생했습니다.')
+          return
+        }
 
         // 사용자 데이터 가져오기
         const { data: userData, error: userError } = await supabase
           .from('users')
           .select('id, nickname, img_url, created_at')
 
-        if (userError)
+        if (userError) {
           setError('users 데이터를 가져오는 중 오류가 발생했습니다.')
+          return
+        }
 
-        // 북마크 데이터 가져오기
+        // 북마크 데이터 가져오기 (현재 유저의 북마크만 가져오기)
         const { data: bookmarkData, error: bookmarkError } = await supabase
           .from('bookmarks')
           .select('post_id')
+          .eq('user_id', user.id) // 현재 로그인된 유저의 북마크만 가져오기
 
-        if (bookmarkError)
-          setError('bookmarks 데이터를 가져오는 중 오류가 발생했습니다.')
+        if (bookmarkError) {
+          setError('북마크 데이터를 가져오는 중 오류가 발생했습니다.')
+          return
+        }
 
         // 북마크된 게시글 ID 추출
         const bookmarkedPostIds = bookmarkData?.map(
@@ -77,7 +84,7 @@ export default function HotLearningPage() {
         )
 
         // 게시글 데이터에 북마크 정보 추가
-        const parsedPosts = (postData as Bookmarks[]).map((post) => ({
+        const parsedPosts = postData.map((post) => ({
           ...post,
           words:
             typeof post.words === 'string'
@@ -88,47 +95,48 @@ export default function HotLearningPage() {
 
         setPosts(parsedPosts) // 게시글 상태 업데이트
         setUsers(userData as UserData[]) // 사용자 정보 상태 업데이트
+        setError(null)
       } catch (error) {
-        setError('북마크 데이터를 처리하는 중 오류가 발생했습니다.')
+        setError('데이터를 가져오는 중 오류가 발생했습니다.')
       }
     }
 
-    fetchData()
-  }, [])
+    if (user) {
+      fetchData()
+    }
+  }, [user]) // user가 변경될 때마다 실행
 
   // 북마크 토글 함수 (클릭하면 북마크 추가/삭제)
   const toggleBookmark = async (id: string) => {
     if (!user) {
-      router.push('/auth/login') // 로그인 상태가 아니면 로그인 페이지로 이동
+      router.push('/auth/login')
       return
     }
 
     try {
-      // 북마크 추가/삭제
       const post = posts.find((p) => p.id === id)
       if (!post) return
 
-      const isBookmarked = post.isBookmarked // 현재 북마크 상태 확인
+      const isBookmarked = post.isBookmarked
 
       if (isBookmarked) {
-        // 북마크 삭제
         await supabase
           .from('bookmarks')
           .delete()
           .eq('user_id', user.id)
           .eq('post_id', id)
       } else {
-        // 북마크 추가
         await supabase.from('bookmarks').insert({
           user_id: user.id,
           post_id: id,
         })
       }
 
-      // 서버에서 최신 데이터 가져와서 상태 업데이트
+      // Supabase와 동기화된 데이터 가져오기
       const { data: bookmarkData } = await supabase
         .from('bookmarks')
         .select('post_id')
+        .eq('user_id', user.id)
 
       const bookmarkedPostIds = bookmarkData?.map(
         (bookmark) => bookmark.post_id,
@@ -141,7 +149,7 @@ export default function HotLearningPage() {
         })),
       )
     } catch (error) {
-      setError('북마크 처리 중 오류 발생')
+      setError('북마크 상태를 변경할 수 없습니다.')
     }
   }
 
