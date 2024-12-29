@@ -34,7 +34,8 @@ export default function HotLearningPage() {
       if (supabaseUser) {
         setUser({
           id: supabaseUser.id,
-          email: supabaseUser.email,
+          email: supabaseUser.email || '',
+          nickname: supabaseUser.user_metadata?.nickname, //에러떠서 추가해줌
           img_url: supabaseUser.user_metadata?.img_url || '', // 프로필 이미지
         })
       }
@@ -71,7 +72,7 @@ export default function HotLearningPage() {
         const { data: bookmarkData, error: bookmarkError } = await supabase
           .from('bookmarks')
           .select('post_id')
-          .eq('user_id', user.id) // 현재 로그인된 유저의 북마크만 가져오기
+          .eq('user_id', user?.id || '') 
 
         if (bookmarkError) {
           setError('북마크 데이터를 가져오는 중 오류가 발생했습니다.')
