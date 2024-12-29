@@ -11,7 +11,7 @@ import { useAuthStore } from '@/store/auth'
 
 import { FaCircleArrowLeft, FaCircleArrowRight } from 'react-icons/fa6'
 import Swal from 'sweetalert2'
-import { Post } from '@/types/CreateCardListTypes'
+import { Post } from '@/types/createCardListTypes'
 
 // 작성한 게시글 가져오기
 export async function fetchMyPosts(userId: string | null): Promise<Post[]> {
@@ -47,7 +47,7 @@ export default function MyPageCards() {
   // 게시글 가져오기
   const {
     data: posts = [],
-    isLoading,
+    isPending,
     isError,
   } = useQuery({
     queryKey: ['userPosts', userId],
@@ -99,7 +99,7 @@ export default function MyPageCards() {
   const handleGoToDetails = (id: string) => router.push(`/comment/${id}`)
 
   // 로딩 상태 처리
-  if (isLoading) {
+  if (isPending) {
     return <div>Loading...</div>
   }
 
