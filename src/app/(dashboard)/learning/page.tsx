@@ -160,68 +160,66 @@ export default function LearnListPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A092D] text-white flex">
-      {/* 메인 콘텐츠 */}
-      <div className="flex-1 ml-20 p-8 overflow-y-auto h-screen">
-        <div className="relative flex flex-col items-center justify-center">
-          {/* 학습 페이지 제목 */}
-          <div className="absolute top-14 left-40">
-            <h1 className="text-3xl font-bold pl-[240px]">학습하기</h1>
-          </div>
-
-          {/* 카드 묶음 mt-44넣어서 hotlearn이랑 일관성있게 만듦*/}
-          <div className="flex items-center justify-center w-full mt-44">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {posts.map((post) => (
-                <div
-                  key={post.id}
-                  className="w-56 h-56 bg-[#2E3856] text-white rounded-lg shadow-lg"
-                >
-                  <div className="w-full h-full flex flex-col p-3">
-                    <h2 className="text-lg font-semibold truncate mb-4">
-                      {post.title}
-                    </h2>
-
-                    <div className="text-sm text-gray-300 flex items-center justify-between mb-6">
-                      <div className="flex items-center space-x-2">
-                        <Image
-                          src={post.users?.img_url || '/dingco.png'}
-                          alt="Profile"
-                          width={30}
-                          height={30}
-                          className="rounded-full"
-                        />
-                        <p>{post.users?.nickname || 'Unknown User'}</p>
-                      </div>
-                      <button
-                        className="ml-4"
-                        onClick={(e) => {
-                          e.stopPropagation()
-                          toggleBookmark(post.id)
-                        }}
-                      >
-                        {post.isBookmarked ? (
-                          <FaStar className="w-[30px] h-[30px]" />
-                        ) : (
-                          <FaRegStar className="w-[30px] h-[30px]" />
-                        )}
-                      </button>
+    <div className="min-h-screen flex justify-center">
+      <div className="max-w-custom w-full flex flex-col p-8 h-screen">
+        
+        <div className="flex items-center justify-center w-full mt-[60px]">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
+            
+            {/* 학습하기 제목 */}
+            <div className="col-span-1 sm:col-span-2 lg:col-span-4 flex justify-start">
+              <h1 className="text-3xl font-bold mb-[10px]">학습하기</h1>
+            </div>
+  
+            {posts.map((post) => (
+              <div
+                key={post.id}
+                className="w-56 h-56 bg-[#2E3856] text-white rounded-lg shadow-lg"
+              >
+                <div className="w-full h-full flex flex-col p-6">
+                  <h2 className="text-lg font-semibold truncate mb-2">
+                    {post.title}
+                  </h2>
+  
+                  <div className="text-sm flex items-center justify-between mb-2">
+                    <div className="flex items-center space-x-2">
+                      <Image
+                        src={post.users?.img_url || '/dingco.png'}
+                        alt="Profile"
+                        width={35}
+                        height={35}
+                        className="rounded-full border"
+                      />
+                      <p>{post.users?.nickname || 'Unknown User'}</p>
                     </div>
-
-                    <div className="flex items-center justify-center mt-6">
-                      <div
-                        className="text-lg rounded-lg bg-[#282E3E] text-center text-white flex items-center justify-center
-                          cursor-pointer hover:bg-[#3f475e] transition duration-300 
-                          h-14 w-28 sm:h-16 sm:w-32 md:h-18 md:w-36 lg:h-18 lg:w-36"
-                        onClick={() => handleGoToDetails(post.id)}
-                      >
-                        {post.words.length} 단어
-                      </div>
+                    <button
+                      className="ml-4"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleBookmark(post.id);
+                      }}
+                    >
+                      {post.isBookmarked ? (
+                        <FaStar className="w-[30px] h-[30px]" />
+                      ) : (
+                        <FaRegStar className="w-[30px] h-[30px]" />
+                      )}
+                    </button>
+                  </div>
+  
+                  <div className="flex items-center justify-center mt-6">
+                    <div
+                      className="text-lg rounded-lg bg-[#282E3E] text-center text-white flex items-center justify-center
+                        cursor-pointer hover:bg-[#3f475e] transition duration-300
+                        h-14 w-28 sm:h-16 sm:w-32"
+                      onClick={() => handleGoToDetails(post.id)}
+                    >
+                      {post.words.length} 단어
                     </div>
                   </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
