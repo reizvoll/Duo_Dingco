@@ -7,8 +7,7 @@ export async function fetchUser(userId: string) {
     .eq('id', userId)
     .single()
   if (error) {
-    console.error('Error fetching user:', error)
-    return null
+    throw new Error('Error Fetching user')
   }
   return data
 }
@@ -38,7 +37,7 @@ export async function insertPost({
     .select()
   if (error) {
     console.error('Error inserting post:', error)
-    return null
+    throw new Error('Failed to insert post. Please try again.')
   }
   return data
 }

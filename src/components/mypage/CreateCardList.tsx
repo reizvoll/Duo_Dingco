@@ -44,7 +44,7 @@ export default function MyPageCards() {
   // 게시글 가져오기
   const {
     data: posts = [],
-    isLoading,
+    isPending,
     isError,
   } = useQuery({
     queryKey: ['userPosts', userId],
@@ -96,7 +96,7 @@ export default function MyPageCards() {
   const handleGoToDetails = (id: string) => router.push(`/comment/${id}`)
 
   // 로딩 상태 처리
-  if (isLoading) {
+  if (isPending) {
     return <div>Loading...</div>
   }
 
