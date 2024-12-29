@@ -72,7 +72,6 @@ export default function LoginForm({
       })
     }
   }
-  console.log('FormData', FormData)
 
   const handleGoogleAuth = async () => {
     const result = await onGoogleLogin()
@@ -87,7 +86,11 @@ export default function LoginForm({
   }
 
   return (
-    <div className="relative w-full max-w-sm md:max-w-md bg-[#13132D] border border-white rounded-lg p-20">
+    <form
+      onSubmit={handleSubmit}
+      className="w-full max-w-md bg-[#13132D] border border-white rounded-lg p-8 relative"
+      style={{ width: '400px', height: '600px' }}
+    >
       <button
         onClick={() => window.history.back()}
         className="absolute top-4 left-4 text-white text-xl"
@@ -95,18 +98,18 @@ export default function LoginForm({
         <IoIosArrowDropleft size={30} />
       </button>
 
-      <h2 className="text-3xl font-bold text-center mt-7 text-white mb-4">
+      <h2 className="text-2xl font-bold text-center mt-5 text-white mb-2">
         로그인
       </h2>
-      <p className="text-center text-gray-400 mb-10">정보를 입력해주세요.</p>
+      <p className="text-center text-gray-400 mb-12">정보를 입력해주세요.</p>
 
-      <form onSubmit={handleSubmit} className="space-y-6">
+      <div className="space-y-4">
         <input
           type="email"
           placeholder="이메일 입력"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          className="w-full py-3 px-4 border-none rounded-lg bg-[#1E1E30] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full py-3 px-5 border-none rounded-lg bg-[#1E1E30] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         />
         <div className="relative">
@@ -115,7 +118,7 @@ export default function LoginForm({
             placeholder="비밀번호 입력"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full py-3 px-4 border-none rounded-lg bg-[#1E1E30] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="w-full py-3 px-5 border-none rounded-lg bg-[#1E1E30] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
             required
           />
           <button
@@ -126,16 +129,25 @@ export default function LoginForm({
             {isPasswordVisible ? '숨기기' : '보이기'}
           </button>
         </div>
+      </div>
 
-        <div className="mt-8 flex justify-center">
-          <button
-            type="submit"
-            className="w-2/4 bg-[#1E1E30] py-3 text-white rounded-full hover:bg-[#282847] text-center"
-          >
-            로그인
-          </button>
-        </div>
-      </form>
+      <div className="text-center mt-4 mb-6">
+        <a
+          href="/auth/signup"
+          className="text-gray-400 hover:text-blue-500 transition duration-300"
+        >
+          계정이 없으십니까?
+        </a>
+      </div>
+
+      <div className="mt-7 flex justify-center mb-7">
+        <button
+          type="submit"
+          className="w-3/4 bg-[#1E1E30] py-3 text-white rounded-full hover:bg-[#282847] text-center"
+        >
+          로그인
+        </button>
+      </div>
 
       <div className="flex items-center justify-center mt-6">
         <hr className="border-gray-500 w-1/4" />
@@ -143,10 +155,11 @@ export default function LoginForm({
         <hr className="border-gray-500 w-1/4" />
       </div>
 
-      <div className="mt-6 flex justify-center">
+      <div className="mt-9 flex justify-center mb-6">
+        {' '}
         <button
           onClick={handleGoogleAuth}
-          className="flex items-center bg-white text-black px-5 py-3 rounded-full shadow hover:shadow-lg"
+          className="flex items-center bg-white text-black px-4 py-3 rounded-full shadow hover:shadow-lg w-3/4 justify-center"
         >
           <Image
             src="/google-logo.png"
@@ -158,6 +171,6 @@ export default function LoginForm({
           로그인 진행하기
         </button>
       </div>
-    </div>
+    </form>
   )
 }
