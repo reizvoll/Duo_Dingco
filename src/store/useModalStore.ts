@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { UserData } from '../types/User'
+import { UserData } from '../types/user'
 
 // 상태 타입 정의 (마이페이지는 왜 말썽일까)
 interface ModalState {

@@ -1,4 +1,4 @@
-import { Post } from '@/types/MypageTypes'
+import { Post } from '@/types/mypageTypes'
 import Image from 'next/image'
 import { FaStar, FaRegStar } from 'react-icons/fa6'
 

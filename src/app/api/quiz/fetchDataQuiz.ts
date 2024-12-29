@@ -1,5 +1,5 @@
 import { supabase } from '@/supabase/supabaseClient';
-import { Tables } from '@/types/database.types';
+import { Tables } from '../../../../database.types';
 
 type Word = {
     word: string;

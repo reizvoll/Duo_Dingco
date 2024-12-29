@@ -5,10 +5,9 @@ import { supabase } from '@/supabase/supabaseClient'
 import { useAuthStore } from '@/store/auth'
 import { FaCircleArrowLeft, FaCircleArrowRight } from 'react-icons/fa6'
 import { useState } from 'react'
-
 import BookmarkedCard from './BookmarkedCard'
 import { useRouter } from 'next/navigation'
-import { Post } from '@/types/MypageTypes'
+import { Post } from '@/types/mypageTypes'
 
 // 북마크된 게시물 데이터 조회
 const fetchUserBookmarks = async (userId: string): Promise<Post[]> => {

@@ -1,4 +1,4 @@
-'use client';
+'use client'
 
 import useProfileHandlers from '@/hooks/useProfileHandler';
 import Image from 'next/image';

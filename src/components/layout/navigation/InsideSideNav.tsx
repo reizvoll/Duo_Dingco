@@ -67,61 +67,61 @@ export default function InsideSideNav({
       `}
     >
       {/* 상단 아이콘과 로고 */}
-      <div>  
-      <div className="flex items-center pt-6 pl-6">
-        <button className="text-4xl text-gray-50" onClick={toggleMenu}>
-          <PiListBold />
-        </button>
-        {menuIsOpen && (
-          <Link href="/" passHref>
-            <div className="ml-4 cursor-pointer">
-              <Image
-                src="/duodingco_logo.png"
-                width={60}
-                height={60}
-                alt="듀오딩코 로고"
-              />
-            </div>
-          </Link>
-        )}
-      </div>
+      <div>
+        <div className="flex items-center pt-6 pl-6">
+          <button className="text-4xl text-gray-50" onClick={toggleMenu}>
+            <PiListBold />
+          </button>
+          {menuIsOpen && (
+            <Link href="/" passHref>
+              <div className="ml-4 cursor-pointer">
+                <Image
+                  src="/duodingco_logo.png"
+                  width={60}
+                  height={60}
+                  alt="듀오딩코 로고"
+                />
+              </div>
+            </Link>
+          )}
+        </div>
 
-      {/* 메뉴 리스트 */}
-      <nav className="h-full flex flex-col justify-start items-start pt-28 gap-8 pl-4">
-        {MENU_ITEMS.map((item) => {
-          const isActive = selectedMenu === item.path.split('/')[1]
-          return (
-            <Link
-              key={item.path}
-              href={item.path}
-              onClick={toggleMenu}
-              className={`flex items-center rounded-lg ${isActive ? 'bg-[#4A4E69]' : 'hover:bg-[#2E3143]'
-                } ${menuIsOpen
-                  ? 'w-[80%] p-3 gap-4'
-                  : 'w-[60px] h-[60px] justify-center'
-                }`}
-            >
-              {/* 아이콘 크기 적용 부분 (iconSize로 분기 처리) */}
-              <div
-                className={`${item.iconSize} ${isActive ? 'text-[#AFB7FF]' : 'text-[#E0E1DD]'}
+        {/* 메뉴 리스트 */}
+        <nav className="h-full flex flex-col justify-start items-start pt-28 gap-8 pl-4">
+          {MENU_ITEMS.map((item) => {
+            const isActive = selectedMenu === item.path.split('/')[1]
+            return (
+              <Link
+                key={item.path}
+                href={item.path}
+                onClick={toggleMenu}
+                className={`flex items-center rounded-lg ${isActive ? 'bg-[#4A4E69]' : 'hover:bg-[#2E3143]'
+                  } ${menuIsOpen
+                    ? 'w-[80%] p-3 gap-4'
+                    : 'w-[60px] h-[60px] justify-center'
+                  }`}
+              >
+                {/* 아이콘 크기 적용 부분 (iconSize로 분기 처리) */}
+                <div
+                  className={`${item.iconSize} ${isActive ? 'text-[#AFB7FF]' : 'text-[#E0E1DD]'}
                  flex items-center justify-center h-[40px]
                 `}
-              >
-                {item.icon}
-              </div>
-              {menuIsOpen && (
-                <span
-                  className={`text-xl ${isActive ? 'text-[#B4CFFA]' : 'text-[#E0E1DD]'
-                    }`}
                 >
-                  {item.label}
-                </span>
-              )}
-            </Link>
-          )
-        })}
-      </nav>
-    </div>
+                  {item.icon}
+                </div>
+                {menuIsOpen && (
+                  <span
+                    className={`text-xl ${isActive ? 'text-[#B4CFFA]' : 'text-[#E0E1DD]'
+                      }`}
+                  >
+                    {item.label}
+                  </span>
+                )}
+              </Link>
+            )
+          })}
+        </nav>
+      </div>
 
       {/* 하단 마이페이지 */}
       <div className="flex justify-start pl-4 mb-10">

@@ -1,4 +1,4 @@
-export interface cardInfoProps {
+export interface CardInfoProps {
   postId: string
   userId: string
 }
