@@ -1,5 +1,5 @@
 import { supabase } from '@/supabase/supabaseClient'
-import { User } from '@/types/user'
+import { User } from '@/types/User'
 
 export const fetchProfile = async (userId: string) => {
   const { data, error } = await supabase
