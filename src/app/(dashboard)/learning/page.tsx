@@ -1,13 +1,13 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/supabase/supabaseClient'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { FaStar } from 'react-icons/fa6'
 import { FaRegStar } from 'react-icons/fa6'
 import { Bookmarks } from '@/types/commentTypes'
 import { useAuthStore } from '@/store/auth'
+import { supabase } from '@/supabase/supabaseClient'
 //test중새고해도 별채워져있어야함
 // 잘들어 림졍🔥 지금부터 주석으로 하나하나 설명해줄게
 export default function LearnListPage() {
