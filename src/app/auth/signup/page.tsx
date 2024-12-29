@@ -3,6 +3,7 @@ import { useState } from 'react'
 import Swal from 'sweetalert2'
 import Image from 'next/image'
 import { handleSignUp } from './actions'
+import { IoIosArrowDropleft } from 'react-icons/io'
 
 export default function SignUpPage() {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
@@ -86,13 +87,21 @@ export default function SignUpPage() {
       }}
       className="w-full max-w-md bg-[#13132D] border border-white rounded-lg p-8 relative"
       encType="multipart/form-data"
+      style={{ width: '400px', height: '670px' }}
     >
-      <h2 className="text-2xl font-bold text-center mt-7 text-white mb-2">
+      <button
+        onClick={() => window.history.back()}
+        className="absolute top-6 left-6 text-white text-xl"
+      >
+        <IoIosArrowDropleft size={30} />
+      </button>
+
+      <h2 className="text-2xl font-bold text-center mt-10 text-white mb-2">
         가입하기
       </h2>
-      <p className="text-center text-gray-400 mb-10">정보를 입력해주세요.</p>
+      <p className="text-center text-gray-400 mb-6">정보를 입력해주세요.</p>
 
-      <div className="flex justify-center mb-10">
+      <div className="flex justify-center mb-8">
         <label htmlFor="profileImage" className="cursor-pointer">
           <div className="relative h-20 w-20 bg-gray-200 rounded-full overflow-hidden border border-gray-400">
             <Image
@@ -174,11 +183,10 @@ export default function SignUpPage() {
           </button>
         </div>
       </div>
-
-      <div className="mt-6 flex justify-center">
+      <div className="mt-8 flex justify-center">
         <button
           type="submit"
-          className="w-2/4 bg-[#1E1E30] m-6 text-white p-3 rounded-full hover:bg-[#282847] text-center"
+          className="w-2/4 bg-[#1E1E30] text-white p-3 rounded-full hover:bg-[#282847] text-center"
         >
           회원가입
         </button>
