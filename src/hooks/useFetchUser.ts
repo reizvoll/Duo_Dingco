@@ -14,7 +14,6 @@ export default function useFetchUser() {
       const { data: sessionData, error: sessionError } = await supabase.auth.getSession();
 
       if (sessionError || !sessionData.session) {
-        console.log('세션 없음, 유저 초기화');
         clearUser();
         closeModal();
         setLoading(false);
@@ -50,7 +49,6 @@ export default function useFetchUser() {
       };
 
       setUser(newUser);
-      console.log('유저 정보 설정 완료:', newUser);
       setLoading(false);
     };
 
