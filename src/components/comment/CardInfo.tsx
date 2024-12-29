@@ -1,13 +1,13 @@
 'use client'
 
+import Image from 'next/image'
+import { useRouter } from 'next/navigation'
+import { RiStarFill, RiStarLine } from 'react-icons/ri'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { fetchBookmarkStatus, toggleBookmark } from '@/app/api/comment/bookmark'
 import { fetchProfile } from '@/app/api/comment/fetchDataInfo'
 import { fetchPostId } from '@/app/api/post/updating'
 import { CardInfoProps } from '@/types/CardInfoProps'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
-import { useRouter } from 'next/navigation'
-
-import { RiStarFill, RiStarLine } from 'react-icons/ri'
 
 export default function CardInfo({ postId, userId }: CardInfoProps) {
   const queryClient = useQueryClient()
@@ -91,10 +91,12 @@ export default function CardInfo({ postId, userId }: CardInfoProps) {
           </div>
           <p className="text-white text-lg mt-2 mb-4">{post.description}</p>
           <div className="flex items-center gap-2">
-            <img
-              src={profile?.img_url}
+            <Image
+              src={profile?.img_url || '/dingco.png'}
               alt={profile?.nickname}
-              className="w-10 h-10 rounded-full"
+              width={40}
+              height={40}
+              className="rounded-full"
             />
             <span>{profile?.nickname}</span>
           </div>
