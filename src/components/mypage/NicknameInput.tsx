@@ -1,10 +1,11 @@
-'use client';
+'use client'
 
-import useProfileHandlers from "@/hooks/useProfileHandler";
+import { NicknameInputProps } from '@/types/NicknameInputProps'
 
-export default function NicknameInput() {
-  const { nickname, setNickname } = useProfileHandlers();
-
+export default function NicknameInput({
+  nickname,
+  setNickname,
+}: NicknameInputProps) {
   return (
     <div className="mt-6">
       <label className="text-sm text-gray-400">닉네임</label>
@@ -16,5 +17,5 @@ export default function NicknameInput() {
         placeholder="닉네임을 입력하세요"
       />
     </div>
-  );
+  )
 }

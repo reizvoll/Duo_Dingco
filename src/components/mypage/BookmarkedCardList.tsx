@@ -5,9 +5,10 @@ import { supabase } from '@/supabase/supabaseClient'
 import { useAuthStore } from '@/store/auth'
 import { FaCircleArrowLeft, FaCircleArrowRight } from 'react-icons/fa6'
 import { useState } from 'react'
-import { Post } from '@/types/mypageTypes'
+
 import BookmarkedCard from './BookmarkedCard'
 import { useRouter } from 'next/navigation'
+import { Post } from '@/types/MypageTypes'
 
 // 북마크된 게시물 데이터 조회
 const fetchUserBookmarks = async (userId: string): Promise<Post[]> => {
@@ -20,20 +21,25 @@ const fetchUserBookmarks = async (userId: string): Promise<Post[]> => {
 
   const { data: posts } = await supabase
     .from('posts')
-    .select(`
+    .select(
+      `
       id,
       title,
       user_id,
       words,
       users(*)
-    `)
+    `,
+    )
     .in('id', postIds)
 
   // 게시물 데이터 파싱 및 기본값 설정
   return Array.isArray(posts)
     ? posts.map((post) => ({
         ...post,
-        words: typeof post.words === 'string' ? JSON.parse(post.words) : post.words || [],
+        words:
+          typeof post.words === 'string'
+            ? JSON.parse(post.words)
+            : post.words || [],
         isBookmarked: true,
         users: {
           ...post.users,
@@ -72,8 +78,14 @@ export default function BookmarkCardList() {
 
     try {
       isBookmarked
-        ? await supabase.from('bookmarks').delete().eq('user_id', user.id).eq('post_id', id)
-        : await supabase.from('bookmarks').insert({ user_id: user.id, post_id: id })
+        ? await supabase
+            .from('bookmarks')
+            .delete()
+            .eq('user_id', user.id)
+            .eq('post_id', id)
+        : await supabase
+            .from('bookmarks')
+            .insert({ user_id: user.id, post_id: id })
 
       // 데이터 새로고침
       queryClient.invalidateQueries({ queryKey: ['bookmarkedPosts', user?.id] })
@@ -86,7 +98,8 @@ export default function BookmarkCardList() {
 
   // 로딩 및 에러 상태
   if (isPending) return <div>Loading...</div>
-  if (isError || bookmarkedPosts.length === 0) return <div className="text-white">북마크한 게시물이 없습니다.</div>
+  if (isError || bookmarkedPosts.length === 0)
+    return <div className="text-white">북마크한 게시물이 없습니다.</div>
 
   return (
     <div className="flex flex-col items-center mt-12">
@@ -104,18 +117,23 @@ export default function BookmarkCardList() {
 
         {/* 카드 목록 */}
         <div className="flex gap-6 overflow-hidden">
-          {bookmarkedPosts.slice(currentIndex, currentIndex + maxVisibleCards).map((post) => (
-            <BookmarkedCard
-              key={post.id}
-              post={post}
-              onToggleBookmark={toggleBookmark}
-              handleGoToDetails={handleGoToDetails}
-            />
-          ))}
+          {bookmarkedPosts
+            .slice(currentIndex, currentIndex + maxVisibleCards)
+            .map((post) => (
+              <BookmarkedCard
+                key={post.id}
+                post={post}
+                onToggleBookmark={toggleBookmark}
+                handleGoToDetails={handleGoToDetails}
+              />
+            ))}
         </div>
 
         <button
-          onClick={() => currentIndex < bookmarkedPosts.length - maxVisibleCards && setCurrentIndex(currentIndex + 1)}
+          onClick={() =>
+            currentIndex < bookmarkedPosts.length - maxVisibleCards &&
+            setCurrentIndex(currentIndex + 1)
+          }
           disabled={currentIndex >= bookmarkedPosts.length - maxVisibleCards}
           className={`p-2 ${currentIndex >= bookmarkedPosts.length - maxVisibleCards ? 'text-gray-500' : 'text-white'}`}
         >

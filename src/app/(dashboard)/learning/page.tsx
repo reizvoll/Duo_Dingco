@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { FaStar } from 'react-icons/fa6'
 import { FaRegStar } from 'react-icons/fa6'
-import { Bookmarks } from '@/types/commentTypes'
+import { Bookmarks } from '@/types/CommentTypes'
 import { useAuthStore } from '@/store/auth'
 import { supabase } from '@/supabase/supabaseClient'
 //test중새고해도 별채워져있어야함
