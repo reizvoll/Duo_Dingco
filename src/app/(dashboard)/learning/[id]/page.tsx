@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import Image from 'next/image'
 import { FaStar, FaRegStar } from 'react-icons/fa'
 import { FaCircleArrowLeft, FaCircleArrowRight } from 'react-icons/fa6'
-import { Bookmarks } from '@/types/CommentTypes'
+import { Bookmarks } from '@/types/commentTypes'
 import { useAuthStore } from '@/store/auth'
 import Swal from 'sweetalert2'
 

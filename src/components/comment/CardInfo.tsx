@@ -3,13 +3,13 @@
 import { fetchBookmarkStatus, toggleBookmark } from '@/app/api/comment/bookmark'
 import { fetchProfile } from '@/app/api/comment/fetchDataInfo'
 import { fetchPostId } from '@/app/api/post/updating'
-import { cardInfoProps } from '@/types/CardInfoProps'
+import { CardInfoProps } from '@/types/CardInfoProps'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
 
 import { RiStarFill, RiStarLine } from 'react-icons/ri'
 
-export default function CardInfo({ postId, userId }: cardInfoProps) {
+export default function CardInfo({ postId, userId }: CardInfoProps) {
   const queryClient = useQueryClient()
   const router = useRouter()
 

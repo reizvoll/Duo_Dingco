@@ -3,15 +3,12 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-
 import { supabase } from '@/supabase/supabaseClient'
-
 import { deletePostById } from '@/app/api/post/deleting'
 import { useAuthStore } from '@/store/auth'
-
 import { FaCircleArrowLeft, FaCircleArrowRight } from 'react-icons/fa6'
 import Swal from 'sweetalert2'
-import { Post } from '@/types/CreateCardListTypes'
+import { Post } from '@/types/createCardListTypes'
 
 // 작성한 게시글 가져오기
 export async function fetchMyPosts(userId: string | null): Promise<Post[]> {
