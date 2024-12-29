@@ -5,8 +5,11 @@ import { useQuery } from '@tanstack/react-query'
 import { FaCircleArrowRight, FaCircleArrowLeft } from 'react-icons/fa6'
 import { useState } from 'react'
 import { fetchPostList } from '@/app/api/comment/postList'
+import Swal from 'sweetalert2'
+import { useRouter } from 'next/navigation'
 
 export default function CardSlide() {
+  const router = useRouter()
   const [currentIndex, setCurrentIndex] = useState(0)
 
   const {
@@ -40,6 +43,20 @@ export default function CardSlide() {
     }
   }
 
+  const handleWordClick = (postId: string) => {
+    Swal.fire({
+      title: '문제 풀이 페이지로 이동하시겠습니까?',
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonText: '이동',
+      cancelButtonText: '취소',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        router.push(`/quiz/${postId}`)
+      }
+    })
+  }
+
   return (
     <div className="flex m-8 items-center gap-4">
       {/* 좌측 버튼 */}
@@ -62,7 +79,11 @@ export default function CardSlide() {
               className="flex-shrink-0 w-[20%] h-[250px] bg-[#2E3856] rounded-lg 
               flex flex-col items-center justify-center"
             >
-              <div className="w-20 h-20 bg-gray-700 rounded-full flex items-center justify-center mb-4">
+              <div
+                className="w-20 h-20 bg-slate-900 rounded-full flex items-center justify-center mb-4
+                hover:bg-slate-800 cursor-pointer"
+                onClick={() => handleWordClick(post.id)}
+              >
                 {post.wordCount || 0}단어
               </div>
               <p className="text-white p-2 text-sm font-bold break-all whitespace-pre-wrap ">
