@@ -7,12 +7,16 @@ export default async function DashboardLayout({
 }: {
   children: React.ReactNode
 }) {
-
   return (
-      <>
+    <div className="flex h-screen overflow-hidden">
+      {/* 사이드바 */}
+      <SideNav />
+      
+      {/* 메인 컨텐츠 */}
+      <div className="flex-1 flex flex-col h-screen overflow-y-auto">
         <Headers />
-        <SideNav />
         <main className="flex-1">{children}</main>
-      </>
+      </div>
+    </div>
   )
 }
