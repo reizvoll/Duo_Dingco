@@ -1,4 +1,3 @@
-// src/utils/quizHelpers.ts
 import { supabase } from '@/supabase/supabaseClient';
 
 type Word = {
@@ -11,7 +10,7 @@ export const updateUserExpAndLevel = async (
   setUser: React.Dispatch<React.SetStateAction<any>>
 ) => {
   if (user.Lv < 3) {
-    let newExp = user.Exp + 10;
+    let newExp = user.Exp + 5;
     let newLv = user.Lv;
 
     if (newExp >= 100) {
