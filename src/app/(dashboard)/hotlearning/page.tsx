@@ -6,8 +6,8 @@ import { useRouter } from 'next/navigation'
 import Image from 'next/image'
 import { FaStar } from 'react-icons/fa6'
 import { FaRegStar } from 'react-icons/fa6'
-import { Bookmarks } from '@/types/commentTypes'
-import { UserData } from '@/types/user'
+import { Bookmarks } from '@/types/CommentTypes'
+import { UserData } from '@/types/User'
 import { useAuthStore } from '@/store/auth'
 
 // 림졍🔥 설명 더 필요하면 언제든지 말해. 그리고 에러핸들러 그냥 빼버렸어!

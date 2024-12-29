@@ -1,22 +1,25 @@
-'use client';
+'use client'
 
-import { IoClose } from 'react-icons/io5';
-import { handleLogout } from '@/components/auth/LogoutHandler';
-import { useModalStore } from '@/store/useModalStore';
-import useFetchUser from '@/hooks/useFetchUser';
-import useProfileHandlers from '@/hooks/useProfileHandler';
-import { useAuthStore } from '@/store/auth';
-import ProfileImageUpload from './ProfileImageUpload';
-import NicknameInput from './NicknameInput';
+import { IoClose } from 'react-icons/io5'
+import { handleLogout } from '@/components/auth/LogoutHandler'
+import { useModalStore } from '@/store/useModalStore'
+import useFetchUser from '@/hooks/useFetchUser'
+import useProfileHandlers from '@/hooks/useProfileHandler'
+import { useAuthStore } from '@/store/auth'
+import ProfileImageUpload from './ProfileImageUpload'
+import NicknameInput from './NicknameInput'
+import { useState } from 'react'
 
 export default function MyPageModal() {
-  const { isModalOpen, closeModal } = useModalStore();
-  const { clearUser } = useAuthStore();
-  const { loading } = useFetchUser();
-  const { handleNicknameChange } = useProfileHandlers();
+  const { isModalOpen, closeModal } = useModalStore()
+  const { user, clearUser } = useAuthStore()
+  const { loading } = useFetchUser()
+  const { handleNicknameChange } = useProfileHandlers()
 
-  if (loading) return null;
-  if (!isModalOpen) return null;
+  const [nickname, setNickname] = useState(user?.nickname || '')
+
+  if (loading) return null
+  if (!isModalOpen) return null
 
   return (
     <div
@@ -47,7 +50,7 @@ export default function MyPageModal() {
 
         {/* 닉네임 수정 입력 */}
         <div className="mt-6 sm:mt-8 w-[90%] sm:w-[320px] mx-auto">
-          <NicknameInput />
+          <NicknameInput nickname={nickname} setNickname={setNickname} />
         </div>
 
         {/* 버튼 그룹 */}
@@ -55,7 +58,7 @@ export default function MyPageModal() {
           {/* 수정 버튼 */}
           <button
             className="bg-[#282E3E] text-white w-[45%] sm:w-[130px] h-[40px] sm:h-[40px] rounded-md hover:bg-opacity-80"
-            onClick={handleNicknameChange}
+            onClick={() => handleNicknameChange(nickname)}
           >
             수정하기
           </button>
@@ -64,9 +67,9 @@ export default function MyPageModal() {
           <button
             className="bg-[#8A343C] text-white w-[45%] sm:w-[130px] h-[40px] sm:h-[40px] rounded-md hover:bg-opacity-80"
             onClick={async () => {
-              await handleLogout();
-              clearUser();
-              closeModal();
+              await handleLogout()
+              clearUser()
+              closeModal()
             }}
           >
             로그아웃
@@ -74,5 +77,5 @@ export default function MyPageModal() {
         </div>
       </div>
     </div>
-  );
+  )
 }
