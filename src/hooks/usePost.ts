@@ -79,7 +79,7 @@ export function usePost() {
     if (cards.length < 4) {
       Swal.fire({
         icon: 'warning',
-        title: '카드는 최소 4개 이상이어야 수정 가능합니다.',
+        title: '카드는 최소 4개 이상이어야 등록 가능합니다.',
         showConfirmButton: true,
       })
       return
