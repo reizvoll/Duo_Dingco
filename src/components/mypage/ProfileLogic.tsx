@@ -46,8 +46,7 @@ export const updateUserExpAndLevel = async (
     };
   
     setUser(updatedUser);
-    console.log('레벨 및 경험치 업데이트:', updatedUser);
-  
+
     await fetch('/api/updateUser', {
       method: 'POST',
       body: JSON.stringify(updatedUser),

@@ -23,8 +23,6 @@ export default function useFetchUser() {
       const supabaseUser = sessionData.session.user;
       const userId = supabaseUser.id;
 
-      console.log('Supabase 유저 데이터:', supabaseUser);
-
       // users 테이블에서 Lv, Exp 가져오기
       const { data: userData, error: userError } = await supabase
         .from('users')
@@ -33,7 +31,6 @@ export default function useFetchUser() {
         .single();
 
       if (userError || !userData) {
-        console.error('유저 데이터 불러오기 실패:', userError);
         closeModal();
         setLoading(false);
         return;
