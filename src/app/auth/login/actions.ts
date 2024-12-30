@@ -34,7 +34,7 @@ export async function handleGoogleLogin(): Promise<{
     const supabase = await createClient()
     const { data, error: googleError } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: { redirectTo: 'https://duo-dingco-beta.vercel.app/auth/callback' },
+      options: { redirectTo: 'https://duo-dingco-beta.vercel.app/api/auth/callback' },
     })
 
     if (googleError) {
