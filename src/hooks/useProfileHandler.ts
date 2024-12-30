@@ -1,7 +1,9 @@
 import { useState } from 'react'
-import { useAuthStore } from '@/store/auth'
-import { supabase } from '@/supabase/supabaseClient'
 import Swal from 'sweetalert2'
+
+import { supabase } from '@/supabase/supabaseClient'
+
+import { useAuthStore } from '@/store/auth'
 
 export default function useProfileHandlers() {
   const { user, setUser } = useAuthStore()

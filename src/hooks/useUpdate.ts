@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
+import Swal from 'sweetalert2'
+
 import { useRouter } from 'next/navigation'
+
 import { updatePost } from '@/app/api/post/updating'
 import { deletePostById } from '@/app/api/post/deleting'
-import { PostCard } from '@/types/PostCard'
 
-import Swal from 'sweetalert2'
+import { PostCard } from '@/types/PostCard'
 
 export function useUpdate() {
   const router = useRouter()

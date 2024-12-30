@@ -1,8 +1,9 @@
 'use client'
 
+import Swal from 'sweetalert2'
+
 import { supabase } from '@/supabase/supabaseClient'
 import { useAuthStore } from '@/store/auth'
-import Swal from 'sweetalert2'
 
 export const handleLogout = async () => {
   try {

@@ -1,7 +1,10 @@
 import Link from 'next/link'
-import { GoHome } from 'react-icons/go'
+
 import ProtectedLogin from '../protected/ProtectedLogin'
 import ProtectedBookmarks from '../protected/ProtectedBookmarks'
+
+import { GoHome } from 'react-icons/go'
+
 import { handleLogout } from '../../auth/LogoutHandler'
 
 export default function HeadNav() {

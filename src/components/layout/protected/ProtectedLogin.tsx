@@ -1,9 +1,12 @@
 'use client'
 
-import Image from 'next/image'
-import { FiLogIn, FiLogOut } from 'react-icons/fi'
-import { useModalStore } from '@/store/useModalStore'
 import Swal from 'sweetalert2'
+
+import Image from 'next/image'
+
+import { FiLogIn, FiLogOut } from 'react-icons/fi'
+
+import { useModalStore } from '@/store/useModalStore'
 import { useAuthStore } from '@/store/auth'
 
 type ProtectedLoginProps = {

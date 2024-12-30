@@ -1,12 +1,16 @@
 'use client'
 
+import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useRouter } from 'next/navigation'
+
+import BookmarkedCard from './BookmarkedCard'
+
+import { FaCircleArrowLeft, FaCircleArrowRight } from 'react-icons/fa6'
+
 import { supabase } from '@/supabase/supabaseClient'
 import { useAuthStore } from '@/store/auth'
-import { FaCircleArrowLeft, FaCircleArrowRight } from 'react-icons/fa6'
-import { useState } from 'react'
-import BookmarkedCard from './BookmarkedCard'
-import { useRouter } from 'next/navigation'
+
 import { Post } from '@/types/mypageTypes'
 
 // 북마크된 게시물 데이터 조회
@@ -88,8 +92,7 @@ export default function BookmarkCardList() {
 
       // 데이터 새로고침
       queryClient.invalidateQueries({ queryKey: ['bookmarkedPosts', user?.id] })
-    } catch (error) {
-    }
+    } catch (error) {}
   }
 
   const handleGoToDetails = (id: string) => router.push(`/comment/${id}`)
@@ -104,7 +107,7 @@ export default function BookmarkCardList() {
       <h1 className="text-2xl font-semi-bold text-white mb-8 self-start">
         즐겨찾기한 카드
       </h1>
-  
+
       {/* 카드 슬라이드 */}
       <div className="flex items-center w-full gap-4">
         <button
@@ -114,7 +117,7 @@ export default function BookmarkCardList() {
         >
           <FaCircleArrowLeft size={24} />
         </button>
-  
+
         {/* 카드 목록 (왼쪽부터 렌더링) */}
         <div className="flex gap-6 overflow-x-auto scrollbar-hide">
           {bookmarkedPosts
@@ -128,7 +131,7 @@ export default function BookmarkCardList() {
               />
             ))}
         </div>
-  
+
         <button
           onClick={() =>
             currentIndex < bookmarkedPosts.length - maxVisibleCards &&

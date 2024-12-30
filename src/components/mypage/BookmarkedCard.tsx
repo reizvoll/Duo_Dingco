@@ -1,6 +1,8 @@
-import { Post } from '@/types/mypageTypes'
 import Image from 'next/image'
+
 import { FaStar, FaRegStar } from 'react-icons/fa6'
+
+import { Post } from '@/types/mypageTypes'
 
 // 북마크 카드 Props
 type BookmarkCardProps = {
@@ -22,7 +24,7 @@ export default function BookmarkedCard({
         <h2 className="text-lg font-semibold truncate mb-2 text-white">
           {post.title}
         </h2>
-  
+
         {/* 프로필 섹션 */}
         <div className="text-sm flex items-center justify-between mb-2">
           <div className="flex items-center space-x-2">
@@ -38,8 +40,8 @@ export default function BookmarkedCard({
           <button
             className="ml-4"
             onClick={(e) => {
-              e.stopPropagation();
-              onToggleBookmark(post.id);
+              e.stopPropagation()
+              onToggleBookmark(post.id)
             }}
           >
             {post.isBookmarked ? (
@@ -49,7 +51,7 @@ export default function BookmarkedCard({
             )}
           </button>
         </div>
-  
+
         {/* 단어 수 표시 */}
         <div className="flex items-center justify-center mt-6">
           <div

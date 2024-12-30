@@ -1,11 +1,14 @@
 'use client'
 
-import { useQuery } from '@tanstack/react-query'
-import { FaCircleArrowRight, FaCircleArrowLeft } from 'react-icons/fa6'
 import { useState } from 'react'
-import { fetchPostList } from '@/app/api/comment/postList'
+import { useQuery } from '@tanstack/react-query'
 import Swal from 'sweetalert2'
+
 import { useRouter } from 'next/navigation'
+
+import { FaCircleArrowRight, FaCircleArrowLeft } from 'react-icons/fa6'
+
+import { fetchPostList } from '@/app/api/comment/postList'
 
 export default function CardSlide() {
   const router = useRouter()
