@@ -1,15 +1,19 @@
 'use client'
 
 import { useState, useEffect } from 'react'
+
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+
 import { FaStar } from 'react-icons/fa6'
 import { FaRegStar } from 'react-icons/fa6'
-import { Bookmarks } from '@/types/commentTypes'
+
 import { useAuthStore } from '@/store/auth'
+
+import { Bookmarks } from '@/types/commentTypes'
+
 import { supabase } from '@/supabase/supabaseClient'
-//test중새고해도 별채워져있어야함
-// 잘들어 림졍🔥 지금부터 주석으로 하나하나 설명해줄게
+
 export default function LearnListPage() {
   //clearUser는 Zustand 스토어에서 유저 정보를 초기화(세션이 만료되거나 유효하지 않을 때)
   const { user, setUser, clearUser } = useAuthStore()
@@ -48,7 +52,6 @@ export default function LearnListPage() {
     checkSession()
   }, [router, setUser, clearUser])
 
-  console.log('user', user)
   // 2. posts 데이터 가져오기
   useEffect(() => {
     const fetchData = async () => {
@@ -73,8 +76,7 @@ export default function LearnListPage() {
           setIsPending(false) // 로딩 종료
           return
         }
-        // 이부분은 map, post, bookmark에 빨간밑줄생기는데 채채님이 클론해서 확인하신 결과, 빨간밑줄이 없다고 하셨어.
-        // 난 마우스 호버해도 타입 안뜨는데 채채님은 뜨신다~
+
         const parsedPosts = postData.map((post) => ({
           ...post,
           words:
@@ -162,15 +164,13 @@ export default function LearnListPage() {
   return (
     <div className="min-h-screen flex justify-center">
       <div className="max-w-custom w-full flex flex-col p-8 h-screen">
-        
         <div className="flex items-center justify-center w-full mt-[60px]">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
-            
             {/* 학습하기 제목 */}
             <div className="col-span-1 sm:col-span-2 lg:col-span-4 flex justify-start">
               <h1 className="text-3xl font-bold mb-[10px]">학습하기</h1>
             </div>
-  
+
             {posts.map((post) => (
               <div
                 key={post.id}
@@ -180,7 +180,7 @@ export default function LearnListPage() {
                   <h2 className="text-lg font-semibold truncate mb-2">
                     {post.title}
                   </h2>
-  
+
                   <div className="text-sm flex items-center justify-between mb-2">
                     <div className="flex items-center space-x-2">
                       <Image
@@ -195,8 +195,8 @@ export default function LearnListPage() {
                     <button
                       className="ml-4"
                       onClick={(e) => {
-                        e.stopPropagation();
-                        toggleBookmark(post.id);
+                        e.stopPropagation()
+                        toggleBookmark(post.id)
                       }}
                     >
                       {post.isBookmarked ? (
@@ -206,7 +206,7 @@ export default function LearnListPage() {
                       )}
                     </button>
                   </div>
-  
+
                   <div className="flex items-center justify-center mt-6">
                     <div
                       className="text-lg rounded-lg bg-[#282E3E] text-center text-white flex items-center justify-center

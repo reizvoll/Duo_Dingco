@@ -1,10 +1,12 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { useParams } from 'next/navigation'
-import { useAuthStore } from '@/store/auth'
+
 import CardInfo from '@/components/comment/CardInfo'
 import CardSlide from '@/components/comment/CardSlide'
-import { useEffect, useState } from 'react'
+
+import { useAuthStore } from '@/store/auth'
 
 export default function CommentPage() {
   const [isLoadingUser, setIsLoadingUser] = useState(true)
@@ -14,11 +16,10 @@ export default function CommentPage() {
 
   useEffect(() => {
     if (user) {
-      setIsLoadingUser(false) // 사용자 정보가 로드되면 로딩 상태 종료
+      setIsLoadingUser(false)
     }
   }, [user])
 
-  // 사용자 정보 또는 postId가 없을 때 처리
   if (isLoadingUser) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -27,7 +28,6 @@ export default function CommentPage() {
     )
   }
 
-  // 전역 에러 처리로 위임
   if (!user || !user.id) {
     throw new Error('User or user ID is missing')
   }

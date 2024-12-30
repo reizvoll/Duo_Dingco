@@ -1,16 +1,20 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/supabase/supabaseClient'
+
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
+
 import { FaStar } from 'react-icons/fa6'
 import { FaRegStar } from 'react-icons/fa6'
+
+import { supabase } from '@/supabase/supabaseClient'
+
 import { Bookmarks } from '@/types/commentTypes'
 import { UserData } from '@/types/user'
+
 import { useAuthStore } from '@/store/auth'
 
-// 림졍🔥 설명 더 필요하면 언제든지 말해. 그리고 에러핸들러 그냥 빼버렸어!
 export default function HotLearningPage() {
   const { user, setUser, clearUser } = useAuthStore() // Zustand 스토어에서 상태 사용
   const [posts, setPosts] = useState<Bookmarks[]>([]) // 게시글 상태
@@ -72,7 +76,7 @@ export default function HotLearningPage() {
         const { data: bookmarkData, error: bookmarkError } = await supabase
           .from('bookmarks')
           .select('post_id')
-          .eq('user_id', user?.id || '') 
+          .eq('user_id', user?.id || '')
 
         if (bookmarkError) {
           setError('북마크 데이터를 가져오는 중 오류가 발생했습니다.')
@@ -178,20 +182,18 @@ export default function HotLearningPage() {
   return (
     <div className="min-h-screen bg-[#0A092D] text-white flex justify-center">
       <div className="max-w-custom w-full flex flex-col p-8 h-screen">
-        
         <div className="flex items-center justify-center w-full mt-[60px]">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
-            
             {/* 🔥오늘 작성된 따끈~한 단어 제목 */}
             <div className="col-span-1 sm:col-span-2 lg:col-span-4 flex justify-start">
               <h1 className="text-3xl font-bold mb-[10px] pl-[10px]">
                 🔥오늘 작성된 따끈~한 단어
               </h1>
             </div>
-  
+
             {posts.map((post) => {
-              const userInfo = getUserInfo(post.user_id);
-  
+              const userInfo = getUserInfo(post.user_id)
+
               return (
                 <div
                   key={post.id}
@@ -201,7 +203,7 @@ export default function HotLearningPage() {
                     <h2 className="text-lg font-semibold truncate mb-2">
                       {post.title}
                     </h2>
-  
+
                     {/* 작성자 정보와 북마크 */}
                     <div className="text-sm flex items-center justify-between mb-2">
                       <div className="flex items-center space-x-2">
@@ -217,8 +219,8 @@ export default function HotLearningPage() {
                       <button
                         className="ml-4"
                         onClick={(e) => {
-                          e.stopPropagation();
-                          toggleBookmark(post.id);
+                          e.stopPropagation()
+                          toggleBookmark(post.id)
                         }}
                       >
                         {post.isBookmarked ? (
@@ -228,7 +230,7 @@ export default function HotLearningPage() {
                         )}
                       </button>
                     </div>
-  
+
                     {/* 단어 개수 버튼 */}
                     <div className="flex items-center justify-center mt-6">
                       <div
@@ -242,7 +244,7 @@ export default function HotLearningPage() {
                     </div>
                   </div>
                 </div>
-              );
+              )
             })}
           </div>
         </div>
