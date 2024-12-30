@@ -1,7 +1,6 @@
 'use client'
 
 import { useQuery } from '@tanstack/react-query'
-
 import { FaCircleArrowRight, FaCircleArrowLeft } from 'react-icons/fa6'
 import { useState } from 'react'
 import { fetchPostList } from '@/app/api/comment/postList'

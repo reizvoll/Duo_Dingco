@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import useFetchUser from '@/hooks/useFetchUser';
 import { useAuthStore } from '@/store/auth';
-import { AuthState } from '@/store/auth';  // AuthState 타입 사용
+import { AuthState } from '@/store/auth';
 
 // 최대 레벨 설정
 const MAX_LEVEL = 3;

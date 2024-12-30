@@ -5,10 +5,9 @@ import { supabase } from '@/supabase/supabaseClient'
 import { useAuthStore } from '@/store/auth'
 import { FaCircleArrowLeft, FaCircleArrowRight } from 'react-icons/fa6'
 import { useState } from 'react'
-
 import BookmarkedCard from './BookmarkedCard'
 import { useRouter } from 'next/navigation'
-import { Post } from '@/types/MypageTypes'
+import { Post } from '@/types/mypageTypes'
 
 // 북마크된 게시물 데이터 조회
 const fetchUserBookmarks = async (userId: string): Promise<Post[]> => {
@@ -102,21 +101,23 @@ export default function BookmarkCardList() {
     return <div className="text-white">북마크한 게시물이 없습니다.</div>
 
   return (
-    <div className="flex flex-col items-center mt-12">
-      <h1 className="text-3xl font-bold text-white mb-8">즐겨찾기한 카드</h1>
-
+    <div className="flex flex-col items-start mt-12 max-w-custom mx-auto">
+      <h1 className="text-2xl font-semi-bold text-white mb-8 self-start">
+        즐겨찾기한 카드
+      </h1>
+  
       {/* 카드 슬라이드 */}
-      <div className="flex items-center gap-4">
+      <div className="flex items-center w-full gap-4">
         <button
           onClick={() => currentIndex > 0 && setCurrentIndex(currentIndex - 1)}
           disabled={currentIndex === 0}
           className={`p-2 ${currentIndex === 0 ? 'text-gray-500' : 'text-white'}`}
         >
-          <FaCircleArrowLeft size={36} />
+          <FaCircleArrowLeft size={24} />
         </button>
-
-        {/* 카드 목록 */}
-        <div className="flex gap-6 overflow-hidden">
+  
+        {/* 카드 목록 (왼쪽부터 렌더링) */}
+        <div className="flex gap-6 overflow-x-auto scrollbar-hide">
           {bookmarkedPosts
             .slice(currentIndex, currentIndex + maxVisibleCards)
             .map((post) => (
@@ -128,7 +129,7 @@ export default function BookmarkCardList() {
               />
             ))}
         </div>
-
+  
         <button
           onClick={() =>
             currentIndex < bookmarkedPosts.length - maxVisibleCards &&
@@ -137,7 +138,7 @@ export default function BookmarkCardList() {
           disabled={currentIndex >= bookmarkedPosts.length - maxVisibleCards}
           className={`p-2 ${currentIndex >= bookmarkedPosts.length - maxVisibleCards ? 'text-gray-500' : 'text-white'}`}
         >
-          <FaCircleArrowRight size={36} />
+          <FaCircleArrowRight size={24} />
         </button>
       </div>
     </div>
