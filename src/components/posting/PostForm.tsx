@@ -17,13 +17,13 @@ export default function PostForm() {
   } = usePost()
 
   return (
-    <div className="h-screen overflow-y-auto">
-      <form
-        onSubmit={handleSubmit}
-        className="max-width-[1200px] overflow-y-auto flex items-center justify-center"
-      >
-        <div className="w-full max-w-3xl p-8 rounded-lg text-white ">
-          <h1 className="text-2xl font-bold mb-8 text-start">카드 생성하기</h1>
+    <div className="h-screen flex items-center justify-center">
+    <form
+      onSubmit={handleSubmit}
+      className="max-w-custom w-full overflow-y-auto flex flex-col items-center justify-center"
+    >
+      <div className="w-full max-w-3xl p-8 rounded-lg text-white">
+        <h1 className="text-2xl font-bold mb-8 text-start">카드 생성하기</h1>
 
           {/* 제목 부분 div */}
           <div className="mb-4">

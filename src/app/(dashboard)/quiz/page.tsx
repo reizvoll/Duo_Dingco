@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Image from 'next/image'
-import { Tables } from '@/types/database.types'
+import { Tables } from '../../../../database.types'
 import { supabase } from '@/supabase/supabaseClient'
 
 type Word = {
@@ -70,55 +70,55 @@ const QuizListPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A092D] text-white flex">
-      <div className="flex-1 ml-20 p-8 overflow-y-auto h-screen">
-        <div className="relative flex flex-col items-center justify-center">
-          <div className="absolute top-14 left-40">
-            <h1 className="text-3xl font-bold">퀴즈풀기</h1>
+    <div className="min-h-screen flex justify-center">
+    <div className="max-w-custom w-full flex flex-col p-8 h-screen">
+      
+      <div className="flex items-center justify-center w-full mt-[60px]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 items-start">
+          
+          {/* 퀴즈풀기 제목 */}
+          <div className="col-span-1 sm:col-span-2 lg:col-span-4 flex justify-start">
+            <h1 className="text-3xl font-bold mb-[10px]">퀴즈풀기</h1>
           </div>
-
-          <div className="flex items-center justify-center w-full mt-24">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {posts.map((post) => {
-                const userInfo = getUserInfo(post.user_id)
-                return (
-                  <div
-                    key={post.id}
-                    className="w-56 h-56 bg-[#2E3856] text-white rounded-lg shadow-lg cursor-pointer"
-                    onClick={() => handleNavigateToQuiz(post.id)}
-                  >
-                    <div className="w-full h-full flex flex-col p-3">
-                      <h2 className="text-lg font-semibold truncate mb-4">
-                        {post.title}
-                      </h2>
-
-                      <div className="text-sm text-gray-300 flex items-center justify-between mb-6">
-                        <div className="flex items-center space-x-2">
-                          <Image
-                            src={userInfo.img_url || '/dingco.png'}
-                            alt="Profile"
-                            width={30}
-                            height={30}
-                            className="rounded-full"
-                          />
-                          <p>{userInfo.nickname}</p>
-                        </div>
+            {posts.map((post) => {
+              const userInfo = getUserInfo(post.user_id);
+              return (
+                <div
+                  key={post.id}
+                  className="w-56 h-56 bg-[#2E3856] rounded-lg shadow-lg cursor-pointer"
+                  onClick={() => handleNavigateToQuiz(post.id)}
+                >
+                  <div className="w-full h-full flex flex-col p-6">
+                    <h2 className="text-lg font-semibold truncate mb-2">
+                      {post.title}
+                    </h2>
+  
+                    <div className="text-sm flex items-center justify-between mb-2">
+                      <div className="flex items-center space-x-2">
+                        <Image
+                          src={userInfo.img_url || '/dingco.png'}
+                          alt="Profile"
+                          width={35}
+                          height={35}
+                          className="rounded-full border"
+                        />
+                        <p>{userInfo.nickname}</p>
                       </div>
-
-                      <div className="flex items-center justify-center mt-6">
-                        <div
-                          className="text-lg rounded-lg bg-[#282E3E] text-center text-white flex items-center justify-center
-                            cursor-pointer hover:bg-[#3f475e] transition duration-300 
-                            h-14 w-28 sm:h-16 sm:w-32 md:h-18 md:w-36 lg:h-18 lg:w-36"
-                        >
-                          {Array.isArray(post.words) ? post.words.length : '알 수 없음'} 단어
-                        </div>
+                    </div>
+  
+                    <div className="flex items-center justify-center mt-6">
+                      <div
+                        className="text-lg rounded-lg bg-[#282E3E] text-center text-white flex items-center justify-center
+                          cursor-pointer hover:bg-[#3f475e] transition duration-300
+                          h-14 w-28 sm:h-16 sm:w-32 md:h-18 md:w-36 lg:h-18 lg:w-36"
+                      >
+                        {Array.isArray(post.words) ? post.words.length : '알 수 없음'} 단어
                       </div>
                     </div>
                   </div>
-                )
-              })}
-            </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

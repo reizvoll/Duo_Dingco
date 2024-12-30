@@ -1,10 +1,8 @@
 import { useState } from 'react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useRouter } from 'next/navigation'
-
 import { updatePost } from '@/app/api/post/updating'
 import { deletePostById } from '@/app/api/post/deleting'
-
 import { PostCard } from '@/types/PostCard'
 
 import Swal from 'sweetalert2'

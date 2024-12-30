@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import { useAuthStore } from '@/store/auth'
 import { supabase } from '@/supabase/supabaseClient'
+import Swal from 'sweetalert2'
 
 export default function useProfileHandlers() {
   const { user, setUser } = useAuthStore()
-  // const [nickname, setNickname] = useState(user?.nickname || '')
   const [previewImage, setPreviewImage] = useState(
     user?.img_url || '/dingco.png',
   )
@@ -13,97 +13,129 @@ export default function useProfileHandlers() {
   // 닉네임 중복 확인 및 업데이트
   const handleNicknameChange = async (nickname: string) => {
     if (nickname.trim() === '') {
-      alert('닉네임을 입력해주세요.')
+      Swal.fire({
+        icon: 'warning',
+        title: '닉네임을 입력해주세요.',
+        confirmButtonText: '확인',
+      })
       return
     }
 
     if (user) {
-      // 1. 닉네임 중복 확인
       const { data: existingUser, error: checkError } = await supabase
         .from('users')
         .select('nickname')
         .eq('nickname', nickname)
         .maybeSingle()
 
-      console.log(user.id)
-
       if (checkError) {
-        console.error('닉네임 확인 중 오류 발생:', checkError)
-        alert('서버 오류가 발생했습니다. 다시 시도해주세요.')
+        Swal.fire({
+          icon: 'error',
+          title: '서버 오류',
+          text: '서버 오류가 발생했습니다. 다시 시도해주세요.',
+          confirmButtonText: '확인',
+        })
         return
       }
 
       if (existingUser && existingUser.nickname !== user.nickname) {
-        alert('이미 존재하는 닉네임입니다. 다른 닉네임을 선택해주세요.')
+        Swal.fire({
+          icon: 'warning',
+          title: '중복된 닉네임',
+          text: '이미 존재하는 닉네임입니다. 다른 닉네임을 선택해주세요.',
+          confirmButtonText: '확인',
+        })
         return
       }
 
-      // 2. 닉네임 업데이트
       const { error: updateError } = await supabase
         .from('users')
         .update({ nickname: nickname })
         .eq('id', user.id)
 
       if (updateError) {
-        alert('닉네임 업데이트 실패')
-        console.error('닉네임 업데이트 실패:', updateError.message)
+        Swal.fire({
+          icon: 'error',
+          title: '업데이트 실패',
+          text: '닉네임 업데이트에 실패했습니다.',
+          confirmButtonText: '확인',
+        })
       } else {
         setUser({ ...user, nickname })
-        alert('닉네임이 성공적으로 변경되었습니다!')
+        Swal.fire({
+          icon: 'success',
+          title: '닉네임 변경 완료',
+          text: '닉네임이 성공적으로 변경되었습니다!',
+          confirmButtonText: '확인',
+        })
       }
     }
   }
 
-  // 프로필 이미지 업로드 및 업데이트 (얜 작동잘됨 건들 ㄴㄴ)
+  // 프로필 이미지 업로드 및 업데이트
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file && user) {
       setUploading(true)
       const filePath = `public/${user.id}/profile.jpg`
 
-      // 이미지 업로드
       const { error: uploadError } = await supabase.storage
         .from('profiles')
         .upload(filePath, file, { upsert: true })
 
       if (uploadError) {
-        alert('이미지 업로드 실패')
-        console.error('이미지 업로드 실패:', uploadError.message)
+        Swal.fire({
+          icon: 'error',
+          title: '이미지 업로드 실패',
+          text: '이미지 업로드에 실패했습니다.',
+          confirmButtonText: '확인',
+        })
         setUploading(false)
         return
       }
 
-      // 업로드된 이미지 URL 가져오기
       const { data } = supabase.storage.from('profiles').getPublicUrl(filePath)
 
       if (!data || !data.publicUrl) {
-        alert('이미지 URL을 불러오는 데 실패했습니다.')
+        Swal.fire({
+          icon: 'error',
+          title: 'URL 불러오기 실패',
+          text: '이미지 URL을 불러오는 데 실패했습니다.',
+          confirmButtonText: '확인',
+        })
         setUploading(false)
         return
       }
 
       const imageUrl = data.publicUrl
 
-      // DB 업데이트
       const { error: updateError } = await supabase
         .from('users')
         .update({ img_url: imageUrl })
         .eq('id', user.id)
 
       if (updateError) {
-        alert('프로필 이미지 업데이트 실패')
+        Swal.fire({
+          icon: 'error',
+          title: '업데이트 실패',
+          text: '프로필 이미지 업데이트에 실패했습니다.',
+          confirmButtonText: '확인',
+        })
       } else {
         setUser({ ...user, img_url: imageUrl })
         setPreviewImage(imageUrl)
-        alert('프로필 이미지가 성공적으로 업데이트되었습니다.')
+        Swal.fire({
+          icon: 'success',
+          title: '프로필 업데이트 완료',
+          text: '프로필 이미지가 성공적으로 업데이트되었습니다.',
+          confirmButtonText: '확인',
+        })
       }
       setUploading(false)
     }
   }
 
   return {
-    // nickname,
-    // setNickname,
     previewImage,
     handleImageUpload,
     handleNicknameChange,
