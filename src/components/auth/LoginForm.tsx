@@ -98,7 +98,7 @@ export default function LoginForm({
         <IoIosArrowDropleft size={30} />
       </button>
 
-      <h2 className="text-2xl font-bold text-center mt-5 text-white mb-2">
+      <h2 className="text-2xl font-bold text-center mt-10 text-white mb-4">
         로그인
       </h2>
       <p className="text-center text-gray-400 mb-12">정보를 입력해주세요.</p>
@@ -131,31 +131,32 @@ export default function LoginForm({
         </div>
       </div>
 
-      <div className="text-center mt-4 mb-6">
+      <div className="text-center mt-8">
+        <a className="text-gray-400">계정이 없으십니까?</a>
         <a
           href="/auth/signup"
-          className="text-gray-400 hover:text-blue-500 transition duration-300"
+          className="text-gray-400 hover:text-blue-500 transition duration-300 ml-8"
         >
-          계정이 없으십니까?
+          회원가입하기
         </a>
       </div>
 
-      <div className="mt-7 flex justify-center mb-7">
+      <div className="mt-8 flex justify-center ">
         <button
           type="submit"
-          className="w-3/4 bg-[#1E1E30] py-3 text-white rounded-full hover:bg-[#282847] text-center"
+          className="w-3/4 bg-[#1E1E30] py-3 rounded-full hover:bg-[#282847] text-center"
         >
           로그인
         </button>
       </div>
 
-      <div className="flex items-center justify-center mt-6">
-        <hr className="border-gray-500 w-1/4" />
+      <div className="flex items-center justify-center mt-4">
+        <hr className="border-gray-500 w-1/3" />
         <span className="text-gray-400 mx-4">또는</span>
-        <hr className="border-gray-500 w-1/4" />
+        <hr className="border-gray-500 w-1/3" />
       </div>
 
-      <div className="mt-9 flex justify-center mb-6">
+      <div className="mt-4 flex justify-center mb-6">
         {' '}
         <button
           onClick={handleGoogleAuth}
