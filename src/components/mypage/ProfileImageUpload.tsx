@@ -1,17 +1,19 @@
 'use client'
 
-import useProfileHandlers from '@/hooks/useProfileHandler';
-import Image from 'next/image';
-import { useRef } from 'react';
+import { useRef } from 'react'
+
+import Image from 'next/image'
+
+import useProfileHandlers from '@/hooks/useProfileHandler'
 
 export default function ProfileImageUpload() {
-  const { previewImage, handleImageUpload, uploading } = useProfileHandlers();
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const { previewImage, handleImageUpload, uploading } = useProfileHandlers()
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   // p 태그 클릭 시 input 클릭 트리거
   const triggerFileInput = () => {
-    fileInputRef.current?.click();
-  };
+    fileInputRef.current?.click()
+  }
 
   return (
     <div className="flex flex-col items-center">
@@ -47,5 +49,5 @@ export default function ProfileImageUpload() {
         프로필 이미지
       </p>
     </div>
-  );
+  )
 }

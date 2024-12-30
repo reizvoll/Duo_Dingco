@@ -1,8 +1,12 @@
 import { useEffect, useState } from 'react'
-import { insertPost } from '@/app/api/post/posting'
-import { PostCard } from '@/types/PostCard'
-import { useRouter } from 'next/navigation'
 import Swal from 'sweetalert2'
+
+import { useRouter } from 'next/navigation'
+
+import { insertPost } from '@/app/api/post/posting'
+
+import { PostCard } from '@/types/PostCard'
+
 import { useAuthStore } from '@/store/auth'
 
 export function usePost() {

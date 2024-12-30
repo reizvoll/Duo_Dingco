@@ -2,9 +2,11 @@
 
 import { useState } from 'react'
 import Swal from 'sweetalert2'
-import Image from 'next/image'
-import { IoIosArrowDropleft } from 'react-icons/io'
+
 import { useRouter } from 'next/navigation'
+import Image from 'next/image'
+
+import { IoIosArrowDropleft } from 'react-icons/io'
 
 export default function SignUpForm({
   action,

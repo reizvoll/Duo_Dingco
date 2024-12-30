@@ -1,14 +1,19 @@
 'use client'
 
-import { IoClose } from 'react-icons/io5'
-import { handleLogout } from '@/components/auth/LogoutHandler'
-import { useModalStore } from '@/store/useModalStore'
-import useFetchUser from '@/hooks/useFetchUser'
-import useProfileHandlers from '@/hooks/useProfileHandler'
-import { useAuthStore } from '@/store/auth'
-import ProfileImageUpload from './ProfileImageUpload'
 import NicknameInput from './NicknameInput'
+import useProfileHandlers from '@/hooks/useProfileHandler'
+
 import { useState } from 'react'
+import { IoClose } from 'react-icons/io5'
+
+import { handleLogout } from '@/components/auth/LogoutHandler'
+
+import { useModalStore } from '@/store/useModalStore'
+
+import useFetchUser from '@/hooks/useFetchUser'
+import { useAuthStore } from '@/store/auth'
+
+import ProfileImageUpload from './ProfileImageUpload'
 
 export default function MyPageModal() {
   const { isModalOpen, closeModal } = useModalStore()

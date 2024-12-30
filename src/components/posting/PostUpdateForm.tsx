@@ -1,8 +1,10 @@
 'use client'
 
-import { useUpdate } from '@/hooks/useUpdate'
 import { useEffect } from 'react'
+
 import { RiDeleteBin6Line } from 'react-icons/ri'
+
+import { useUpdate } from '@/hooks/useUpdate'
 
 export default function UpdateForm({ post }: { post: any }) {
   const {

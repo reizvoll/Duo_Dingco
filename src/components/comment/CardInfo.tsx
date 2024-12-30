@@ -1,12 +1,15 @@
 'use client'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+
 import { RiStarFill, RiStarLine } from 'react-icons/ri'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+
 import { fetchBookmarkStatus, toggleBookmark } from '@/app/api/comment/bookmark'
 import { fetchProfile } from '@/app/api/comment/fetchDataInfo'
 import { fetchPostId } from '@/app/api/post/updating'
+
 import { CardInfoProps } from '@/types/CardInfoProps'
 
 export default function CardInfo({ postId, userId }: CardInfoProps) {

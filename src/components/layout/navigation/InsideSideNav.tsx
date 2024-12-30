@@ -1,14 +1,17 @@
 'use client'
 
 import Link from 'next/link'
+import Image from 'next/image'
+
+import { useEffect, useRef, useState } from 'react'
+
 import { usePathname } from 'next/navigation'
-import React, { useEffect, useRef, useState } from 'react'
+
 import { GoHome } from 'react-icons/go'
 import { LuBookA } from 'react-icons/lu'
 import { MdOutlinePostAdd, MdOutlineQuiz } from 'react-icons/md'
 import { FaRegCircleUser } from 'react-icons/fa6'
 import { PiListBold } from 'react-icons/pi'
-import Image from 'next/image'
 import { FaHotjar } from 'react-icons/fa'
 
 interface SidebarProps {
@@ -18,10 +21,30 @@ interface SidebarProps {
 
 const MENU_ITEMS = [
   { path: '/', label: '홈', icon: <GoHome />, iconSize: 'text-4xl' },
-  { path: '/learning', label: '학습하기', icon: <LuBookA />, iconSize: 'text-4xl' },
-  { path: '/quiz', label: 'Quiz', icon: <MdOutlineQuiz />, iconSize: 'text-4xl' },
-  { path: '/create', label: '문제 생성하기', icon: <MdOutlinePostAdd />, iconSize: 'text-4xl' },
-  { path: '/hotlearning', label: '따끈-한 단어', icon: <FaHotjar />, iconSize: 'text-3xl' },  // FaHotjar만 크기 작게
+  {
+    path: '/learning',
+    label: '학습하기',
+    icon: <LuBookA />,
+    iconSize: 'text-4xl',
+  },
+  {
+    path: '/quiz',
+    label: 'Quiz',
+    icon: <MdOutlineQuiz />,
+    iconSize: 'text-4xl',
+  },
+  {
+    path: '/create',
+    label: '문제 생성하기',
+    icon: <MdOutlinePostAdd />,
+    iconSize: 'text-4xl',
+  },
+  {
+    path: '/hotlearning',
+    label: '따끈-한 단어',
+    icon: <FaHotjar />,
+    iconSize: 'text-3xl',
+  }, // FaHotjar만 크기 작게
 ]
 
 export default function InsideSideNav({
@@ -95,11 +118,13 @@ export default function InsideSideNav({
                 key={item.path}
                 href={item.path}
                 onClick={toggleMenu}
-                className={`flex items-center rounded-lg ${isActive ? 'bg-[#4A4E69]' : 'hover:bg-[#2E3143]'
-                  } ${menuIsOpen
+                className={`flex items-center rounded-lg ${
+                  isActive ? 'bg-[#4A4E69]' : 'hover:bg-[#2E3143]'
+                } ${
+                  menuIsOpen
                     ? 'w-[80%] p-3 gap-4'
                     : 'w-[60px] h-[60px] justify-center'
-                  }`}
+                }`}
               >
                 {/* 아이콘 크기 적용 부분 (iconSize로 분기 처리) */}
                 <div
@@ -111,8 +136,9 @@ export default function InsideSideNav({
                 </div>
                 {menuIsOpen && (
                   <span
-                    className={`text-xl ${isActive ? 'text-[#B4CFFA]' : 'text-[#E0E1DD]'
-                      }`}
+                    className={`text-xl ${
+                      isActive ? 'text-[#B4CFFA]' : 'text-[#E0E1DD]'
+                    }`}
                   >
                     {item.label}
                   </span>
@@ -127,20 +153,24 @@ export default function InsideSideNav({
       <div className="flex justify-start pl-4 mb-10">
         <Link
           href="/mypage"
-          className={`flex items-center rounded-lg ${selectedMenu === 'mypage' ? 'bg-[#4A4E69]' : 'hover:bg-[#2E3143]'
-            } ${menuIsOpen
+          className={`flex items-center rounded-lg ${
+            selectedMenu === 'mypage' ? 'bg-[#4A4E69]' : 'hover:bg-[#2E3143]'
+          } ${
+            menuIsOpen
               ? 'w-[80%] p-3 gap-4'
               : 'w-[60px] h-[60px] justify-center'
-            }`}
+          }`}
         >
           <FaRegCircleUser
-            className={`text-4xl ${selectedMenu === 'mypage' ? 'text-[#AFB7FF]' : 'text-[#E0E1DD]'
-              }`}
+            className={`text-4xl ${
+              selectedMenu === 'mypage' ? 'text-[#AFB7FF]' : 'text-[#E0E1DD]'
+            }`}
           />
           {menuIsOpen && (
             <span
-              className={`text-xl ${selectedMenu === 'mypage' ? 'text-[#B4CFFA]' : 'text-[#E0E1DD]'
-                }`}
+              className={`text-xl ${
+                selectedMenu === 'mypage' ? 'text-[#B4CFFA]' : 'text-[#E0E1DD]'
+              }`}
             >
               마이페이지
             </span>
