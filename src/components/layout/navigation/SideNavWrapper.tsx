@@ -12,9 +12,9 @@ export default function SideNavWrapper() {
 
   return (
     <div
-      className={`fixed top-0 left-0 h-screen shadow-lg z-50 flex flex-col items-center py-6
+      className={`h-screen shadow-lg z-50 flex flex-col items-center py-6
         transform transition-all duration-300 ease-in-out
-        ${menuIsOpen ? 'w-[280px]' : 'w-[90px]'}`}
+        ${menuIsOpen ? 'w-[240px]' : 'w-[90px]'}`}
     >
       <InsideSideNav menuIsOpen={menuIsOpen} toggleMenu={toggleMenu} />
     </div>

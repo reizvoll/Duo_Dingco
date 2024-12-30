@@ -21,5 +21,9 @@ export interface Bookmarks {
   description: string
   words: { word: string; meaning: string }[]
   user_id: string
+  users?: {
+    img_url: string | null 
+    nickname: string
+  }
   isBookmarked?: boolean
 }

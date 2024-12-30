@@ -3,16 +3,13 @@
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { RiStarFill, RiStarLine } from 'react-icons/ri'
-
 import { useQuery, useQueryClient } from '@tanstack/react-query'
-
 import { fetchBookmarkStatus, toggleBookmark } from '@/app/api/comment/bookmark'
 import { fetchProfile } from '@/app/api/comment/fetchDataInfo'
 import { fetchPostId } from '@/app/api/post/updating'
+import { CardInfoProps } from '@/types/CardInfoProps'
 
-import { cardInfoProps } from '@/types/CardInfoProps'
-
-export default function CardInfo({ postId, userId }: cardInfoProps) {
+export default function CardInfo({ postId, userId }: CardInfoProps) {
   const queryClient = useQueryClient()
   const router = useRouter()
 
@@ -109,7 +106,7 @@ export default function CardInfo({ postId, userId }: cardInfoProps) {
         </div>
 
         {/* 오른쪽 부분 세션 */}
-        <div className="w-[400px] h-[300px] flex items-center flex-col justify-center bg-gray-900 rounded-lg">
+        <div className="w-[400px] h-[300px] flex items-center flex-col justify-center bg-gray-900 rounded-lg -translate-y-10">
           <div className="w-72 h-40 bg-gray-700 rounded-lg flex items-center justify-center">
             <div className="bg-[#0A092D] text-white text-lg tracking-wide font-bold py-2 px-6 rounded-lg">
               {typeof post.words === 'string' || Array.isArray(post.words)
