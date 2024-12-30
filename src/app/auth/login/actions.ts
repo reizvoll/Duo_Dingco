@@ -13,8 +13,12 @@ export async function handleLogin(
   }
 
   const supabase = await createClient()
-  const { error } = await supabase.auth.signInWithPassword({ email, password })
-  if (error) {
+  const { error: loginError } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  })
+
+  if (loginError) {
     return { success: false, message: '이메일 또는 비밀번호가 잘못되었습니다.' }
   }
 
@@ -28,15 +32,13 @@ export async function handleGoogleLogin(): Promise<{
 }> {
   try {
     const supabase = await createClient()
-    const { data, error } = await supabase.auth.signInWithOAuth({
+    const { data, error: googleError } = await supabase.auth.signInWithOAuth({
       provider: 'google',
-      options: {
-        redirectTo: 'localhost:3000/auth/callback',
-      },
+      options: { redirectTo: 'localhost:3000/auth/callback' },
     })
 
-    if (error) {
-      return { success: false, message: error.message }
+    if (googleError) {
+      return { success: false, message: googleError.message }
     }
 
     if (data.url) {

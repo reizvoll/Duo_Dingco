@@ -46,7 +46,7 @@ export async function handleSignUp(
 
     let publicUrl: string | null = null
 
-    if (profileImage) {
+    if (profileImage && profileImage.size > 0) {
       const { error: uploadError } = await supabase.storage
         .from('profiles')
         .upload(`public/${nickname}/profile.jpg`, profileImage, {
