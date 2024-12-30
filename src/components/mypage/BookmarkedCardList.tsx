@@ -89,7 +89,6 @@ export default function BookmarkCardList() {
       // 데이터 새로고침
       queryClient.invalidateQueries({ queryKey: ['bookmarkedPosts', user?.id] })
     } catch (error) {
-      console.error('Error toggling bookmark:', error)
     }
   }
 
