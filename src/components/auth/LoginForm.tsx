@@ -159,6 +159,7 @@ export default function LoginForm({
       <div className="mt-4 flex justify-center mb-6">
         {' '}
         <button
+          type="button"
           onClick={handleGoogleAuth}
           className="flex items-center bg-white text-black px-4 py-3 rounded-full shadow hover:shadow-lg w-3/4 justify-center"
         >

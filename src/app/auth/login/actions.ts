@@ -1,7 +1,6 @@
 'use server'
 
 import { createClient } from '@/supabase/supabaseServer'
-import { error } from 'console'
 
 export async function handleLogin(
   formData: FormData,
@@ -21,7 +20,7 @@ export async function handleLogin(
 
   return { success: true, message: '로그인 성공' }
 }
-console.log(error)
+
 export async function handleGoogleLogin(): Promise<{
   success: boolean
   url?: string

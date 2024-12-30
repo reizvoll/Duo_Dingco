@@ -1,16 +1,19 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { supabase } from '@/supabase/supabaseClient'
-import { useRouter, useSearchParams } from 'next/navigation'
-import Image from 'next/image'
-import { FaStar, FaRegStar } from 'react-icons/fa'
-import { FaCircleArrowLeft, FaCircleArrowRight } from 'react-icons/fa6'
-import { Bookmarks } from '@/types/commentTypes'
-import { useAuthStore } from '@/store/auth'
 import Swal from 'sweetalert2'
 
-// 림졍🔥 여기도 설명필요해? 일단 달아볼게
+import { useRouter } from 'next/navigation'
+import Image from 'next/image'
+
+import { supabase } from '@/supabase/supabaseClient'
+
+import { FaStar, FaRegStar } from 'react-icons/fa'
+import { FaCircleArrowLeft, FaCircleArrowRight } from 'react-icons/fa6'
+
+import { Bookmarks } from '@/types/commentTypes'
+import { useAuthStore } from '@/store/auth'
+
 export default function LearnDetailPage({
   params,
 }: {
@@ -25,7 +28,6 @@ export default function LearnDetailPage({
   // 페이지 라우팅 관련
   const { id } = params // 동적 세그먼트에서 받은 게시글 ID
   const router = useRouter()
-  const searchParams = useSearchParams()
 
   // 뒤로가기 버튼 동작
   const handleBack = () => {
@@ -55,7 +57,7 @@ export default function LearnDetailPage({
         setError('게시글 데이터를 가져오는 중 오류가 발생했습니다.')
         return
       }
-      console.log('user', user)
+
       // 단어 데이터 파싱
       const parsedWords =
         typeof postData.words === 'string'
@@ -79,19 +81,11 @@ export default function LearnDetailPage({
   useEffect(() => {
     const checkSession = async () => {
       const { data, error } = await supabase.auth.getSession()
+
       if (error || !data.session) {
         clearUser() // 세션이 없으면 유저 초기화
         router.push('/auth/login')
         return
-      }
-      // 세션이 있으면 유저 정보 설정
-      const supabaseUser = data.session.user
-      if (supabaseUser) {
-        setUser({
-          id: supabaseUser.id,
-          email: supabaseUser.email,
-          img_url: supabaseUser.user_metadata?.img_url || '',
-        })
       }
     }
 
